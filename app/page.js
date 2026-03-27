@@ -13,15 +13,16 @@ export default function Home() {
   const [showAddOrder, setShowAddOrder] = useState(false)
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
+    customer_phone: '',
     product: '',
     price: '',
     note: ''
   })
 
   const supabase = createClientComponentClient({
-  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
-  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
-})
+    supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+    supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+  })
 
   // Check user on load
   useEffect(() => {
@@ -82,8 +83,14 @@ export default function Home() {
   // Add order
   const handleAddOrder = async (e) => {
     e.preventDefault()
-    if (!newOrder.customer_name || !newOrder.product || !newOrder.price) {
-      alert('Tüm alanları doldurunuz!')
+    if (!newOrder.customer_name || !newOrder.customer_phone || !newOrder.product || !newOrder.price) {
+      alert('Müşteri adı, telefon, ürün ve fiyat zorunlu!')
+      return
+    }
+
+    // Validate phone number (10 digits)
+    if (!/^\d{10}$/.test(newOrder.customer_phone)) {
+      alert('Telefon numarası 10 haneli olmalı (örn: 5551234567)')
       return
     }
 
@@ -92,6 +99,7 @@ export default function Home() {
         {
           user_id: user.id,
           customer_name: newOrder.customer_name,
+          customer_phone: newOrder.customer_phone,
           product: newOrder.product,
           price: parseFloat(newOrder.price),
           status: 'payment_pending',
@@ -100,7 +108,7 @@ export default function Home() {
       ])
 
       if (error) throw error
-      setNewOrder({ customer_name: '', product: '', price: '', note: '' })
+      setNewOrder({ customer_name: '', customer_phone: '', product: '', price: '', note: '' })
       setShowAddOrder(false)
       await fetchOrders(user.id)
     } catch (error) {
@@ -305,35 +313,46 @@ export default function Home() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <input
                 type="text"
-                placeholder="Müşteri Adı"
+                placeholder="Müşteri Adı *"
                 value={newOrder.customer_name}
                 onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
                 style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+                required
               />
               <input
                 type="text"
-                placeholder="Ürün"
-                value={newOrder.product}
-                onChange={(e) => setNewOrder({ ...newOrder, product: e.target.value })}
+                placeholder="Müşteri Telefonu (5551234567) *"
+                value={newOrder.customer_phone}
+                onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
+                maxLength="10"
                 style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+                required
               />
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' }}>
               <input
+                type="text"
+                placeholder="Ürün *"
+                value={newOrder.product}
+                onChange={(e) => setNewOrder({ ...newOrder, product: e.target.value })}
+                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+                required
+              />
+              <input
                 type="number"
-                placeholder="Fiyat (TL)"
+                placeholder="Fiyat (TL) *"
                 value={newOrder.price}
                 onChange={(e) => setNewOrder({ ...newOrder, price: e.target.value })}
                 style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
-              />
-              <input
-                type="text"
-                placeholder="Not (opsiyonel)"
-                value={newOrder.note}
-                onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
-                style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px' }}
+                required
               />
             </div>
+            <textarea
+              placeholder="Not (opsiyonel)"
+              value={newOrder.note}
+              onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
+              style={{ padding: '10px', border: '1px solid #ddd', borderRadius: '5px', fontFamily: 'Arial', width: '100%', minHeight: '80px', marginBottom: '15px' }}
+            />
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
                 type="submit"
@@ -384,6 +403,9 @@ export default function Home() {
             }}
           >
             <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>{order.customer_name}</h3>
+            <p style={{ margin: '5px 0', color: '#666', fontSize: '12px' }}>
+              📱 {order.customer_phone}
+            </p>
             <p style={{ margin: '5px 0', color: '#666' }}>
               <strong>Ürün:</strong> {order.product}
             </p>
@@ -502,25 +524,27 @@ export default function Home() {
               </button>
             </div>
 
-            {/* WhatsApp Button */}
-            <a
-              href={`https://wa.me/905354640492?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürün: ${order.product}, Fiyat: ₺${order.price}. Lütfen ödeme yapınız.`}
-              target="_blank"
-              rel="noopener noreferrer"
-              style={{
-                display: 'block',
-                textAlign: 'center',
-                padding: '10px',
-                background: '#25d366',
-                color: 'white',
-                borderRadius: '5px',
-                textDecoration: 'none',
-                fontWeight: 'bold',
-                marginTop: '10px',
-              }}
-            >
-              💬 WhatsApp Mesajı Gönder
-            </a>
+            {/* WhatsApp Button - müşteri numarasına mesaj gönder */}
+            {order.customer_phone && (
+              <a
+                href={`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürün: ${order.product}, Fiyat: ₺${order.price}. Lütfen ödeme yapınız.`}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: 'block',
+                  textAlign: 'center',
+                  padding: '10px',
+                  background: '#25d366',
+                  color: 'white',
+                  borderRadius: '5px',
+                  textDecoration: 'none',
+                  fontWeight: 'bold',
+                  marginTop: '10px',
+                }}
+              >
+                💬 WhatsApp Gönder
+              </a>
+            )}
           </div>
         ))}
       </div>
