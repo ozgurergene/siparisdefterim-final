@@ -1,14 +1,8 @@
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-
 export const metadata = {
   title: "SiparişDefterim",
 }
 
-export default async function RootLayout({ children }) {
-  const supabase = createServerComponentClient({ cookies })
-  const { data: { session } } = await supabase.auth.getSession()
-
+export default function RootLayout({ children }) {
   return (
     <html lang="tr">
       <body>{children}</body>
