@@ -40,15 +40,15 @@ export default function Home() {
       hover: '#f9fafb',
     },
     dark: {
-      bg: '#1a1a2e',
-      bgSecondary: '#16213e',
+      bg: '#0f1419',
+      bgSecondary: '#1a1f2e',
       text: '#e4e4e7',
-      textSecondary: '#a1a1aa',
-      border: '#404050',
-      header: '#0f3460',
-      input: '#16213e',
-      inputBorder: '#404050',
-      hover: '#1e2a47',
+      textSecondary: '#9ca3af',
+      border: '#2d3748',
+      header: '#131820',
+      input: '#1a1f2e',
+      inputBorder: '#2d3748',
+      hover: '#1f2937',
     }
   }
 
@@ -220,7 +220,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial', background: c.bg, color: c.text, minHeight: '100vh' }}>
+      <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial', background: c.bg, color: c.text, minHeight: '100vh', margin: 0 }}>
         <h2>Yükleniyor...</h2>
       </div>
     )
@@ -229,7 +229,7 @@ export default function Home() {
   // LOGIN PAGE
   if (!user) {
     return (
-      <div style={{ minHeight: '100vh', background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Arial', padding: '20px' }}>
+      <div style={{ minHeight: '100vh', background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Arial', padding: '20px', margin: 0 }}>
         <div style={{ maxWidth: '400px', width: '100%', padding: '40px', border: `1px solid ${c.border}`, borderRadius: '12px', background: c.header, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
             <button
@@ -352,7 +352,7 @@ export default function Home() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, transition: 'background 0.3s' }}>
+    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, transition: 'background 0.3s', margin: 0, padding: 0 }}>
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
