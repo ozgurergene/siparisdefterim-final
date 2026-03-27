@@ -1,3 +1,4 @@
+console.log('Page loaded')
 export const metadata = {
   title: "SiparişDefterim",
 }
