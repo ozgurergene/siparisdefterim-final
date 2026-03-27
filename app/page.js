@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
-import { useEffect } from 'react'
 
 export default function Home() {
   const [user, setUser] = useState(null)
