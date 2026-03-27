@@ -504,7 +504,7 @@ export default function Home() {
 
             {/* WhatsApp Button */}
             <a
-              href={`https://wa.me/905XXXXXXXXX?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürün: ${order.product}, Fiyat: ₺${order.price}. Lütfen ödeme yapınız.`}
+              href={`https://wa.me/905354640492?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürün: ${order.product}, Fiyat: ₺${order.price}. Lütfen ödeme yapınız.`}
               target="_blank"
               rel="noopener noreferrer"
               style={{
