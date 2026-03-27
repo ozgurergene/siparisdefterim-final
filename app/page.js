@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
+import { useEffect } from 'react'
 
 export default function Home() {
   const [user, setUser] = useState(null)
@@ -18,7 +19,10 @@ export default function Home() {
     note: ''
   })
 
-  const supabase = createClientComponentClient()
+  const supabase = createClientComponentClient({
+  supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
+  supabaseKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+})
 
   // Check user on load
   useEffect(() => {
