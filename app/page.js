@@ -453,10 +453,10 @@ export default function Home() {
           {/* Customer Info - Fixed */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
               <input
                 type="text"
-                placeholder="Adı"
+                placeholder="Adı Soyadı"
                 value={newOrder.customer_name}
                 onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
                 style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
@@ -588,7 +588,7 @@ export default function Home() {
               fontSize: '14px',
             }}
           >
-            📋 Sipariş Oluştur
+            ✅ Onayla
           </button>
         </div>
 
