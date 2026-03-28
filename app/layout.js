@@ -4,8 +4,23 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="tr">
-      <body>{children}</body>
+    <html lang="tr" style={{ margin: 0, padding: 0 }}>
+      <body style={{ margin: 0, padding: 0 }}>
+        <style>{`
+          * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+          }
+          html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+          }
+        `}</style>
+        {children}
+      </body>
     </html>
   )
 }
