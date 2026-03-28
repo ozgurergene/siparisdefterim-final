@@ -15,7 +15,7 @@ export default function Home() {
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
-    products: [{ product: '', quantity: 1, unit_price: '', kdv: '' }],
+    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
     note: ''
   })
 
@@ -130,6 +130,16 @@ export default function Home() {
     }
   }
 
+  // Calculate KDV amount (percentage-based)
+  const calculateKDVAmount = (product) => {
+    const quantity = parseInt(product.quantity) || 1
+    const unitPrice = parseFloat(product.unit_price) || 0
+    const subtotal = quantity * unitPrice
+    const kdvRate = parseFloat(product.kdv_rate) || 0
+    const kdvAmount = (subtotal * kdvRate) / 100
+    return kdvAmount.toFixed(2)
+  }
+
   // Calculate subtotal
   const calculateSubtotal = (product) => {
     const quantity = parseInt(product.quantity) || 1
@@ -140,8 +150,8 @@ export default function Home() {
   // Calculate line total with KDV
   const calculateLineTotal = (product) => {
     const subtotal = parseFloat(calculateSubtotal(product))
-    const kdv = parseFloat(product.kdv) || 0
-    return (subtotal + kdv).toFixed(2)
+    const kdvAmount = parseFloat(calculateKDVAmount(product))
+    return (subtotal + kdvAmount).toFixed(2)
   }
 
   // Calculate grand total
@@ -154,7 +164,7 @@ export default function Home() {
   // Calculate total KDV
   const calculateTotalKDV = () => {
     return newOrder.products.reduce((sum, product) => {
-      return sum + (parseFloat(product.kdv) || 0)
+      return sum + parseFloat(calculateKDVAmount(product))
     }, 0).toFixed(2)
   }
 
@@ -162,7 +172,7 @@ export default function Home() {
   const addProductLine = () => {
     setNewOrder({
       ...newOrder,
-      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv: '' }]
+      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv_rate: 0 }]
     })
   }
 
@@ -231,7 +241,7 @@ export default function Home() {
       setNewOrder({
         customer_name: '',
         customer_phone: '',
-        products: [{ product: '', quantity: 1, unit_price: '', kdv: '' }],
+        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
         note: ''
       })
       await fetchUserData(user.id)
@@ -541,10 +551,14 @@ export default function Home() {
                       <input
                         type="number"
                         placeholder="0"
-                        value={product.kdv}
-                        onChange={(e) => updateProductLine(index, 'kdv', e.target.value)}
+                        value={product.kdv_rate}
+                        onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)}
                         style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                       />
+                      <div style={{ fontSize: '10px', color: c.textSecondary, marginTop: '2px' }}>%</div>
+                    </td>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
+                      ₺{calculateKDVAmount(product)}
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: '#007bff' }}>
                       ₺{calculateLineTotal(product)}
