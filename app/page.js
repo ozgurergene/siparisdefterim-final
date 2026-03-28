@@ -258,20 +258,40 @@ export default function Home() {
     setEditingData({ ...editingData, products: updatedProducts })
   }
 
+  // Parse products from JSON or old format
+  const parseProducts = (order) => {
+    // Try to parse as JSON (new format)
+    if (order.products_json) {
+      try {
+        return JSON.parse(order.products_json)
+      } catch (e) {
+        console.log('Failed to parse products_json')
+      }
+    }
+
+    // Fallback to old format (parse from product string)
+    try {
+      const products = order.product.split(', ').map(p => {
+        const match = p.match(/^(.+?)\s+x(\d+)\s+\(₺([\d.]+)\)/)
+        if (match) {
+          return {
+            product: match[1],
+            quantity: parseInt(match[2]),
+            unit_price: (parseFloat(match[3]) / parseInt(match[2])).toFixed(2),
+            kdv_rate: 0
+          }
+        }
+        return { product: p, quantity: 1, unit_price: 0, kdv_rate: 0 }
+      })
+      return products
+    } catch (e) {
+      return [{ product: order.product, quantity: 1, unit_price: 0, kdv_rate: 0 }]
+    }
+  }
+
   // Start editing
   const startEditing = (order) => {
-    const products = order.product.split(', ').map(p => {
-      const match = p.match(/^(.+?)\s+x(\d+)\s+\(₺([\d.]+)\)/)
-      if (match) {
-        return {
-          product: match[1],
-          quantity: parseInt(match[2]),
-          unit_price: parseFloat(match[3]) / parseInt(match[2]),
-          kdv_rate: 0
-        }
-      }
-      return { product: p, quantity: 1, unit_price: 0, kdv_rate: 0 }
-    })
+    const products = parseProducts(order)
 
     setEditingId(order.id)
     setEditingData({
@@ -289,6 +309,7 @@ export default function Home() {
     try {
       const totalPrice = parseFloat(calculateEditGrandTotal())
       const productList = editingData.products.map(p => `${p.product} x${p.quantity} (₺${calculateLineTotal(p)})`).join(', ')
+      const productsJson = JSON.stringify(editingData.products)
 
       const { error } = await supabase
         .from('orders')
@@ -296,6 +317,7 @@ export default function Home() {
           customer_name: editingData.customer_name,
           customer_phone: editingData.customer_phone,
           product: productList,
+          products_json: productsJson,
           price: totalPrice,
           note: editingData.note,
           status: editingData.status
@@ -345,6 +367,7 @@ export default function Home() {
     try {
       const totalPrice = parseFloat(calculateGrandTotal())
       const productList = newOrder.products.map(p => `${p.product} x${p.quantity} (₺${calculateLineTotal(p)})`).join(', ')
+      const productsJson = JSON.stringify(newOrder.products)
 
       const { error } = await supabase.from('orders').insert([
         {
@@ -352,6 +375,7 @@ export default function Home() {
           customer_name: newOrder.customer_name,
           customer_phone: newOrder.customer_phone,
           product: productList,
+          products_json: productsJson,
           price: totalPrice,
           status: 'payment_pending',
           note: newOrder.note,
@@ -589,7 +613,7 @@ export default function Home() {
         <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
           <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
           
-          {/* Customer Info - Fixed */}
+          {/* Customer Info */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
