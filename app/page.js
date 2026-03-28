@@ -11,15 +11,11 @@ export default function Home() {
   const [password, setPassword] = useState('')
   const [orders, setOrders] = useState([])
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
-  const [showAddOrder, setShowAddOrder] = useState(false)
   const [theme, setTheme] = useState('light')
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
-    product: '',
-    quantity: 1,
-    unit_price: '',
-    price: '',
+    products: [{ product: '', quantity: 1, unit_price: '' }],
     note: ''
   })
 
@@ -114,7 +110,6 @@ export default function Home() {
         })
         if (error) throw new Error(error.message)
         
-        // 1 saniye bekle, sonra sayfayı yenile
         setTimeout(() => {
           window.location.reload()
         }, 1000)
@@ -135,11 +130,39 @@ export default function Home() {
     }
   }
 
-  // Calculate total price
-  const calculateTotal = () => {
-    const quantity = parseInt(newOrder.quantity) || 1
-    const unitPrice = parseFloat(newOrder.unit_price) || 0
+  // Calculate line total
+  const calculateLineTotal = (product) => {
+    const quantity = parseInt(product.quantity) || 1
+    const unitPrice = parseFloat(product.unit_price) || 0
     return (quantity * unitPrice).toFixed(2)
+  }
+
+  // Calculate grand total
+  const calculateGrandTotal = () => {
+    return newOrder.products.reduce((sum, product) => {
+      return sum + parseFloat(calculateLineTotal(product))
+    }, 0).toFixed(2)
+  }
+
+  // Add product line
+  const addProductLine = () => {
+    setNewOrder({
+      ...newOrder,
+      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '' }]
+    })
+  }
+
+  // Update product line
+  const updateProductLine = (index, field, value) => {
+    const updatedProducts = [...newOrder.products]
+    updatedProducts[index] = { ...updatedProducts[index], [field]: value }
+    setNewOrder({ ...newOrder, products: updatedProducts })
+  }
+
+  // Remove product line
+  const removeProductLine = (index) => {
+    const updatedProducts = newOrder.products.filter((_, i) => i !== index)
+    setNewOrder({ ...newOrder, products: updatedProducts })
   }
 
   // Add order
@@ -151,8 +174,8 @@ export default function Home() {
       return
     }
 
-    if (!newOrder.customer_name || !newOrder.customer_phone || !newOrder.product || !newOrder.unit_price) {
-      alert('Müşteri adı, telefon, ürün ve birim fiyat zorunlu!')
+    if (!newOrder.customer_name || !newOrder.customer_phone) {
+      alert('Müşteri adı ve telefon zorunlu!')
       return
     }
 
@@ -161,15 +184,22 @@ export default function Home() {
       return
     }
 
+    if (newOrder.products.some(p => !p.product || !p.unit_price)) {
+      alert('Tüm ürünlerin adı ve fiyatı zorunlu!')
+      return
+    }
+
     try {
-      const totalPrice = calculateTotal()
+      const totalPrice = parseFloat(calculateGrandTotal())
+      const productList = newOrder.products.map(p => `${p.product} x${p.quantity} (₺${calculateLineTotal(p)})`).join(', ')
+
       const { error } = await supabase.from('orders').insert([
         {
           user_id: user.id,
           customer_name: newOrder.customer_name,
           customer_phone: newOrder.customer_phone,
-          product: newOrder.product,
-          price: parseFloat(totalPrice),
+          product: productList,
+          price: totalPrice,
           status: 'payment_pending',
           note: newOrder.note,
         },
@@ -184,8 +214,12 @@ export default function Home() {
 
       if (updateError) throw updateError
 
-      setNewOrder({ customer_name: '', customer_phone: '', product: '', quantity: 1, unit_price: '', price: '', note: '' })
-      setShowAddOrder(false)
+      setNewOrder({
+        customer_name: '',
+        customer_phone: '',
+        products: [{ product: '', quantity: 1, unit_price: '' }],
+        note: ''
+      })
       await fetchUserData(user.id)
     } catch (error) {
       alert('Hata: ' + error.message)
@@ -229,7 +263,6 @@ export default function Home() {
     await supabase.auth.signOut()
     setUser(null)
     setOrders([])
-    setShowAddOrder(false)
   }
 
   if (loading) {
@@ -357,14 +390,6 @@ export default function Home() {
     completed: '#95e1d3',
   }
 
-  const statusLabels = {
-    payment_pending: '💰 Ödeme',
-    paid: '✅ Ödendi',
-    preparing: '📦 Hazırlaniyor',
-    shipped: '🚚 Kargoya',
-    completed: '🎉 Tamamlandı',
-  }
-
   return (
     <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, transition: 'background 0.3s', margin: 0, padding: 0 }}>
       {/* Header */}
@@ -422,10 +447,11 @@ export default function Home() {
         )}
 
         {/* Add Order Form */}
-        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflowX: 'auto' }}>
+        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
           <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', alignItems: 'end', minWidth: '700px' }}>
+          {/* Customer Info - Fixed */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
               <input
@@ -447,62 +473,95 @@ export default function Home() {
                 style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
-              <input
-                type="text"
-                placeholder="Ürün adı"
-                value={newOrder.product}
-                onChange={(e) => setNewOrder({ ...newOrder, product: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adet</label>
-              <input
-                type="number"
-                placeholder="1"
-                min="1"
-                value={newOrder.quantity}
-                onChange={(e) => setNewOrder({ ...newOrder, quantity: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Birim Fiyat</label>
-              <input
-                type="number"
-                placeholder="0"
-                value={newOrder.unit_price}
-                onChange={(e) => setNewOrder({ ...newOrder, unit_price: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Toplam Fiyat</label>
-              <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
-                ₺{calculateTotal()}
-              </div>
-            </div>
-            <button
-              onClick={handleAddOrder}
-              disabled={ordersCreatedCount >= 50}
-              style={{
-                padding: '8px 15px',
-                background: ordersCreatedCount >= 50 ? '#ccc' : '#28a745',
-                color: 'white',
-                border: 'none',
-                borderRadius: '4px',
-                cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer',
-                fontWeight: 'bold',
-                fontSize: '13px',
-                height: '38px',
-              }}
-            >
-              ➕ Ekle
-            </button>
           </div>
-          <div style={{ marginTop: '10px' }}>
+
+          {/* Product Lines */}
+          <div style={{ marginBottom: '15px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', fontSize: '11px', fontWeight: 'bold', color: c.textSecondary }}>
+              <div>Ürün</div>
+              <div style={{ textAlign: 'center' }}>Adet</div>
+              <div style={{ textAlign: 'center' }}>Birim Fiyat</div>
+              <div style={{ textAlign: 'center' }}>Toplam</div>
+              <div></div>
+            </div>
+
+            {newOrder.products.map((product, index) => (
+              <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
+                <input
+                  type="text"
+                  placeholder="Ürün adı"
+                  value={product.product}
+                  onChange={(e) => updateProductLine(index, 'product', e.target.value)}
+                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                />
+                <input
+                  type="number"
+                  placeholder="1"
+                  min="1"
+                  value={product.quantity}
+                  onChange={(e) => updateProductLine(index, 'quantity', e.target.value)}
+                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                />
+                <input
+                  type="number"
+                  placeholder="0"
+                  value={product.unit_price}
+                  onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)}
+                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                />
+                <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
+                  ₺{calculateLineTotal(product)}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => removeProductLine(index)}
+                  disabled={newOrder.products.length === 1}
+                  style={{
+                    padding: '6px 8px',
+                    background: newOrder.products.length === 1 ? '#ccc' : '#dc3545',
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: newOrder.products.length === 1 ? 'not-allowed' : 'pointer',
+                    fontWeight: 'bold',
+                    fontSize: '12px',
+                  }}
+                >
+                  🗑️
+                </button>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Product Line Button */}
+          <button
+            type="button"
+            onClick={addProductLine}
+            style={{
+              padding: '6px 10px',
+              background: '#28a745',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              fontSize: '12px',
+              marginBottom: '15px',
+            }}
+          >
+            ➕
+          </button>
+
+          {/* Grand Total */}
+          <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', marginBottom: '15px' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', color: c.text }}>
+              <span>GENEL TOPLAM:</span>
+              <span style={{ fontSize: '16px', color: '#007bff' }}>₺{calculateGrandTotal()}</span>
+            </div>
+          </div>
+
+          {/* Note */}
+          <div style={{ marginBottom: '15px' }}>
             <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
             <input
               type="text"
@@ -512,16 +571,35 @@ export default function Home() {
               style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
             />
           </div>
+
+          {/* Create Order Button */}
+          <button
+            onClick={handleAddOrder}
+            disabled={ordersCreatedCount >= 50}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: ordersCreatedCount >= 50 ? '#ccc' : '#007bff',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer',
+              fontWeight: 'bold',
+              fontSize: '14px',
+            }}
+          >
+            📋 Sipariş Oluştur
+          </button>
         </div>
 
-        {/* Orders Table - HORIZONTAL SCROLL */}
+        {/* Orders Table */}
         <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '800px' }}>
             <thead>
               <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>WhatsApp</th>
@@ -563,7 +641,7 @@ export default function Home() {
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
                     {order.customer_phone && (
                       <a
-                        href={`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürün: ${order.product}, Fiyat: ₺${order.price}. Lütfen ödeme yapınız.`}
+                        href={`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürünler: ${order.product}, Toplam: ₺${order.price}. Lütfen ödeme yapınız.`}
                         target="_blank"
                         rel="noopener noreferrer"
                         style={{
