@@ -636,16 +636,18 @@ export default function Home() {
                 style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
-              <input
-                type="text"
-                placeholder="Adres"
-                value={newOrder.customer_address}
-                onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
+          </div>
+
+          {/* Address Row */}
+          <div style={{ marginBottom: '15px' }}>
+            <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+            <input
+              type="text"
+              placeholder="Adres"
+              value={newOrder.customer_address}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
+              style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+            />
           </div>
 
           {/* Product Lines Table */}
@@ -1007,7 +1009,7 @@ export default function Home() {
             <h2 style={{ margin: '0 0 20px 0', color: c.text }}>📝 Sipariş Düzenle</h2>
 
             {/* Customer Info */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
               <div>
                 <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
                 <input
@@ -1027,15 +1029,17 @@ export default function Home() {
                   style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
                 />
               </div>
-              <div>
-                <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
-                <input
-                  type="text"
-                  value={editingData.customer_address}
-                  onChange={(e) => setEditingData({ ...editingData, customer_address: e.target.value })}
-                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
-                />
-              </div>
+            </div>
+
+            {/* Address Row */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+              <input
+                type="text"
+                value={editingData.customer_address}
+                onChange={(e) => setEditingData({ ...editingData, customer_address: e.target.value })}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
             </div>
 
             {/* Products Table */}
