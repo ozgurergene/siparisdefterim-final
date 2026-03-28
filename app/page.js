@@ -15,7 +15,7 @@ export default function Home() {
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
-    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 18 }],
+    products: [{ product: '', quantity: 1, unit_price: '', kdv: '' }],
     note: ''
   })
 
@@ -130,22 +130,18 @@ export default function Home() {
     }
   }
 
-  // Calculate KDV amount
-  const calculateKDV = (product) => {
+  // Calculate subtotal
+  const calculateSubtotal = (product) => {
     const quantity = parseInt(product.quantity) || 1
     const unitPrice = parseFloat(product.unit_price) || 0
-    const subtotal = quantity * unitPrice
-    const kdvAmount = (subtotal * product.kdv_rate) / 100
-    return kdvAmount.toFixed(2)
+    return (quantity * unitPrice).toFixed(2)
   }
 
   // Calculate line total with KDV
   const calculateLineTotal = (product) => {
-    const quantity = parseInt(product.quantity) || 1
-    const unitPrice = parseFloat(product.unit_price) || 0
-    const subtotal = quantity * unitPrice
-    const kdvAmount = parseFloat(calculateKDV(product))
-    return (subtotal + kdvAmount).toFixed(2)
+    const subtotal = parseFloat(calculateSubtotal(product))
+    const kdv = parseFloat(product.kdv) || 0
+    return (subtotal + kdv).toFixed(2)
   }
 
   // Calculate grand total
@@ -155,11 +151,18 @@ export default function Home() {
     }, 0).toFixed(2)
   }
 
+  // Calculate total KDV
+  const calculateTotalKDV = () => {
+    return newOrder.products.reduce((sum, product) => {
+      return sum + (parseFloat(product.kdv) || 0)
+    }, 0).toFixed(2)
+  }
+
   // Add product line
   const addProductLine = () => {
     setNewOrder({
       ...newOrder,
-      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv_rate: 18 }]
+      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv: '' }]
     })
   }
 
@@ -228,7 +231,7 @@ export default function Home() {
       setNewOrder({
         customer_name: '',
         customer_phone: '',
-        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 18 }],
+        products: [{ product: '', quantity: 1, unit_price: '', kdv: '' }],
         note: ''
       })
       await fetchUserData(user.id)
@@ -486,76 +489,89 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Product Lines */}
+          {/* Product Lines Table */}
           <div style={{ marginBottom: '15px', overflowX: 'auto' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 0.8fr 1fr 1fr auto', gap: '8px', marginBottom: '10px', fontSize: '11px', fontWeight: 'bold', color: c.textSecondary, minWidth: '900px' }}>
-              <div>Ürün</div>
-              <div style={{ textAlign: 'center' }}>Adet</div>
-              <div style={{ textAlign: 'center' }}>Birim Fiyat</div>
-              <div style={{ textAlign: 'center' }}>KDV %</div>
-              <div style={{ textAlign: 'center' }}>KDV Tutar</div>
-              <div style={{ textAlign: 'center' }}>Toplam</div>
-              <div></div>
-            </div>
-
-            {newOrder.products.map((product, index) => (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 0.8fr 1fr 1fr auto', gap: '8px', marginBottom: '10px', alignItems: 'end', minWidth: '900px' }}>
-                <input
-                  type="text"
-                  placeholder="Ürün adı"
-                  value={product.product}
-                  onChange={(e) => updateProductLine(index, 'product', e.target.value)}
-                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
-                />
-                <input
-                  type="number"
-                  placeholder="1"
-                  min="1"
-                  value={product.quantity}
-                  onChange={(e) => updateProductLine(index, 'quantity', e.target.value)}
-                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
-                />
-                <input
-                  type="number"
-                  placeholder="0"
-                  value={product.unit_price}
-                  onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)}
-                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
-                />
-                <select
-                  value={product.kdv_rate}
-                  onChange={(e) => updateProductLine(index, 'kdv_rate', parseFloat(e.target.value))}
-                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
-                >
-                  <option value={0}>%0</option>
-                  <option value={8}>%8</option>
-                  <option value={18}>%18</option>
-                </select>
-                <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
-                  ₺{calculateKDV(product)}
-                </div>
-                <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
-                  ₺{calculateLineTotal(product)}
-                </div>
-                <button
-                  type="button"
-                  onClick={() => removeProductLine(index)}
-                  disabled={newOrder.products.length === 1}
-                  style={{
-                    padding: '6px 8px',
-                    background: newOrder.products.length === 1 ? '#ccc' : '#dc3545',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: newOrder.products.length === 1 ? 'not-allowed' : 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '12px',
-                  }}
-                >
-                  🗑️
-                </button>
-              </div>
-            ))}
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px', fontSize: '12px' }}>
+              <thead>
+                <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
+                  <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '70px', color: c.text }}>Adet</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Birim Fiyatı</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Tutarı</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>KDV</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Toplam</th>
+                  <th style={{ padding: '10px', textAlign: 'center', width: '40px', color: c.text }}></th>
+                </tr>
+              </thead>
+              <tbody>
+                {newOrder.products.map((product, index) => (
+                  <tr key={index} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}` }}>
+                      <input
+                        type="text"
+                        placeholder="Ürün adı"
+                        value={product.product}
+                        onChange={(e) => updateProductLine(index, 'product', e.target.value)}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                      />
+                    </td>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
+                      <input
+                        type="number"
+                        placeholder="1"
+                        min="1"
+                        value={product.quantity}
+                        onChange={(e) => updateProductLine(index, 'quantity', e.target.value)}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                      />
+                    </td>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={product.unit_price}
+                        onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                      />
+                    </td>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
+                      ₺{calculateSubtotal(product)}
+                    </td>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
+                      <input
+                        type="number"
+                        placeholder="0"
+                        value={product.kdv}
+                        onChange={(e) => updateProductLine(index, 'kdv', e.target.value)}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                      />
+                    </td>
+                    <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: '#007bff' }}>
+                      ₺{calculateLineTotal(product)}
+                    </td>
+                    <td style={{ padding: '8px', textAlign: 'center' }}>
+                      <button
+                        type="button"
+                        onClick={() => removeProductLine(index)}
+                        disabled={newOrder.products.length === 1}
+                        style={{
+                          padding: '4px 6px',
+                          background: newOrder.products.length === 1 ? '#ccc' : '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: newOrder.products.length === 1 ? 'not-allowed' : 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '12px',
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
 
           {/* Add Product Line Button */}
@@ -577,11 +593,19 @@ export default function Home() {
             ➕
           </button>
 
-          {/* Grand Total */}
-          <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', marginBottom: '15px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 'bold', color: c.text }}>
-              <span>GENEL TOPLAM:</span>
-              <span style={{ fontSize: '16px', color: '#007bff' }}>₺{calculateGrandTotal()}</span>
+          {/* Summary */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '13px' }}>
+            <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+              <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutarı</div>
+              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{newOrder.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2)}</div>
+            </div>
+            <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+              <div style={{ color: c.textSecondary, marginBottom: '5px' }}>KDV</div>
+              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateTotalKDV()}</div>
+            </div>
+            <div style={{ padding: '10px', background: '#007bff', border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+              <div style={{ color: 'white', marginBottom: '5px' }}>Genel Toplam</div>
+              <div style={{ fontWeight: 'bold', color: 'white', fontSize: '16px' }}>₺{calculateGrandTotal()}</div>
             </div>
           </div>
 
