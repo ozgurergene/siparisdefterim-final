@@ -16,7 +16,14 @@ export default function Home() {
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [editingId, setEditingId] = useState(null)
-  const [editingData, setEditingData] = useState({})
+  const [editingData, setEditingData] = useState({
+    customer_name: '',
+    customer_phone: '',
+    customer_address: '',
+    products: [],
+    note: '',
+    status: 'payment_pending'
+  })
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
@@ -186,9 +193,25 @@ export default function Home() {
     }, 0).toFixed(2)
   }
 
+  // Calculate grand total for editing
+  const calculateEditGrandTotal = () => {
+    if (!editingData.products) return '0.00'
+    return editingData.products.reduce((sum, product) => {
+      return sum + parseFloat(calculateLineTotal(product))
+    }, 0).toFixed(2)
+  }
+
   // Calculate total KDV
   const calculateTotalKDV = () => {
     return newOrder.products.reduce((sum, product) => {
+      return sum + parseFloat(calculateKDVAmount(product))
+    }, 0).toFixed(2)
+  }
+
+  // Calculate total KDV for editing
+  const calculateEditTotalKDV = () => {
+    if (!editingData.products) return '0.00'
+    return editingData.products.reduce((sum, product) => {
       return sum + parseFloat(calculateKDVAmount(product))
     }, 0).toFixed(2)
   }
@@ -201,11 +224,26 @@ export default function Home() {
     })
   }
 
+  // Add product line in edit
+  const addProductLineEdit = () => {
+    setEditingData({
+      ...editingData,
+      products: [...editingData.products, { product: '', quantity: 1, unit_price: '', kdv_rate: 0 }]
+    })
+  }
+
   // Update product line
   const updateProductLine = (index, field, value) => {
     const updatedProducts = [...newOrder.products]
     updatedProducts[index] = { ...updatedProducts[index], [field]: value }
     setNewOrder({ ...newOrder, products: updatedProducts })
+  }
+
+  // Update product line in edit
+  const updateProductLineEdit = (index, field, value) => {
+    const updatedProducts = [...editingData.products]
+    updatedProducts[index] = { ...updatedProducts[index], [field]: value }
+    setEditingData({ ...editingData, products: updatedProducts })
   }
 
   // Remove product line
@@ -214,12 +252,33 @@ export default function Home() {
     setNewOrder({ ...newOrder, products: updatedProducts })
   }
 
+  // Remove product line in edit
+  const removeProductLineEdit = (index) => {
+    const updatedProducts = editingData.products.filter((_, i) => i !== index)
+    setEditingData({ ...editingData, products: updatedProducts })
+  }
+
   // Start editing
   const startEditing = (order) => {
+    const products = order.product.split(', ').map(p => {
+      const match = p.match(/^(.+?)\s+x(\d+)\s+\(₺([\d.]+)\)/)
+      if (match) {
+        return {
+          product: match[1],
+          quantity: parseInt(match[2]),
+          unit_price: parseFloat(match[3]) / parseInt(match[2]),
+          kdv_rate: 0
+        }
+      }
+      return { product: p, quantity: 1, unit_price: 0, kdv_rate: 0 }
+    })
+
     setEditingId(order.id)
     setEditingData({
       customer_name: order.customer_name,
       customer_phone: order.customer_phone,
+      customer_address: order.customer_address || '',
+      products: products,
       note: order.note,
       status: order.status
     })
@@ -228,11 +287,16 @@ export default function Home() {
   // Save edit
   const saveEdit = async () => {
     try {
+      const totalPrice = parseFloat(calculateEditGrandTotal())
+      const productList = editingData.products.map(p => `${p.product} x${p.quantity} (₺${calculateLineTotal(p)})`).join(', ')
+
       const { error } = await supabase
         .from('orders')
         .update({
           customer_name: editingData.customer_name,
           customer_phone: editingData.customer_phone,
+          product: productList,
+          price: totalPrice,
           note: editingData.note,
           status: editingData.status
         })
@@ -780,202 +844,75 @@ export default function Home() {
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '120px', color: c.text }}>İşlem</th>
               </tr>
             </thead>
             <tbody>
               {filteredOrders.map((order, index) => (
                 <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
-                    {editingId === order.id ? (
-                      <input
-                        type="text"
-                        value={editingData.customer_name}
-                        onChange={(e) => setEditingData({ ...editingData, customer_name: e.target.value })}
-                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', background: c.input, color: c.text }}
-                      />
-                    ) : (
-                      order.customer_name
-                    )}
-                  </td>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>
-                    {editingId === order.id ? (
-                      <input
-                        type="text"
-                        value={editingData.customer_phone}
-                        onChange={(e) => setEditingData({ ...editingData, customer_phone: e.target.value.replace(/\D/g, '') })}
-                        maxLength="10"
-                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', background: c.input, color: c.text }}
-                      />
-                    ) : (
-                      <>📱 {order.customer_phone}</>
-                    )}
-                  </td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {order.product.split(', ').map((prod, idx) => (
                       <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>
                         {prod}
                       </div>
                     ))}
-                    {editingId === order.id ? (
-                      <div style={{ marginTop: '8px' }}>
-                        <input
-                          type="text"
-                          placeholder="Not..."
-                          value={editingData.note}
-                          onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
-                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '11px', background: c.input, color: c.text, boxSizing: 'border-box' }}
-                        />
-                      </div>
-                    ) : (
-                      order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>
-                    )}
+                    {order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
-                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
-                    {editingId === order.id ? (
-                      <select
-                        value={editingData.status}
-                        onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
-                        style={{
-                          padding: '4px 6px',
-                          border: `2px solid ${statusColors[editingData.status]}`,
-                          background: statusColors[editingData.status],
-                          color: editingData.status === 'paid' || editingData.status === 'completed' ? '#333' : 'white',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontWeight: 'bold',
-                          fontSize: '11px',
-                        }}
-                      >
-                        <option value="payment_pending">💰 Ödeme</option>
-                        <option value="paid">✅ Ödendi</option>
-                        <option value="preparing">📦 Hazır.</option>
-                        <option value="shipped">🚚 Kargo</option>
-                        <option value="completed">🎉 Tamamlandı</option>
-                      </select>
-                    ) : (
-                      <select
-                        value={order.status}
-                        onChange={(e) => {
-                          startEditing(order)
-                          setEditingData({ ...order, status: e.target.value })
-                          setTimeout(() => {
-                            const newEditingData = { ...order, status: e.target.value }
-                            setEditingData(newEditingData)
-                            supabase.from('orders').update({ status: e.target.value }).eq('id', order.id).then(() => {
-                              setEditingId(null)
-                              fetchUserData(user.id)
-                            })
-                          }, 0)
-                        }}
-                        style={{
-                          padding: '4px 6px',
-                          border: `2px solid ${statusColors[order.status]}`,
-                          background: statusColors[order.status],
-                          color: order.status === 'paid' || order.status === 'completed' ? '#333' : 'white',
-                          borderRadius: '4px',
-                          cursor: 'pointer',
-                          fontWeight: 'bold',
-                          fontSize: '11px',
-                        }}
-                      >
-                        <option value="payment_pending">💰 Ödeme</option>
-                        <option value="paid">✅ Ödendi</option>
-                        <option value="preparing">📦 Hazır.</option>
-                        <option value="shipped">🚚 Kargo</option>
-                        <option value="completed">🎉 Tamamlandı</option>
-                      </select>
-                    )}
-                  </td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>
-                    {editingId === order.id ? (
-                      <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
-                        <button
-                          onClick={saveEdit}
-                          style={{
-                            padding: '6px 10px',
-                            background: '#28a745',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '11px',
-                          }}
-                        >
-                          ✓
-                        </button>
-                        <button
-                          onClick={cancelEdit}
-                          style={{
-                            padding: '6px 10px',
-                            background: '#6c757d',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '11px',
-                          }}
-                        >
-                          ✕
-                        </button>
-                      </div>
-                    ) : (
-                      <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
-                        <button
-                          onClick={() => startEditing(order)}
-                          style={{
-                            padding: '6px 10px',
-                            background: '#007bff',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '11px',
-                          }}
-                        >
-                          ✎
-                        </button>
-                        <button
-                          onClick={() => {
-                            if (order.customer_phone) {
-                              window.open(`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürünler: ${order.product}, Toplam: ₺${order.price}. Lütfen ödeme yapınız.`, '_blank')
-                            }
-                          }}
-                          style={{
-                            padding: '6px 10px',
-                            background: '#25d366',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '11px',
-                          }}
-                        >
-                          W
-                        </button>
-                        <button
-                          onClick={() => deleteOrder(order.id)}
-                          style={{
-                            padding: '6px 10px',
-                            background: '#dc3545',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontWeight: 'bold',
-                            fontSize: '11px',
-                          }}
-                        >
-                          🗑️
-                        </button>
-                      </div>
-                    )}
+                    <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                      <button
+                        onClick={() => startEditing(order)}
+                        style={{
+                          padding: '6px 10px',
+                          background: '#007bff',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '11px',
+                        }}
+                      >
+                        ✎ Düzenle
+                      </button>
+                      <button
+                        onClick={() => {
+                          if (order.customer_phone) {
+                            window.open(`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürünler: ${order.product}, Toplam: ₺${order.price}. Lütfen ödeme yapınız.`, '_blank')
+                          }
+                        }}
+                        style={{
+                          padding: '6px 10px',
+                          background: '#25d366',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '11px',
+                        }}
+                      >
+                        W
+                      </button>
+                      <button
+                        onClick={() => deleteOrder(order.id)}
+                        style={{
+                          padding: '6px 10px',
+                          background: '#dc3545',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '11px',
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
@@ -989,6 +926,262 @@ export default function Home() {
           </div>
         )}
       </div>
+
+      {/* Edit Modal */}
+      {editingId && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.7)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000,
+          padding: '20px',
+        }}>
+          <div style={{
+            background: c.header,
+            border: `1px solid ${c.border}`,
+            borderRadius: '8px',
+            padding: '20px',
+            maxWidth: '900px',
+            width: '100%',
+            maxHeight: '90vh',
+            overflowY: 'auto',
+            color: c.text,
+          }}>
+            <h2 style={{ margin: '0 0 20px 0', color: c.text }}>📝 Sipariş Düzenle</h2>
+
+            {/* Customer Info */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
+                <input
+                  type="text"
+                  value={editingData.customer_name}
+                  onChange={(e) => setEditingData({ ...editingData, customer_name: e.target.value })}
+                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+                <input
+                  type="text"
+                  value={editingData.customer_phone}
+                  onChange={(e) => setEditingData({ ...editingData, customer_phone: e.target.value.replace(/\D/g, '') })}
+                  maxLength="10"
+                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+                <input
+                  type="text"
+                  value={editingData.customer_address}
+                  onChange={(e) => setEditingData({ ...editingData, customer_address: e.target.value })}
+                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                />
+              </div>
+            </div>
+
+            {/* Products Table */}
+            <div style={{ marginBottom: '20px', overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+                <thead>
+                  <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
+                    <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
+                    <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '70px', color: c.text }}>Adet</th>
+                    <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Birim Fiyatı</th>
+                    <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Tutar</th>
+                    <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>KDV %</th>
+                    <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>KDV Tutarı</th>
+                    <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Toplam Tutar</th>
+                    <th style={{ padding: '10px', textAlign: 'center', width: '40px', color: c.text }}></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {editingData.products && editingData.products.map((product, index) => (
+                    <tr key={index} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}` }}>
+                        <input
+                          type="text"
+                          value={product.product}
+                          onChange={(e) => updateProductLineEdit(index, 'product', e.target.value)}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                        />
+                      </td>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
+                        <input
+                          type="number"
+                          min="1"
+                          value={product.quantity}
+                          onChange={(e) => updateProductLineEdit(index, 'quantity', e.target.value)}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                        />
+                      </td>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
+                        <input
+                          type="number"
+                          value={product.unit_price}
+                          onChange={(e) => updateProductLineEdit(index, 'unit_price', e.target.value)}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                        />
+                      </td>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
+                        ₺{calculateSubtotal(product)}
+                      </td>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: c.text }}>%</span>
+                          <input
+                            type="number"
+                            value={product.kdv_rate}
+                            onChange={(e) => updateProductLineEdit(index, 'kdv_rate', e.target.value)}
+                            style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                          />
+                        </div>
+                      </td>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
+                        ₺{calculateKDVAmount(product)}
+                      </td>
+                      <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: '#007bff' }}>
+                        ₺{calculateLineTotal(product)}
+                      </td>
+                      <td style={{ padding: '8px', textAlign: 'center' }}>
+                        <button
+                          onClick={() => removeProductLineEdit(index)}
+                          disabled={editingData.products.length === 1}
+                          style={{
+                            padding: '4px 6px',
+                            background: editingData.products.length === 1 ? '#ccc' : '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: editingData.products.length === 1 ? 'not-allowed' : 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '12px',
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Add Product Line Button */}
+            <button
+              onClick={addProductLineEdit}
+              style={{
+                padding: '6px 10px',
+                background: '#28a745',
+                color: 'white',
+                border: 'none',
+                borderRadius: '4px',
+                cursor: 'pointer',
+                fontWeight: 'bold',
+                fontSize: '12px',
+                marginBottom: '20px',
+              }}
+            >
+              ➕
+            </button>
+
+            {/* Summary */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px', fontSize: '13px' }}>
+              <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+                <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutar</div>
+                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{editingData.products ? editingData.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2) : '0.00'}</div>
+              </div>
+              <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+                <div style={{ color: c.textSecondary, marginBottom: '5px' }}>KDV</div>
+                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateEditTotalKDV()}</div>
+              </div>
+              <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+                <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '12px' }}>Toplam Tutar</div>
+                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateEditGrandTotal()}</div>
+              </div>
+            </div>
+
+            {/* Note */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
+              <input
+                type="text"
+                value={editingData.note}
+                onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+
+            {/* Status */}
+            <div style={{ marginBottom: '20px' }}>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Durum</label>
+              <select
+                value={editingData.status}
+                onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
+                style={{
+                  width: '100%',
+                  padding: '8px',
+                  border: `2px solid ${statusColors[editingData.status]}`,
+                  background: statusColors[editingData.status],
+                  color: editingData.status === 'paid' || editingData.status === 'completed' ? '#333' : 'white',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                }}
+              >
+                <option value="payment_pending">💰 Ödeme</option>
+                <option value="paid">✅ Ödendi</option>
+                <option value="preparing">📦 Hazır.</option>
+                <option value="shipped">🚚 Kargo</option>
+                <option value="completed">🎉 Tamamlandı</option>
+              </select>
+            </div>
+
+            {/* Buttons */}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button
+                onClick={saveEdit}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                }}
+              >
+                Kaydet
+              </button>
+              <button
+                onClick={cancelEdit}
+                style={{
+                  flex: 1,
+                  padding: '12px',
+                  background: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px',
+                }}
+              >
+                İptal
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
