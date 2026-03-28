@@ -450,7 +450,7 @@ export default function Home() {
                 border: `1px solid ${c.border}`,
                 borderRadius: '20px',
                 cursor: 'pointer',
-                fontSize: '18px',
+                fontSize: '19px',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '8px',
@@ -516,7 +516,7 @@ export default function Home() {
                 borderRadius: '6px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                fontSize: '16px',
+                fontSize: '17px',
               }}
             >
               {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
@@ -558,15 +558,15 @@ export default function Home() {
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <h1 style={{ margin: 0, fontSize: '24px', minWidth: '150px' }}>📱 SiparişDefterim</h1>
+          <h1 style={{ margin: 0, fontSize: '25px', minWidth: '150px' }}>📱 SiparişDefterim</h1>
           <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'right' }}>
-              <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
+              <p style={{ margin: '0 0 5px 0', fontSize: '17px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
               <div style={{ width: '150px', height: '8px', background: c.bgSecondary, borderRadius: '4px', overflow: 'hidden' }}>
                 <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : '#007bff', transition: 'width 0.3s' }} />
               </div>
             </div>
-            <span style={{ color: c.textSecondary, fontSize: '14px', minWidth: '120px' }}>{user.email}</span>
+            <span style={{ color: c.textSecondary, fontSize: '17px', minWidth: '120px' }}>{user.email}</span>
             <button
               onClick={toggleTheme}
               style={{
@@ -575,7 +575,7 @@ export default function Home() {
                 border: `1px solid ${c.border}`,
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontSize: '16px',
+                fontSize: '17px',
               }}
             >
               {theme === 'light' ? '🌙' : '☀️'}
@@ -611,48 +611,48 @@ export default function Home() {
 
         {/* Add Order Form */}
         <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
+          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '17px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
           
           {/* Customer Info */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
+              <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
               <input
                 type="text"
                 placeholder="Adı Soyadı"
                 value={newOrder.customer_name}
                 onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+              <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
               <input
                 type="text"
                 placeholder="5551234567"
                 value={newOrder.customer_phone}
                 onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
                 maxLength="10"
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
           </div>
 
           {/* Address Row */}
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+            <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
             <input
               type="text"
               placeholder="Adres"
               value={newOrder.customer_address}
               onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
-              style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
             />
           </div>
 
           {/* Product Lines Table */}
           <div style={{ marginBottom: '15px', overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px', fontSize: '12px' }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px', fontSize: '17px' }}>
               <thead>
                 <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
                   <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
@@ -674,7 +674,7 @@ export default function Home() {
                         placeholder="Ürün adı"
                         value={product.product}
                         onChange={(e) => updateProductLine(index, 'product', e.target.value)}
-                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
                       />
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
@@ -684,7 +684,7 @@ export default function Home() {
                         min="1"
                         value={product.quantity}
                         onChange={(e) => updateProductLine(index, 'quantity', e.target.value)}
-                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                       />
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
@@ -693,7 +693,7 @@ export default function Home() {
                         placeholder="0"
                         value={product.unit_price}
                         onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)}
-                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                       />
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
@@ -701,13 +701,13 @@ export default function Home() {
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
                       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: c.text }}>%</span>
+                        <span style={{ fontSize: '17px', fontWeight: 'bold', color: c.text }}>%</span>
                         <input
                           type="number"
                           placeholder="0"
                           value={product.kdv_rate}
                           onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)}
-                          style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                          style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                         />
                       </div>
                     </td>
@@ -730,7 +730,7 @@ export default function Home() {
                           borderRadius: '4px',
                           cursor: newOrder.products.length === 1 ? 'not-allowed' : 'pointer',
                           fontWeight: 'bold',
-                          fontSize: '12px',
+                          fontSize: '17px',
                         }}
                       >
                         🗑️
@@ -754,7 +754,7 @@ export default function Home() {
               borderRadius: '4px',
               cursor: 'pointer',
               fontWeight: 'bold',
-              fontSize: '12px',
+              fontSize: '17px',
               marginBottom: '15px',
             }}
           >
@@ -762,30 +762,30 @@ export default function Home() {
           </button>
 
           {/* Summary */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '13px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '17px' }}>
             <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
               <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutar</div>
-              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{newOrder.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2)}</div>
+              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '17px' }}>₺{newOrder.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2)}</div>
             </div>
             <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
               <div style={{ color: c.textSecondary, marginBottom: '5px' }}>KDV</div>
-              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateTotalKDV()}</div>
+              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '17px' }}>₺{calculateTotalKDV()}</div>
             </div>
             <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '12px' }}>Toplam Tutar</div>
-              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateGrandTotal()}</div>
+              <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '17px' }}>Toplam Tutar</div>
+              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '17px' }}>₺{calculateGrandTotal()}</div>
             </div>
           </div>
 
           {/* Note */}
           <div style={{ marginBottom: '15px' }}>
-            <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
+            <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
             <input
               type="text"
               placeholder="Özel talep, açıklama..."
               value={newOrder.note}
               onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
-              style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
             />
           </div>
 
@@ -802,7 +802,7 @@ export default function Home() {
               borderRadius: '6px',
               cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer',
               fontWeight: 'bold',
-              fontSize: '14px',
+              fontSize: '17px',
             }}
           >
             Onayla
@@ -811,27 +811,27 @@ export default function Home() {
 
         {/* Search Section */}
         <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>🔍 Sipariş Ara</h3>
+          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '17px', fontWeight: 'bold' }}>🔍 Sipariş Ara</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
+              <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
               <input
                 type="text"
                 placeholder="Adı ara..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+              <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
               <input
                 type="text"
                 placeholder="Telefon ara..."
                 value={searchPhone}
                 onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
                 maxLength="10"
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
             <div>
@@ -848,7 +848,7 @@ export default function Home() {
                   borderRadius: '4px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontSize: '13px',
+                  fontSize: '17px',
                   marginTop: '23px',
                 }}
               >
@@ -856,14 +856,14 @@ export default function Home() {
               </button>
             </div>
           </div>
-          <p style={{ margin: '10px 0 0 0', fontSize: '12px', color: c.textSecondary }}>
+          <p style={{ margin: '10px 0 0 0', fontSize: '17px', color: c.textSecondary }}>
             Bulunan: {filteredOrders.length} sipariş
           </p>
         </div>
 
         {/* Orders Table */}
         <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '800px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '17px', minWidth: '800px' }}>
             <thead>
               <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
@@ -878,7 +878,7 @@ export default function Home() {
               {filteredOrders.map((order, index) => (
                 <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '17px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {order.product.split(', ').map((prod, idx) => (
                       <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>
@@ -930,7 +930,7 @@ export default function Home() {
                           borderRadius: '4px',
                           cursor: 'pointer',
                           fontWeight: 'bold',
-                          fontSize: '11px',
+                          fontSize: '13px',
                           display: 'inline-flex',
                           alignItems: 'center',
                           gap: '4px',
@@ -939,7 +939,7 @@ export default function Home() {
                         <img 
                           src="https://dcqdgklkrjvmfjzhliph.supabase.co/storage/v1/object/sign/wp%20logo/pngwing.com.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lNjA2YmZmMy04N2Q0LTRmMjAtYjRmMC01MGRiZDM3OWI1NGYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3cCBsb2dvL3BuZ3dpbmcuY29tLnBuZyIsImlhdCI6MTc3NDcyNTQxMSwiZXhwIjoxODA2MjYxNDExfQ.p5yP8eFZijbKeH4XwfggFNDvI6vpPPsU756s2t4vZKI"
                           alt="WhatsApp"
-                          style={{ width: '14px', height: '14px' }}
+                          style={{ width: '16px', height: '16px' }}
                         />
                       </button>
                       <button
@@ -952,7 +952,7 @@ export default function Home() {
                           borderRadius: '4px',
                           cursor: 'pointer',
                           fontWeight: 'bold',
-                          fontSize: '11px',
+                          fontSize: '13px',
                         }}
                       >
                         ✎
@@ -967,7 +967,7 @@ export default function Home() {
                           borderRadius: '4px',
                           cursor: 'pointer',
                           fontWeight: 'bold',
-                          fontSize: '11px',
+                          fontSize: '13px',
                         }}
                       >
                         🗑️
@@ -1018,40 +1018,40 @@ export default function Home() {
             {/* Customer Info */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
+                <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
                 <input
                   type="text"
                   value={editingData.customer_name}
                   onChange={(e) => setEditingData({ ...editingData, customer_name: e.target.value })}
-                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
                 />
               </div>
               <div>
-                <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+                <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
                 <input
                   type="text"
                   value={editingData.customer_phone}
                   onChange={(e) => setEditingData({ ...editingData, customer_phone: e.target.value.replace(/\D/g, '') })}
                   maxLength="10"
-                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                  style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
                 />
               </div>
             </div>
 
             {/* Address Row */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+              <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
               <input
                 type="text"
                 value={editingData.customer_address}
                 onChange={(e) => setEditingData({ ...editingData, customer_address: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
 
             {/* Products Table */}
             <div style={{ marginBottom: '20px', overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '12px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '17px' }}>
                 <thead>
                   <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
                     <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
@@ -1072,7 +1072,7 @@ export default function Home() {
                           type="text"
                           value={product.product}
                           onChange={(e) => updateProductLineEdit(index, 'product', e.target.value)}
-                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
                         />
                       </td>
                       <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
@@ -1081,7 +1081,7 @@ export default function Home() {
                           min="1"
                           value={product.quantity}
                           onChange={(e) => updateProductLineEdit(index, 'quantity', e.target.value)}
-                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                         />
                       </td>
                       <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
@@ -1089,7 +1089,7 @@ export default function Home() {
                           type="number"
                           value={product.unit_price}
                           onChange={(e) => updateProductLineEdit(index, 'unit_price', e.target.value)}
-                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                         />
                       </td>
                       <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
@@ -1097,12 +1097,12 @@ export default function Home() {
                       </td>
                       <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
-                          <span style={{ fontSize: '12px', fontWeight: 'bold', color: c.text }}>%</span>
+                          <span style={{ fontSize: '17px', fontWeight: 'bold', color: c.text }}>%</span>
                           <input
                             type="number"
                             value={product.kdv_rate}
                             onChange={(e) => updateProductLineEdit(index, 'kdv_rate', e.target.value)}
-                            style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                            style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                           />
                         </div>
                       </td>
@@ -1124,7 +1124,7 @@ export default function Home() {
                             borderRadius: '4px',
                             cursor: editingData.products.length === 1 ? 'not-allowed' : 'pointer',
                             fontWeight: 'bold',
-                            fontSize: '12px',
+                            fontSize: '17px',
                           }}
                         >
                           🗑️
@@ -1147,7 +1147,7 @@ export default function Home() {
                 borderRadius: '4px',
                 cursor: 'pointer',
                 fontWeight: 'bold',
-                fontSize: '12px',
+                fontSize: '17px',
                 marginBottom: '20px',
               }}
             >
@@ -1155,29 +1155,29 @@ export default function Home() {
             </button>
 
             {/* Summary */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px', fontSize: '13px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '20px', fontSize: '17px' }}>
               <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
                 <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutar</div>
-                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{editingData.products ? editingData.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2) : '0.00'}</div>
+                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '17px' }}>₺{editingData.products ? editingData.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2) : '0.00'}</div>
               </div>
               <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
                 <div style={{ color: c.textSecondary, marginBottom: '5px' }}>KDV</div>
-                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateEditTotalKDV()}</div>
+                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '17px' }}>₺{calculateEditTotalKDV()}</div>
               </div>
               <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
-                <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '12px' }}>Toplam Tutar</div>
-                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateEditGrandTotal()}</div>
+                <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '17px' }}>Toplam Tutar</div>
+                <div style={{ fontWeight: 'bold', color: c.text, fontSize: '17px' }}>₺{calculateEditGrandTotal()}</div>
               </div>
             </div>
 
             {/* Note */}
             <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
+              <label style={{ display: 'block', fontSize: '17px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
               <input
                 type="text"
                 value={editingData.note}
                 onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '17px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
 
@@ -1194,7 +1194,7 @@ export default function Home() {
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontSize: '14px',
+                  fontSize: '17px',
                 }}
               >
                 Kaydet
@@ -1210,7 +1210,7 @@ export default function Home() {
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontSize: '14px',
+                  fontSize: '17px',
                 }}
               >
                 İptal
