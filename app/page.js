@@ -654,9 +654,9 @@ export default function Home() {
               <div style={{ color: c.textSecondary, marginBottom: '5px' }}>KDV</div>
               <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateTotalKDV()}</div>
             </div>
-            <div style={{ padding: '10px', background: '#007bff', border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ color: 'white', marginBottom: '5px', fontSize: '12px' }}>Toplam Tutar</div>
-              <div style={{ fontWeight: 'bold', color: 'white', fontSize: '16px' }}>₺{calculateGrandTotal()}</div>
+            <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
+              <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '12px' }}>Toplam Tutar</div>
+              <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateGrandTotal()}</div>
             </div>
           </div>
 
