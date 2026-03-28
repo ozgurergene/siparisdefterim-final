@@ -111,6 +111,13 @@ export default function Home() {
           password,
         })
         if (error) throw new Error(error.message)
+        
+        // Session'ı kontrol et
+        const { data: newSession } = await supabase.auth.getSession()
+        if (newSession?.session?.user) {
+          setUser(newSession.session.user)
+          await fetchUserData(newSession.session.user.id)
+        }
       } else {
         const { error } = await supabase.auth.signUp({
           email,
