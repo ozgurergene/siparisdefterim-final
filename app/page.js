@@ -613,7 +613,7 @@ export default function Home() {
           {/* Summary */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '13px' }}>
             <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutarı</div>
+              <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutar</div>
               <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{newOrder.products.reduce((sum, p) => sum + parseFloat(calculateSubtotal(p)), 0).toFixed(2)}</div>
             </div>
             <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
