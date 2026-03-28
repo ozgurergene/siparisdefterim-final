@@ -508,8 +508,9 @@ export default function Home() {
                   <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '70px', color: c.text }}>Adet</th>
                   <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Birim Fiyatı</th>
                   <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Tutarı</th>
-                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>KDV</th>
-                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Toplam</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>KDV %</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>KDV Tutarı</th>
+                  <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>KDV Toplam</th>
                   <th style={{ padding: '10px', textAlign: 'center', width: '40px', color: c.text }}></th>
                 </tr>
               </thead>
@@ -548,14 +549,16 @@ export default function Home() {
                       ₺{calculateSubtotal(product)}
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
-                      <input
-                        type="number"
-                        placeholder="0"
-                        value={product.kdv_rate}
-                        onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)}
-                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
-                      />
-                      <div style={{ fontSize: '10px', color: c.textSecondary, marginTop: '2px' }}>%</div>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '4px' }}>
+                        <span style={{ fontSize: '12px', fontWeight: 'bold', color: c.text }}>%</span>
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={product.kdv_rate}
+                          onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)}
+                          style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '12px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                        />
+                      </div>
                     </td>
                     <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>
                       ₺{calculateKDVAmount(product)}
@@ -618,7 +621,7 @@ export default function Home() {
               <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateTotalKDV()}</div>
             </div>
             <div style={{ padding: '10px', background: '#007bff', border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
-              <div style={{ color: 'white', marginBottom: '5px' }}>Genel Toplam</div>
+              <div style={{ color: 'white', marginBottom: '5px', fontSize: '12px' }}>Toplam Tutar</div>
               <div style={{ fontWeight: 'bold', color: 'white', fontSize: '16px' }}>₺{calculateGrandTotal()}</div>
             </div>
           </div>
