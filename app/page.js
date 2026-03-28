@@ -15,7 +15,7 @@ export default function Home() {
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
-    products: [{ product: '', quantity: 1, unit_price: '' }],
+    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 18 }],
     note: ''
   })
 
@@ -130,11 +130,22 @@ export default function Home() {
     }
   }
 
-  // Calculate line total
+  // Calculate KDV amount
+  const calculateKDV = (product) => {
+    const quantity = parseInt(product.quantity) || 1
+    const unitPrice = parseFloat(product.unit_price) || 0
+    const subtotal = quantity * unitPrice
+    const kdvAmount = (subtotal * product.kdv_rate) / 100
+    return kdvAmount.toFixed(2)
+  }
+
+  // Calculate line total with KDV
   const calculateLineTotal = (product) => {
     const quantity = parseInt(product.quantity) || 1
     const unitPrice = parseFloat(product.unit_price) || 0
-    return (quantity * unitPrice).toFixed(2)
+    const subtotal = quantity * unitPrice
+    const kdvAmount = parseFloat(calculateKDV(product))
+    return (subtotal + kdvAmount).toFixed(2)
   }
 
   // Calculate grand total
@@ -148,7 +159,7 @@ export default function Home() {
   const addProductLine = () => {
     setNewOrder({
       ...newOrder,
-      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '' }]
+      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv_rate: 18 }]
     })
   }
 
@@ -217,7 +228,7 @@ export default function Home() {
       setNewOrder({
         customer_name: '',
         customer_phone: '',
-        products: [{ product: '', quantity: 1, unit_price: '' }],
+        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 18 }],
         note: ''
       })
       await fetchUserData(user.id)
@@ -476,17 +487,19 @@ export default function Home() {
           </div>
 
           {/* Product Lines */}
-          <div style={{ marginBottom: '15px' }}>
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', fontSize: '11px', fontWeight: 'bold', color: c.textSecondary }}>
+          <div style={{ marginBottom: '15px', overflowX: 'auto' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 0.8fr 1fr 1fr auto', gap: '8px', marginBottom: '10px', fontSize: '11px', fontWeight: 'bold', color: c.textSecondary, minWidth: '900px' }}>
               <div>Ürün</div>
               <div style={{ textAlign: 'center' }}>Adet</div>
               <div style={{ textAlign: 'center' }}>Birim Fiyat</div>
+              <div style={{ textAlign: 'center' }}>KDV %</div>
+              <div style={{ textAlign: 'center' }}>KDV Tutar</div>
               <div style={{ textAlign: 'center' }}>Toplam</div>
               <div></div>
             </div>
 
             {newOrder.products.map((product, index) => (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 1fr 1fr 1fr auto', gap: '10px', marginBottom: '10px', alignItems: 'end' }}>
+              <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 0.8fr 1fr 0.8fr 1fr 1fr auto', gap: '8px', marginBottom: '10px', alignItems: 'end', minWidth: '900px' }}>
                 <input
                   type="text"
                   placeholder="Ürün adı"
@@ -509,6 +522,18 @@ export default function Home() {
                   onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)}
                   style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
                 />
+                <select
+                  value={product.kdv_rate}
+                  onChange={(e) => updateProductLine(index, 'kdv_rate', parseFloat(e.target.value))}
+                  style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }}
+                >
+                  <option value={0}>%0</option>
+                  <option value={8}>%8</option>
+                  <option value={18}>%18</option>
+                </select>
+                <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
+                  ₺{calculateKDV(product)}
+                </div>
                 <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
                   ₺{calculateLineTotal(product)}
                 </div>
