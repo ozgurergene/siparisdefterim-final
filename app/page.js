@@ -71,7 +71,7 @@ export default function Home() {
       setLoading(false)
     }
     checkUser()
-  }, [supabase])
+  }, [])
 
   // Fetch user data and orders
   const fetchUserData = async (userId) => {
