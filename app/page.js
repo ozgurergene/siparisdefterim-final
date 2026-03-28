@@ -40,15 +40,15 @@ export default function Home() {
       hover: '#f9fafb',
     },
     dark: {
-      bg: '#0f1419',
-      bgSecondary: '#1a1f2e',
-      text: '#e4e4e7',
-      textSecondary: '#9ca3af',
-      border: '#2d3748',
-      header: '#131820',
-      input: '#1a1f2e',
-      inputBorder: '#2d3748',
-      hover: '#1f2937',
+      bg: '#1a1a1a',
+      bgSecondary: '#2d2d2d',
+      text: '#e0e0e0',
+      textSecondary: '#b0b0b0',
+      border: '#3a3a3a',
+      header: '#252525',
+      input: '#2d2d2d',
+      inputBorder: '#3a3a3a',
+      hover: '#333333',
     }
   }
 
