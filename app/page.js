@@ -890,13 +890,9 @@ export default function Home() {
                     <select
                       value={order.status}
                       onChange={(e) => {
-                        startEditing(order)
-                        setEditingData(prev => ({ ...prev, status: e.target.value }))
-                        setTimeout(() => {
-                          supabase.from('orders').update({ status: e.target.value }).eq('id', order.id).then(() => {
-                            fetchUserData(user.id)
-                          })
-                        }, 0)
+                        supabase.from('orders').update({ status: e.target.value }).eq('id', order.id).then(() => {
+                          fetchUserData(user.id)
+                        })
                       }}
                       style={{
                         padding: '4px 6px',
