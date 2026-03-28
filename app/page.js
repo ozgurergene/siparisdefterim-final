@@ -112,12 +112,10 @@ export default function Home() {
         })
         if (error) throw new Error(error.message)
         
-        // Session'ı kontrol et
-        const { data: newSession } = await supabase.auth.getSession()
-        if (newSession?.session?.user) {
-          setUser(newSession.session.user)
-          await fetchUserData(newSession.session.user.id)
-        }
+        // 1 saniye bekle, sonra sayfayı yenile
+        setTimeout(() => {
+          window.location.reload()
+        }, 1000)
       } else {
         const { error } = await supabase.auth.signUp({
           email,
@@ -131,7 +129,6 @@ export default function Home() {
       setPassword('')
     } catch (error) {
       alert('Hata: ' + error.message)
-    } finally {
       setLoading(false)
     }
   }
