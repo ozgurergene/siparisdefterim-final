@@ -868,6 +868,7 @@ export default function Home() {
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '120px', color: c.text }}>İşlem</th>
               </tr>
             </thead>
@@ -885,6 +886,36 @@ export default function Home() {
                     {order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
+                    <select
+                      value={order.status}
+                      onChange={(e) => {
+                        startEditing(order)
+                        setEditingData(prev => ({ ...prev, status: e.target.value }))
+                        setTimeout(() => {
+                          supabase.from('orders').update({ status: e.target.value }).eq('id', order.id).then(() => {
+                            fetchUserData(user.id)
+                          })
+                        }, 0)
+                      }}
+                      style={{
+                        padding: '4px 6px',
+                        border: `2px solid ${statusColors[order.status]}`,
+                        background: statusColors[order.status],
+                        color: order.status === 'paid' || order.status === 'completed' ? '#333' : 'white',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '11px',
+                      }}
+                    >
+                      <option value="payment_pending">💰 Ödeme</option>
+                      <option value="paid">✅ Ödendi</option>
+                      <option value="preparing">📦 Hazır.</option>
+                      <option value="shipped">🚚 Kargo</option>
+                      <option value="completed">🎉 Tamamlandı</option>
+                    </select>
+                  </td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>
                     <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
                       <button
