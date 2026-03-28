@@ -17,6 +17,8 @@ export default function Home() {
     customer_name: '',
     customer_phone: '',
     product: '',
+    quantity: 1,
+    unit_price: '',
     price: '',
     note: ''
   })
@@ -133,6 +135,13 @@ export default function Home() {
     }
   }
 
+  // Calculate total price
+  const calculateTotal = () => {
+    const quantity = parseInt(newOrder.quantity) || 1
+    const unitPrice = parseFloat(newOrder.unit_price) || 0
+    return (quantity * unitPrice).toFixed(2)
+  }
+
   // Add order
   const handleAddOrder = async (e) => {
     e.preventDefault()
@@ -142,8 +151,8 @@ export default function Home() {
       return
     }
 
-    if (!newOrder.customer_name || !newOrder.customer_phone || !newOrder.product || !newOrder.price) {
-      alert('Müşteri adı, telefon, ürün ve fiyat zorunlu!')
+    if (!newOrder.customer_name || !newOrder.customer_phone || !newOrder.product || !newOrder.unit_price) {
+      alert('Müşteri adı, telefon, ürün ve birim fiyat zorunlu!')
       return
     }
 
@@ -153,13 +162,14 @@ export default function Home() {
     }
 
     try {
+      const totalPrice = calculateTotal()
       const { error } = await supabase.from('orders').insert([
         {
           user_id: user.id,
           customer_name: newOrder.customer_name,
           customer_phone: newOrder.customer_phone,
           product: newOrder.product,
-          price: parseFloat(newOrder.price),
+          price: parseFloat(totalPrice),
           status: 'payment_pending',
           note: newOrder.note,
         },
@@ -174,7 +184,7 @@ export default function Home() {
 
       if (updateError) throw updateError
 
-      setNewOrder({ customer_name: '', customer_phone: '', product: '', price: '', note: '' })
+      setNewOrder({ customer_name: '', customer_phone: '', product: '', quantity: 1, unit_price: '', price: '', note: '' })
       setShowAddOrder(false)
       await fetchUserData(user.id)
     } catch (error) {
@@ -413,7 +423,9 @@ export default function Home() {
 
         {/* Add Order Form */}
         <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflowX: 'auto' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', alignItems: 'end', minWidth: '600px' }}>
+          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
+          
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', alignItems: 'end', minWidth: '700px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
               <input
@@ -446,14 +458,31 @@ export default function Home() {
               />
             </div>
             <div>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Fiyat</label>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adet</label>
+              <input
+                type="number"
+                placeholder="1"
+                min="1"
+                value={newOrder.quantity}
+                onChange={(e) => setNewOrder({ ...newOrder, quantity: e.target.value })}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Birim Fiyat</label>
               <input
                 type="number"
                 placeholder="0"
-                value={newOrder.price}
-                onChange={(e) => setNewOrder({ ...newOrder, price: e.target.value })}
+                value={newOrder.unit_price}
+                onChange={(e) => setNewOrder({ ...newOrder, unit_price: e.target.value })}
                 style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Toplam Fiyat</label>
+              <div style={{ padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', background: c.bgSecondary, color: c.text, fontWeight: 'bold', textAlign: 'center' }}>
+                ₺{calculateTotal()}
+              </div>
             </div>
             <button
               onClick={handleAddOrder}
@@ -467,6 +496,7 @@ export default function Home() {
                 cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer',
                 fontWeight: 'bold',
                 fontSize: '13px',
+                height: '38px',
               }}
             >
               ➕ Ekle
