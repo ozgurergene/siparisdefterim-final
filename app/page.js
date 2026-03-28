@@ -677,9 +677,13 @@ export default function Home() {
                 <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
-                    {order.product}
-                    {order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '3px' }}>Not: {order.note}</div>}
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {order.product.split(', ').map((prod, idx) => (
+                      <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>
+                        {prod}
+                      </div>
+                    ))}
+                    {order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
