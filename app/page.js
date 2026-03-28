@@ -15,6 +15,8 @@ export default function Home() {
   const [theme, setTheme] = useState('light')
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
+  const [editingId, setEditingId] = useState(null)
+  const [editingData, setEditingData] = useState({})
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
@@ -212,6 +214,46 @@ export default function Home() {
     setNewOrder({ ...newOrder, products: updatedProducts })
   }
 
+  // Start editing
+  const startEditing = (order) => {
+    setEditingId(order.id)
+    setEditingData({
+      customer_name: order.customer_name,
+      customer_phone: order.customer_phone,
+      note: order.note,
+      status: order.status
+    })
+  }
+
+  // Save edit
+  const saveEdit = async () => {
+    try {
+      const { error } = await supabase
+        .from('orders')
+        .update({
+          customer_name: editingData.customer_name,
+          customer_phone: editingData.customer_phone,
+          note: editingData.note,
+          status: editingData.status
+        })
+        .eq('id', editingId)
+
+      if (error) throw error
+      
+      setEditingId(null)
+      setEditingData({})
+      await fetchUserData(user.id)
+    } catch (error) {
+      alert('Hata: ' + error.message)
+    }
+  }
+
+  // Cancel edit
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditingData({})
+  }
+
   // Add order
   const handleAddOrder = async (e) => {
     e.preventDefault()
@@ -268,21 +310,6 @@ export default function Home() {
         products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
         note: ''
       })
-      await fetchUserData(user.id)
-    } catch (error) {
-      alert('Hata: ' + error.message)
-    }
-  }
-
-  // Update order status
-  const updateOrderStatus = async (orderId, newStatus) => {
-    try {
-      const { error } = await supabase
-        .from('orders')
-        .update({ status: newStatus })
-        .eq('id', orderId)
-
-      if (error) throw error
       await fetchUserData(user.id)
     } catch (error) {
       alert('Hata: ' + error.message)
@@ -754,83 +781,201 @@ export default function Home() {
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>WhatsApp</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '50px', color: c.text }}>Sil</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '120px', color: c.text }}>İşlem</th>
               </tr>
             </thead>
             <tbody>
               {filteredOrders.map((order, index) => (
                 <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
+                    {editingId === order.id ? (
+                      <input
+                        type="text"
+                        value={editingData.customer_name}
+                        onChange={(e) => setEditingData({ ...editingData, customer_name: e.target.value })}
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', background: c.input, color: c.text }}
+                      />
+                    ) : (
+                      order.customer_name
+                    )}
+                  </td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>
+                    {editingId === order.id ? (
+                      <input
+                        type="text"
+                        value={editingData.customer_phone}
+                        onChange={(e) => setEditingData({ ...editingData, customer_phone: e.target.value.replace(/\D/g, '') })}
+                        maxLength="10"
+                        style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', background: c.input, color: c.text }}
+                      />
+                    ) : (
+                      <>📱 {order.customer_phone}</>
+                    )}
+                  </td>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                     {order.product.split(', ').map((prod, idx) => (
                       <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>
                         {prod}
                       </div>
                     ))}
-                    {order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
+                    {editingId === order.id ? (
+                      <div style={{ marginTop: '8px' }}>
+                        <input
+                          type="text"
+                          placeholder="Not..."
+                          value={editingData.note}
+                          onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
+                          style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '11px', background: c.input, color: c.text, boxSizing: 'border-box' }}
+                        />
+                      </div>
+                    ) : (
+                      order.note && <div style={{ fontSize: '11px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>
+                    )}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
-                    <select
-                      value={order.status}
-                      onChange={(e) => updateOrderStatus(order.id, e.target.value)}
-                      style={{
-                        padding: '4px 6px',
-                        border: `2px solid ${statusColors[order.status]}`,
-                        background: statusColors[order.status],
-                        color: order.status === 'paid' || order.status === 'completed' ? '#333' : 'white',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '11px',
-                      }}
-                    >
-                      <option value="payment_pending">💰 Ödeme</option>
-                      <option value="paid">✅ Ödendi</option>
-                      <option value="preparing">📦 Hazır.</option>
-                      <option value="shipped">🚚 Kargo</option>
-                      <option value="completed">🎉 Tamamlandı</option>
-                    </select>
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
-                    {order.customer_phone && (
-                      <a
-                        href={`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürünler: ${order.product}, Toplam: ₺${order.price}. Lütfen ödeme yapınız.`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                    {editingId === order.id ? (
+                      <select
+                        value={editingData.status}
+                        onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
                         style={{
-                          display: 'inline-block',
-                          padding: '6px 12px',
-                          background: '#25d366',
-                          color: 'white',
+                          padding: '4px 6px',
+                          border: `2px solid ${statusColors[editingData.status]}`,
+                          background: statusColors[editingData.status],
+                          color: editingData.status === 'paid' || editingData.status === 'completed' ? '#333' : 'white',
                           borderRadius: '4px',
-                          textDecoration: 'none',
+                          cursor: 'pointer',
                           fontWeight: 'bold',
                           fontSize: '11px',
                         }}
                       >
-                        WhatsApp
-                      </a>
+                        <option value="payment_pending">💰 Ödeme</option>
+                        <option value="paid">✅ Ödendi</option>
+                        <option value="preparing">📦 Hazır.</option>
+                        <option value="shipped">🚚 Kargo</option>
+                        <option value="completed">🎉 Tamamlandı</option>
+                      </select>
+                    ) : (
+                      <select
+                        value={order.status}
+                        onChange={(e) => {
+                          startEditing(order)
+                          setEditingData({ ...order, status: e.target.value })
+                          setTimeout(() => {
+                            const newEditingData = { ...order, status: e.target.value }
+                            setEditingData(newEditingData)
+                            supabase.from('orders').update({ status: e.target.value }).eq('id', order.id).then(() => {
+                              setEditingId(null)
+                              fetchUserData(user.id)
+                            })
+                          }, 0)
+                        }}
+                        style={{
+                          padding: '4px 6px',
+                          border: `2px solid ${statusColors[order.status]}`,
+                          background: statusColors[order.status],
+                          color: order.status === 'paid' || order.status === 'completed' ? '#333' : 'white',
+                          borderRadius: '4px',
+                          cursor: 'pointer',
+                          fontWeight: 'bold',
+                          fontSize: '11px',
+                        }}
+                      >
+                        <option value="payment_pending">💰 Ödeme</option>
+                        <option value="paid">✅ Ödendi</option>
+                        <option value="preparing">📦 Hazır.</option>
+                        <option value="shipped">🚚 Kargo</option>
+                        <option value="completed">🎉 Tamamlandı</option>
+                      </select>
                     )}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center' }}>
-                    <button
-                      onClick={() => deleteOrder(order.id)}
-                      style={{
-                        padding: '6px 10px',
-                        background: '#dc3545',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        fontWeight: 'bold',
-                        fontSize: '11px',
-                      }}
-                    >
-                      🗑️
-                    </button>
+                    {editingId === order.id ? (
+                      <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                        <button
+                          onClick={saveEdit}
+                          style={{
+                            padding: '6px 10px',
+                            background: '#28a745',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '11px',
+                          }}
+                        >
+                          ✓
+                        </button>
+                        <button
+                          onClick={cancelEdit}
+                          style={{
+                            padding: '6px 10px',
+                            background: '#6c757d',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '11px',
+                          }}
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ) : (
+                      <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                        <button
+                          onClick={() => startEditing(order)}
+                          style={{
+                            padding: '6px 10px',
+                            background: '#007bff',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '11px',
+                          }}
+                        >
+                          ✎
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (order.customer_phone) {
+                              window.open(`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş oluşturdunuz. Ürünler: ${order.product}, Toplam: ₺${order.price}. Lütfen ödeme yapınız.`, '_blank')
+                            }
+                          }}
+                          style={{
+                            padding: '6px 10px',
+                            background: '#25d366',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '11px',
+                          }}
+                        >
+                          W
+                        </button>
+                        <button
+                          onClick={() => deleteOrder(order.id)}
+                          style={{
+                            padding: '6px 10px',
+                            background: '#dc3545',
+                            color: 'white',
+                            border: 'none',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            fontWeight: 'bold',
+                            fontSize: '11px',
+                          }}
+                        >
+                          🗑️
+                        </button>
+                      </div>
+                    )}
                   </td>
                 </tr>
               ))}
