@@ -10,11 +10,15 @@ export default function Home() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [orders, setOrders] = useState([])
+  const [filteredOrders, setFilteredOrders] = useState([])
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [theme, setTheme] = useState('light')
+  const [searchName, setSearchName] = useState('')
+  const [searchPhone, setSearchPhone] = useState('')
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
+    customer_address: '',
     products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
     note: ''
   })
@@ -70,6 +74,25 @@ export default function Home() {
     }
     checkUser()
   }, [])
+
+  // Real-time filter
+  useEffect(() => {
+    let filtered = orders
+    
+    if (searchName.trim()) {
+      filtered = filtered.filter(order => 
+        order.customer_name.toLowerCase().includes(searchName.toLowerCase())
+      )
+    }
+    
+    if (searchPhone.trim()) {
+      filtered = filtered.filter(order => 
+        order.customer_phone.includes(searchPhone)
+      )
+    }
+    
+    setFilteredOrders(filtered)
+  }, [searchName, searchPhone, orders])
 
   // Fetch user data and orders
   const fetchUserData = async (userId) => {
@@ -198,8 +221,8 @@ export default function Home() {
       return
     }
 
-    if (!newOrder.customer_name || !newOrder.customer_phone) {
-      alert('Müşteri adı ve telefon zorunlu!')
+    if (!newOrder.customer_name || !newOrder.customer_phone || !newOrder.customer_address) {
+      alert('Müşteri adı, telefon ve adres zorunlu!')
       return
     }
 
@@ -241,6 +264,7 @@ export default function Home() {
       setNewOrder({
         customer_name: '',
         customer_phone: '',
+        customer_address: '',
         products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
         note: ''
       })
@@ -497,6 +521,16 @@ export default function Home() {
                 style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
               />
             </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+              <input
+                type="text"
+                placeholder="Adres"
+                value={newOrder.customer_address}
+                onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
           </div>
 
           {/* Product Lines Table */}
@@ -658,6 +692,58 @@ export default function Home() {
           </button>
         </div>
 
+        {/* Search Section */}
+        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
+          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>🔍 Sipariş Ara</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
+              <input
+                type="text"
+                placeholder="Adı ara..."
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+              <input
+                type="text"
+                placeholder="Telefon ara..."
+                value={searchPhone}
+                onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
+                maxLength="10"
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+            <div>
+              <button
+                onClick={() => {
+                  setSearchName('')
+                  setSearchPhone('')
+                }}
+                style={{
+                  padding: '8px 15px',
+                  background: '#6c757d',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '13px',
+                  marginTop: '23px',
+                }}
+              >
+                Temizle
+              </button>
+            </div>
+          </div>
+          <p style={{ margin: '10px 0 0 0', fontSize: '12px', color: c.textSecondary }}>
+            Bulunan: {filteredOrders.length} sipariş
+          </p>
+        </div>
+
         {/* Orders Table */}
         <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '800px' }}>
@@ -673,7 +759,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody>
-              {orders.map((order, index) => (
+              {filteredOrders.map((order, index) => (
                 <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
                   <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
@@ -752,10 +838,9 @@ export default function Home() {
           </table>
         </div>
 
-        {orders.length === 0 && (
+        {filteredOrders.length === 0 && (
           <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px', background: c.header, borderRadius: '8px', marginTop: '20px', border: `1px solid ${c.border}` }}>
-            <p>📭 Henüz sipariş yok.</p>
-            <p>Yukarıdaki formu kullanarak ilk siparişinizi ekleyin!</p>
+            <p>📭 Sipariş bulunamadı.</p>
           </div>
         )}
       </div>
