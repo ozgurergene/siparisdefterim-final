@@ -1174,31 +1174,6 @@ export default function Home() {
               />
             </div>
 
-            {/* Status */}
-            <div style={{ marginBottom: '20px' }}>
-              <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Durum</label>
-              <select
-                value={editingData.status}
-                onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
-                style={{
-                  width: '100%',
-                  padding: '8px',
-                  border: `2px solid ${statusColors[editingData.status]}`,
-                  background: statusColors[editingData.status],
-                  color: editingData.status === 'paid' || editingData.status === 'completed' ? '#333' : 'white',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontWeight: 'bold',
-                }}
-              >
-                <option value="payment_pending">💰 Ödeme</option>
-                <option value="paid">✅ Ödendi</option>
-                <option value="preparing">📦 Hazır.</option>
-                <option value="shipped">🚚 Kargo</option>
-                <option value="completed">🎉 Tamamlandı</option>
-              </select>
-            </div>
-
             {/* Buttons */}
             <div style={{ display: 'flex', gap: '10px' }}>
               <button
