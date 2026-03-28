@@ -599,7 +599,7 @@ export default function Home() {
       </div>
 
       {/* Main Content */}
-      <div style={{ maxWidth: '1400px', margin: '0 auto', padding: '20px' }}>
+      <div style={{ width: '100%', padding: '20px' }}>
         {/* Limit Warning */}
         {ordersCreatedCount >= 50 && (
           <div style={{ background: theme === 'light' ? '#ffe0e0' : '#4a2626', border: '2px solid #ff6b6b', borderRadius: '8px', padding: '15px', marginBottom: '20px', textAlign: 'center' }}>
