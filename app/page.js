@@ -588,7 +588,7 @@ export default function Home() {
               fontSize: '14px',
             }}
           >
-            ✅ Onayla
+            Onayla
           </button>
         </div>
 
