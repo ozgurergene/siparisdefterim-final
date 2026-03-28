@@ -81,13 +81,13 @@ export default function Home() {
     
     if (searchName.trim()) {
       filtered = filtered.filter(order => 
-        order.customer_name.toLowerCase().includes(searchName.toLowerCase())
+        order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
       )
     }
     
     if (searchPhone.trim()) {
       filtered = filtered.filter(order => 
-        order.customer_phone.includes(searchPhone)
+        order.customer_phone.startsWith(searchPhone)
       )
     }
     
