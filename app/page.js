@@ -359,16 +359,16 @@ export default function Home() {
     <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, transition: 'background 0.3s', margin: 0, padding: 0 }}>
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <h1 style={{ margin: 0, fontSize: '24px' }}>📱 SiparişDefterim</h1>
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          <h1 style={{ margin: 0, fontSize: '24px', minWidth: '150px' }}>📱 SiparişDefterim</h1>
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
             <div style={{ textAlign: 'right' }}>
               <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
               <div style={{ width: '150px', height: '8px', background: c.bgSecondary, borderRadius: '4px', overflow: 'hidden' }}>
                 <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : '#007bff', transition: 'width 0.3s' }} />
               </div>
             </div>
-            <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
+            <span style={{ color: c.textSecondary, fontSize: '14px', minWidth: '120px' }}>{user.email}</span>
             <button
               onClick={toggleTheme}
               style={{
@@ -412,8 +412,8 @@ export default function Home() {
         )}
 
         {/* Add Order Form */}
-        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '150px 120px 1fr 80px 100px', gap: '10px', alignItems: 'end' }}>
+        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflowX: 'auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '10px', alignItems: 'end', minWidth: '600px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '12px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
               <input
@@ -484,9 +484,9 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Orders Table */}
-        <div style={{ background: c.header, borderRadius: '8px', overflow: 'hidden', border: `1px solid ${c.border}` }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px' }}>
+        {/* Orders Table - HORIZONTAL SCROLL */}
+        <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '800px' }}>
             <thead>
               <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
