@@ -1,5 +1,7 @@
 'use client'
 
+export const dynamic = 'force-dynamic'
+
 import { useState, useEffect } from 'react'
 import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 
@@ -18,7 +20,6 @@ export default function ResetPassword() {
   const colors = {
     light: {
       bg: '#ffffff',
-      bgSecondary: '#f5f7fa',
       text: '#1a1a1a',
       textSecondary: '#666666',
       border: '#e0e4e8',
@@ -28,7 +29,6 @@ export default function ResetPassword() {
     },
     dark: {
       bg: '#1a1a1a',
-      bgSecondary: '#2d2d2d',
       text: '#e0e0e0',
       textSecondary: '#b0b0b0',
       border: '#3a3a3a',
@@ -79,7 +79,7 @@ export default function ResetPassword() {
   return (
     <div style={{ minHeight: '100vh', background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Arial', padding: '20px' }}>
       <div style={{ maxWidth: '400px', width: '100%', padding: '40px', border: `1px solid ${c.border}`, borderRadius: '12px', background: c.header, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-        
+
         <h1 style={{ textAlign: 'center', color: c.text, marginBottom: '10px' }}>📱 SiparişDefterim</h1>
         <h2 style={{ textAlign: 'center', color: c.text, marginBottom: '30px', fontSize: '20px' }}>🔐 Yeni Şifre Belirle</h2>
 
