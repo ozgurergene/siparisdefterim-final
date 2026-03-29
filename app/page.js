@@ -94,10 +94,9 @@ export default function Home() {
         }
         
         if (data?.session?.user) {
-          setUser(data.session.user)
-          await fetchUserData(data.session.user.id)
-          // Clear the code from URL
-          window.history.replaceState({}, '', '/')
+          // Clear the code from URL and reload to ensure clean state
+          window.location.href = '/'
+          return
         }
         setLoading(false)
         return
