@@ -74,9 +74,36 @@ export default function Home() {
     setTheme(savedTheme)
   }, [])
 
-  // Check user on load
+  // Check user on load and handle OAuth callback
   useEffect(() => {
-    const checkUser = async () => {
+    const handleAuth = async () => {
+      // Check if there's a code in the URL (OAuth callback)
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('code')
+      
+      if (code) {
+        // Exchange the code for a session
+        const { data, error } = await supabase.auth.exchangeCodeForSession(code)
+        
+        if (error) {
+          console.error('OAuth error:', error)
+          // Clear the URL and show login
+          window.history.replaceState({}, '', '/')
+          setLoading(false)
+          return
+        }
+        
+        if (data?.session?.user) {
+          setUser(data.session.user)
+          await fetchUserData(data.session.user.id)
+          // Clear the code from URL
+          window.history.replaceState({}, '', '/')
+        }
+        setLoading(false)
+        return
+      }
+      
+      // No code in URL, check existing session
       const { data } = await supabase.auth.getSession()
       if (data?.session?.user) {
         setUser(data.session.user)
@@ -84,9 +111,10 @@ export default function Home() {
       }
       setLoading(false)
     }
-    checkUser()
+    
+    handleAuth()
 
-    // Listen for auth state changes (for OAuth redirect)
+    // Listen for auth state changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         setUser(session.user)
