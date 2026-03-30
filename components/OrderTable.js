@@ -10,28 +10,28 @@ export default function OrderTable({ filteredOrders, user, theme, startEditing, 
     const product = order.product
     const price = order.price
     
-    // Emojiler Unicode kodları ile
-    const wave = String.fromCodePoint(0x1F44B)
-    const party = String.fromCodePoint(0x1F389)
-    const packageEmoji = String.fromCodePoint(0x1F4E6)
-    const money = String.fromCodePoint(0x1F4B0)
-    const smile = String.fromCodePoint(0x1F60A)
-    const check = String.fromCodePoint(0x2705)
-    const sparkles = String.fromCodePoint(0x2728)
-    const pray = String.fromCodePoint(0x1F64F)
-    const truck = String.fromCodePoint(0x1F69A)
-    const star = String.fromCodePoint(0x2B50)
-    const hearts = String.fromCodePoint(0x1F495)
+    // Unicode kodları ile emojiler (freecodecamp listesinden)
+    const wave = String.fromCodePoint(0x1F44B)        // 👋 Waving hand
+    const party = String.fromCodePoint(0x1F389)       // 🎉 Party popper
+    const packageBox = String.fromCodePoint(0x1F4E6)  // 📦 Package
+    const money = String.fromCodePoint(0x1F4B0)       // 💰 Money bag
+    const smile = String.fromCodePoint(0x1F60A)       // 😊 Smiling face
+    const check = String.fromCodePoint(0x2705)        // ✅ Check mark
+    const sparkles = String.fromCodePoint(0x2728)     // ✨ Sparkles
+    const pray = String.fromCodePoint(0x1F64F)        // 🙏 Praying hands
+    const truck = String.fromCodePoint(0x1F69A)       // 🚚 Delivery truck
+    const star = String.fromCodePoint(0x2B50)         // ⭐ Star
+    const hearts = String.fromCodePoint(0x1F495)      // 💕 Two hearts
     
     const messages = {
       payment_pending: `Merhaba ${name} ${wave}
 
 Siparişiniz başarıyla oluşturuldu, teşekkür ederiz! ${party}
 
-${packageEmoji} Sipariş Detayı:
+${packageBox} Sipariş Detayı:
 ${product}
 
-${money} Toplam Tutar: ₺${price}
+${money} Toplam Tutar: ${price} TL
 
 Ödemenizi aldıktan sonra siparişinizi hemen hazırlamaya başlayacağız. Herhangi bir sorunuz olursa yazabilirsiniz ${smile}`,
       
@@ -39,13 +39,13 @@ ${money} Toplam Tutar: ₺${price}
 
 Ödemeniz başarıyla alındı, teşekkür ederiz! ${check}
 
-Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz ${packageEmoji}
+Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz ${packageBox}
 
 İyi günler dileriz! ${smile}`,
       
       preparing: `Merhaba ${name} ${wave}
 
-Siparişiniz şu anda özenle hazırlanıyor! ${packageEmoji}${sparkles}
+Siparişiniz şu anda özenle hazırlanıyor! ${packageBox}${sparkles}
 
 Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
 
