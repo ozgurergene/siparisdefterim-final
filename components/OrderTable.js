@@ -28,9 +28,9 @@ Toplam Tutar: ${price} TL
 
 Ödemeniz başarıyla alındı, teşekkür ederiz! :)
 
-Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz.
+Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size bilgi vereceğiz.
 
-İyi günler dileriz!`,
+İyi günler dileriz! :)`,
       
       preparing: `Merhaba :) ${name},
 
