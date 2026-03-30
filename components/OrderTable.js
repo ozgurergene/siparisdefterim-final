@@ -60,9 +60,13 @@ export default function OrderTable({ filteredOrders, user, theme, startEditing, 
                         window.open(`https://wa.me/90${order.customer_phone}?text=Merhaba! "${order.customer_name}" için sipariş. Ürünler: ${order.product}, Toplam: ₺${order.price}`, '_blank')
                       }
                     }}
-                    style={{ padding: '6px 10px', background: '#25d366', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}
+                    style={{ padding: '6px 10px', background: '#25d366', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
                   >
-                    💬
+                    <img 
+                      src="https://dcqdgklkrjvmfjzhliph.supabase.co/storage/v1/object/sign/wp%20logo/pngwing.com.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lNjA2YmZmMy04N2Q0LTRmMjAtYjRmMC01MGRiZDM3OWI1NGYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3cCBsb2dvL3BuZ3dpbmcuY29tLnBuZyIsImlhdCI6MTc3NDcyNTQxMSwiZXhwIjoxODA2MjYxNDExfQ.p5yP8eFZijbKeH4XwfggFNDvI6vpPPsU756s2t4vZKI"
+                      alt="WhatsApp"
+                      style={{ width: '20px', height: '20px' }}
+                    />
                   </button>
                   <button
                     onClick={() => startEditing(order)}
