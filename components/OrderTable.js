@@ -43,7 +43,7 @@ Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size heme
 
 İyi günler dileriz! ${smile}`,
       
-      preparing: `Merhaba ${name} ${wave}
+      preparing: `Merhaba ${name} ${wave}🌊
 
 Siparişiniz şu anda özenle hazırlanıyor! ${packageBox}${sparkles}
 
