@@ -10,62 +10,51 @@ export default function OrderTable({ filteredOrders, user, theme, startEditing, 
     const product = order.product
     const price = order.price
     
-    // Unicode kodları ile emojiler (freecodecamp listesinden)
-    const wave = String.fromCodePoint(0x1F44B)        // 👋 Waving hand
-    const party = String.fromCodePoint(0x1F389)       // 🎉 Party popper
-    const packageBox = String.fromCodePoint(0x1F4E6)  // 📦 Package
-    const money = String.fromCodePoint(0x1F4B0)       // 💰 Money bag
-    const smile = String.fromCodePoint(0x1F60A)       // 😊 Smiling face
-    const check = String.fromCodePoint(0x2705)        // ✅ Check mark
-    const sparkles = String.fromCodePoint(0x2728)     // ✨ Sparkles
-    const pray = String.fromCodePoint(0x1F64F)        // 🙏 Praying hands
-    const truck = String.fromCodePoint(0x1F69A)       // 🚚 Delivery truck
-    const star = String.fromCodePoint(0x2B50)         // ⭐ Star
-    const hearts = String.fromCodePoint(0x1F495)      // 💕 Two hearts
-    
     const messages = {
-      payment_pending: `Merhaba ${name} ${wave}
+      payment_pending: `Merhaba ${name},
 
-Siparişiniz başarıyla oluşturuldu, teşekkür ederiz! ${party}
+Siparişiniz başarıyla oluşturuldu, teşekkür ederiz!
 
-${packageBox} Sipariş Detayı:
+Sipariş Detayı:
 ${product}
 
-${money} Toplam Tutar: ${price} TL
+Toplam Tutar: ${price} TL
 
-Ödemenizi aldıktan sonra siparişinizi hemen hazırlamaya başlayacağız. Herhangi bir sorunuz olursa yazabilirsiniz ${smile}`,
+Ödemenizi aldıktan sonra siparişinizi hemen hazırlamaya başlayacağız. Herhangi bir sorunuz olursa yazabilirsiniz.
+
+İyi günler dileriz!`,
       
-      paid: `Merhaba ${name} ${wave}
+      paid: `Merhaba ${name},
 
-Ödemeniz başarıyla alındı, teşekkür ederiz! ${check}
+Ödemeniz başarıyla alındı, teşekkür ederiz!
 
-Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz ${packageBox}
+Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz.
 
-İyi günler dileriz! ${smile}`,
+İyi günler dileriz!`,
       
-      preparing: `Merhaba ${name} ${wave}🌊
+      preparing: `Merhaba ${name},
 
-Siparişiniz şu anda özenle hazırlanıyor! ${packageBox}${sparkles}
+Siparişiniz şu anda özenle hazırlanıyor!
 
 Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
 
-Bizi tercih ettiğiniz için teşekkürler! ${pray}`,
+Bizi tercih ettiğiniz için teşekkürler!`,
       
-      shipped: `Merhaba ${name} ${wave}
+      shipped: `Merhaba ${name},
 
-Harika haber! Siparişiniz kargoya verildi! ${truck}
+Harika haber! Siparişiniz kargoya verildi!
 
 Paketiniz yolda, çok yakında elinizde olacak.
 
-Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler! ${smile}`,
+Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler!`,
       
-      completed: `Merhaba ${name} ${wave}
+      completed: `Merhaba ${name},
 
-Siparişiniz tamamlandı! ${party}
+Siparişiniz tamamlandı!
 
-Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli! ${star}
+Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli!
 
-Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! ${hearts}`
+Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
     }
     
     return messages[order.status] || messages.payment_pending
