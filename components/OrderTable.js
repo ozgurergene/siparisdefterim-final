@@ -5,6 +5,64 @@ import { colors, statusColors } from '../lib/theme'
 export default function OrderTable({ filteredOrders, user, theme, startEditing, deleteOrder, updateOrderStatus }) {
   const c = colors[theme]
 
+  const getWhatsAppMessage = (order) => {
+    const name = order.customer_name
+    const product = order.product
+    const price = order.price
+    
+    const messages = {
+      payment_pending: 
+`Merhaba ${name} 👋
+
+Siparişiniz başarıyla oluşturuldu, teşekkür ederiz! 🎉
+
+📦 Sipariş Detayı:
+${product}
+
+💰 Toplam Tutar: ₺${price}
+
+Ödemenizi aldıktan sonra siparişinizi hemen hazırlamaya başlayacağız. Herhangi bir sorunuz olursa yazabilirsiniz 😊`,
+      
+      paid: 
+`Merhaba ${name} 👋
+
+Ödemeniz başarıyla alındı, teşekkür ederiz! ✅
+
+Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz 📦
+
+İyi günler dileriz! 😊`,
+      
+      preparing: 
+`Merhaba ${name} 👋
+
+Siparişiniz şu anda özenle hazırlanıyor! 📦✨
+
+Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
+
+Bizi tercih ettiğiniz için teşekkürler! 🙏`,
+      
+      shipped: 
+`Merhaba ${name} 👋
+
+Harika haber! Siparişiniz kargoya verildi! 🚚
+
+Paketiniz yolda, çok yakında elinizde olacak.
+
+Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler! 😊`,
+      
+      completed: 
+`Merhaba ${name} 👋
+
+Siparişiniz tamamlandı! 🎉
+
+Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli! ⭐
+
+Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! 💕`
+    }
+    
+    return messages[order.status] || messages.payment_pending
+  }
+
   return (
     <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px', minWidth: '800px' }}>
@@ -57,53 +115,9 @@ export default function OrderTable({ filteredOrders, user, theme, startEditing, 
                   <button
                     onClick={() => {
                       if (order.customer_phone) {
-                        const messages = {
-                          payment_pending: `Merhaba ${order.customer_name} 🙋‍♀️
-
-Siparişiniz başarıyla oluşturuldu, teşekkür ederiz! 🎉
-
-📦 Sipariş Detayı:
-${order.product}
-
-💰 Toplam Tutar: ₺${order.price}
-
-Ödemenizi aldıktan sonra siparişinizi hemen hazırlamaya başlayacağız. Herhangi bir sorunuz olursa yazabilirsiniz 😊`,
-                          
-                          paid: `Merhaba ${order.customer_name} 🙋‍♀️
-
-Ödemeniz başarıyla alındı, teşekkür ederiz! ✅
-
-Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz 📦
-
-İyi günler dileriz! 😊`,
-                          
-                          preparing: `Merhaba ${order.customer_name} 🙋‍♀️
-
-Siparişiniz şu anda özenle hazırlanıyor! 📦✨
-
-Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
-
-Bizi tercih ettiğiniz için teşekkürler! 🙏`,
-                          
-                          shipped: `Merhaba ${order.customer_name} 🙋‍♀️
-
-Harika haber! Siparişiniz kargoya verildi! 🚚💨
-
-Paketiniz yolda, çok yakında elinizde olacak.
-
-Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler dileriz! 😊`,
-                          
-                          completed: `Merhaba ${order.customer_name} 🙋‍♀️
-
-Siparişiniz tamamlandı! 🎉
-
-Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli! ⭐
-
-Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! 💕`
-                        }
-                        
-                        const message = messages[order.status] || messages.payment_pending
-                        window.open(`https://wa.me/90${order.customer_phone}?text=${encodeURIComponent(message)}`, '_blank')
+                        const message = getWhatsAppMessage(order)
+                        const url = 'https://wa.me/90' + order.customer_phone + '?text=' + encodeURIComponent(message)
+                        window.open(url, '_blank')
                       }
                     }}
                     style={{ padding: '6px 10px', background: '#25d366', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
