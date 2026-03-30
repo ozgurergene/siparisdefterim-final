@@ -11,7 +11,7 @@ export default function OrderTable({ filteredOrders, user, theme, startEditing, 
     const price = order.price
     
     const messages = {
-      payment_pending: `Merhaba ${name},
+      payment_pending: `Merhaba :) ${name},
 
 Siparişiniz başarıyla oluşturuldu, teşekkür ederiz!
 
@@ -24,37 +24,37 @@ Toplam Tutar: ${price} TL
 
 İyi günler dileriz!`,
       
-      paid: `Merhaba ${name},
+      paid: `Merhaba :) ${name},
 
-Ödemeniz başarıyla alındı, teşekkür ederiz!
+Ödemeniz başarıyla alındı, teşekkür ederiz! :)
 
 Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz.
 
 İyi günler dileriz!`,
       
-      preparing: `Merhaba ${name},
+      preparing: `Merhaba :) ${name},
 
-Siparişiniz şu anda özenle hazırlanıyor!
+Siparişiniz şu anda özenle hazırlanıyor! :)
 
 Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
 
-Bizi tercih ettiğiniz için teşekkürler!`,
+Bizi tercih ettiğiniz için teşekkür ederiz!`,
       
-      shipped: `Merhaba ${name},
+      shipped: `Merhaba :) ${name},
 
 Harika haber! Siparişiniz kargoya verildi!
 
-Paketiniz yolda, çok yakında elinizde olacak.
+Paketiniz yolda, çok yakında sizlere ulaştırılacak.
 
-Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler!`,
+Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler dileriz! :)`,
       
-      completed: `Merhaba ${name},
+      completed: `Merhaba :) ${name},
 
-Siparişiniz tamamlandı!
+Siparişiniz tamamlandı! :)
 
-Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli!
+Umarız ürünlerimizi beğenirsiniz. :) Memnuniyetiniz bizim için çok değerli!
 
-Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
+Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
     }
     
     return messages[order.status] || messages.payment_pending
