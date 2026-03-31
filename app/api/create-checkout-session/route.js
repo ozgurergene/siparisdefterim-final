@@ -5,7 +5,10 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
 export async function POST(request) {
   try {
+    console.log('🔵 Checkout request başladı');
+    
     const { plan, price, userEmail } = await request.json();
+    console.log('📨 Request data:', { plan, price, userEmail });
 
     // Plan bilgilerine göre ürün adı belirle
     let productName = '';
@@ -18,13 +21,18 @@ export async function POST(request) {
       productName = 'SiparişDefterim Pro - Yearly';
       billingInterval = 'year';
     } else {
+      console.error('❌ Invalid plan:', plan);
       return NextResponse.json(
         { error: 'Invalid plan' },
         { status: 400 }
       );
     }
 
+    console.log('✅ Plan verified:', { productName, billingInterval });
+
     // Checkout session oluştur
+    console.log('🔄 Stripe session oluşturuluyor...');
+    
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -54,9 +62,13 @@ export async function POST(request) {
       },
     });
 
+    console.log('✅ Session created:', session.id);
+    console.log('🎉 Checkout URL:', session.url);
+
     return NextResponse.json({ url: session.url });
   } catch (error) {
-    console.error('Stripe error:', error);
+    console.error('❌ Stripe error:', error.message);
+    console.error('Error details:', error);
     return NextResponse.json(
       { error: error.message },
       { status: 500 }
