@@ -94,11 +94,12 @@ export default function LoginPage() {
         if (error) throw new Error(error.message)
         router.push('/dashboard')
       } else {
+        // KAYIT OL
         const { error } = await supabase.auth.signUp({ email, password })
         if (error) throw new Error(error.message)
-        alert('Kayıt başarılı! Şimdi giriş yapabilirsiniz.')
-        setIsLogin(true)
-        setLoading(false)
+        
+        // Kayıt başarılı → /legal-confirm'e yönlendir
+        router.push('/legal-confirm')
       }
       setEmail('')
       setPassword('')

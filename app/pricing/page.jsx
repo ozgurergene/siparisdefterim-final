@@ -1,15 +1,70 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { supabase } from '../../lib/supabase';
 
 export default function PricingPage() {
+  const router = useRouter();
   const [billingCycle, setBillingCycle] = useState('monthly');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
   const monthlyPrice = 99;
   const yearlyPrice = 999;
   const monthlyAnnualTotal = monthlyPrice * 12;
   const discountPercent = Math.round(((monthlyAnnualTotal - yearlyPrice) / monthlyAnnualTotal) * 100);
   const discountAmount = monthlyAnnualTotal - yearlyPrice;
+
+  const handlePlanSelect = async (planType) => {
+    setLoading(true);
+    setError('');
+
+    try {
+      // Şu anki user'ı al
+      const { data: { user }, error: userError } = await supabase.auth.getUser();
+      
+      if (userError || !user) {
+        setError('Giriş yapmanız gerekiyor');
+        router.push('/login');
+        return;
+      }
+
+      // Ücretsiz plan seçilirse → Direkt success'e git
+      if (planType === 'free') {
+        router.push('/success');
+        return;
+      }
+
+      // Pro plan seçilirse → Supabase'e kaydet + Payment'e git
+      const planName = billingCycle === 'monthly' ? 'pro_monthly' : 'pro_yearly';
+      const price = billingCycle === 'monthly' ? monthlyPrice : yearlyPrice;
+
+      // Subscriptions tablosuna kaydet
+      const { error: insertError } = await supabase
+        .from('subscriptions')
+        .insert({
+          user_id: user.id,
+          plan: planName,
+          status: 'active',
+          price: price,
+          start_date: new Date().toISOString(),
+        });
+
+      if (insertError) {
+        setError('Plan kaydedilemedi: ' + insertError.message);
+        return;
+      }
+
+      // Payment sayfasına yönlendir
+      router.push(`/payment?plan=${planName}&price=${price}`);
+    } catch (err) {
+      setError('Bir hata oluştu: ' + err.message);
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={{
@@ -34,7 +89,7 @@ export default function PricingPage() {
             color: '#333',
             margin: '0 0 16px 0',
           }}>
-            SİPARİŞ DEFTERİM FİYATLANDIRMASI
+            SİPARİŞDEFTERİM FİYATLANDIRMASI
           </h1>
           <p style={{
             fontSize: '18px',
@@ -45,7 +100,24 @@ export default function PricingPage() {
           </p>
         </div>
 
-        {/* FREE PLAN */}
+        {/* ERROR MESSAGE */}
+        {error && (
+          <div style={{
+            backgroundColor: '#FFEBEE',
+            border: '1px solid #EF5350',
+            color: '#C62828',
+            padding: '16px',
+            borderRadius: '8px',
+            marginBottom: '30px',
+            maxWidth: '600px',
+            margin: '0 auto 30px',
+            textAlign: 'center',
+          }}>
+            {error}
+          </div>
+        )}
+
+        {/* PLANS */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))',
@@ -53,10 +125,10 @@ export default function PricingPage() {
           marginBottom: '60px',
         }}>
           
-          {/* FREE CARD */}
+          {/* FREE PLAN */}
           <div style={{
             backgroundColor: '#F5F5F5',
-            border: '2px solid #333',
+            border: '2px solid #CCCCCC',
             borderRadius: '16px',
             padding: '40px 30px',
             textAlign: 'center',
@@ -97,7 +169,7 @@ export default function PricingPage() {
                 color: '#999',
                 marginTop: '8px',
               }}>
-                / İlk ay 50 siparişe kadar ücretsiz
+                / Sonsuza kadar
               </div>
             </div>
 
@@ -146,23 +218,28 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <button style={{
-              width: '100%',
-              padding: '14px 24px',
-              backgroundColor: '#DDDDDD',
-              color: '#333',
-              border: '2px solid #BBBBBB',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-            }}>
+            <button
+              onClick={() => handlePlanSelect('free')}
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px 24px',
+                backgroundColor: '#DDDDDD',
+                color: '#333',
+                border: '2px solid #BBBBBB',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+                transition: 'all 0.3s',
+              }}
+            >
               HEMEN BAŞLA
             </button>
           </div>
 
-          {/* PRO CARD */}
+          {/* PRO PLAN */}
           <div style={{
             backgroundColor: '#F5F5F5',
             border: '3px solid #4CAF50',
@@ -388,22 +465,26 @@ export default function PricingPage() {
               </div>
             </div>
 
-            <button style={{
-              width: '100%',
-              padding: '14px 24px',
-              backgroundColor: '#4CAF50',
-              color: '#FFFFFF',
-              border: 'none',
-              borderRadius: '8px',
-              fontSize: '16px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              transition: 'all 0.3s',
-            }}
-            onMouseEnter={(e) => e.target.style.backgroundColor = '#45A049'}
-            onMouseLeave={(e) => e.target.style.backgroundColor = '#4CAF50'}
+            <button
+              onClick={() => handlePlanSelect('pro')}
+              disabled={loading}
+              style={{
+                width: '100%',
+                padding: '14px 24px',
+                backgroundColor: '#4CAF50',
+                color: '#FFFFFF',
+                border: 'none',
+                borderRadius: '8px',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: loading ? 'not-allowed' : 'pointer',
+                opacity: loading ? 0.6 : 1,
+                transition: 'all 0.3s',
+              }}
+              onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#45A049')}
+              onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = '#4CAF50')}
             >
-              HEMEN BAŞLA
+              {loading ? 'YÜKLENİYOR...' : 'HEMEN BAŞLA'}
             </button>
           </div>
         </div>
@@ -442,7 +523,7 @@ export default function PricingPage() {
               margin: '0',
               lineHeight: '1.6',
             }}>
-              Ayda 50'den az sipariş işliyorsanız Ücretsiz plan yeterli. Daha fazlasına ihtiyaç duyarsanız Pro plana yükseltebilirsiniz.
+              Ayda 50'den az sipariş işliyorsanız Ücretsiz plan yeterli. Daha fazlasına ihtiyaç duyarsanız Pro plana yükseltin.
             </p>
           </div>
 
@@ -453,7 +534,7 @@ export default function PricingPage() {
               color: '#333',
               margin: '0 0 8px 0',
             }}>
-              İstediğim zaman ayrılabilir miyim?
+              Yerinden ayrılabilir miyim?
             </h4>
             <p style={{
               fontSize: '14px',
