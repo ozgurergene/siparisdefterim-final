@@ -1,3 +1,5 @@
+import { Suspense } from 'react';
+
 export const metadata = {
   title: "SiparişDefterim",
 }
@@ -19,7 +21,9 @@ export default function RootLayout({ children }) {
             height: 100%;
           }
         `}</style>
-        {children}
+        <Suspense fallback={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', color: '#666' }}>Yükleniyor...</div>}>
+          {children}
+        </Suspense>
       </body>
     </html>
   )
