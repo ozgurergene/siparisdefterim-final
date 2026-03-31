@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
+import dynamic from 'next/dynamic'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import { calculateGrandTotal, calculateLineTotal, parseProducts } from '../../lib/calculations'
@@ -10,7 +11,8 @@ import OrderForm from '../../components/OrderForm'
 import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
-import UpgradeModal from '../../components/UpgradeModal'
+
+const UpgradeModal = dynamic(() => import('./UpgradeModal'), { ssr: false })
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -88,7 +90,7 @@ export default function DashboardPage() {
     try {
       const { data: userData, error: userError } = await supabase
         .from('users')
-        .select('orders_created_count')
+        .select('*')
         .eq('id', userId)
         .single()
       
