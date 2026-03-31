@@ -30,18 +30,32 @@ export default function PricingPage() {
         return;
       }
 
-      // Ücretsiz plan seçilirse → Direkt success'e git
+      // Ücretsiz plan seçilirse → user_profiles'a kaydet + success'e git
       if (planType === 'free') {
+        // user_profiles'a kaydet
+        const { error: profileError } = await supabase
+          .from('user_profiles')
+          .upsert({
+            id: user.id,
+            is_pro: false,
+            subscription_plan: 'free',
+          });
+
+        if (profileError) {
+          setError('Profil kaydedilemedi: ' + profileError.message);
+          return;
+        }
+
         router.push('/success');
         return;
       }
 
-      // Pro plan seçilirse → Supabase'e kaydet + Payment'e git
+      // Pro plan seçilirse → subscriptions'a kaydet + user_profiles'a kaydet + Payment'e git
       const planName = billingCycle === 'monthly' ? 'pro_monthly' : 'pro_yearly';
       const price = billingCycle === 'monthly' ? monthlyPrice : yearlyPrice;
 
-      // Subscriptions tablosuna kaydet
-      const { error: insertError } = await supabase
+      // subscriptions tablosuna kaydet
+      const { error: subscriptionError } = await supabase
         .from('subscriptions')
         .insert({
           user_id: user.id,
@@ -51,8 +65,22 @@ export default function PricingPage() {
           start_date: new Date().toISOString(),
         });
 
-      if (insertError) {
-        setError('Plan kaydedilemedi: ' + insertError.message);
+      if (subscriptionError) {
+        setError('Plan kaydedilemedi: ' + subscriptionError.message);
+        return;
+      }
+
+      // user_profiles'a Pro flag'ı kaydet
+      const { error: profileError } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: user.id,
+          is_pro: true,
+          subscription_plan: planName,
+        });
+
+      if (profileError) {
+        setError('Profil güncellenemedi: ' + profileError.message);
         return;
       }
 
