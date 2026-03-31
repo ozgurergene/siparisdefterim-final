@@ -84,35 +84,31 @@ export default function LoginPage() {
     }
   }
 
-  const handleAuth = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+const handleAuth = async (e) => {
+  e.preventDefault()
+  setLoading(true)
 
-    try {
-      if (isLogin) {
-        const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw new Error(error.message)
-        router.push('/dashboard')
-      } else {
-        // KAYIT OL
-        const { error } = await supabase.auth.signUp({ email, password })
-        if (error) throw new Error(error.message)
-        
-        // Kayıt başarılı - Email doğrulama mesajı göster
-        alert('Kayıt başarılı! Email adresinize gelen linke tıklayın.')
-        setEmail('')
-        setPassword('')
-        setIsLogin(true)
-        setLoading(false)
-        return
-      }
-      setEmail('')
-      setPassword('')
-    } catch (error) {
-      alert('Hata: ' + error.message)
-      setLoading(false)
+  try {
+    if (isLogin) {
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) throw new Error(error.message)
+      router.push('/dashboard')
+    } else {
+      // KAYIT OL
+      const { error } = await supabase.auth.signUp({ email, password })
+      if (error) throw new Error(error.message)
+      
+      // Kayıt başarılı - Direkt legal-confirm'e yönlendir (email confirmation kapalı)
+      router.push('/legal-confirm')
+      return
     }
+    setEmail('')
+    setPassword('')
+  } catch (error) {
+    alert('Hata: ' + error.message)
+    setLoading(false)
   }
+}
 
   if (loading) {
     return (
