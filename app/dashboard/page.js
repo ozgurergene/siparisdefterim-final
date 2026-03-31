@@ -10,6 +10,7 @@ import OrderForm from '../../components/OrderForm'
 import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
+import UpgradeModal from '../../components/UpgradeModal'
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -22,6 +23,7 @@ export default function DashboardPage() {
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [editingId, setEditingId] = useState(null)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [editingData, setEditingData] = useState({
     customer_name: '',
     customer_phone: '',
@@ -124,7 +126,7 @@ export default function DashboardPage() {
     e.preventDefault()
     
     if (ordersCreatedCount >= 50) {
-      alert('50 sipariş limitine ulaştınız! Pro plana yükseltin.')
+      setShowUpgradeModal(true)
       return
     }
 
@@ -257,6 +259,8 @@ export default function DashboardPage() {
 
   return (
     <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0 }}>
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
+
       <Header
         user={user}
         ordersCreatedCount={ordersCreatedCount}
