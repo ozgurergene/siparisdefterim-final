@@ -97,7 +97,7 @@ export default function PricingPage() {
                 color: '#999',
                 marginTop: '8px',
               }}>
-                / 50 siparişe kadar
+                / İlk ay 50 siparişe kadar ücretsiz
               </div>
             </div>
 
