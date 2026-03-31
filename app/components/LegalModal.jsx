@@ -17,8 +17,8 @@ const LegalModal = ({ onComplete }) => {
   const items = [
     {
       id: 'enlightenmentRead',
-      label: 'KVKK Aydinlatma Metni',
-      description: 'Kisisel verileriniz nasil islenecegini okuyunuz',
+      label: 'KVKK Aydınlatma Metni',
+      description: 'Kişisel verilerinizin nasıl işleneceğini okuyunuz',
       fullText: `Veri Sorumlusu: SiparisDefterim
 
 İşlenen Kişisel Veriler:
@@ -45,8 +45,8 @@ Hukuki Dayanak:
     },
     {
       id: 'termsCheck',
-      label: 'Mesafeli Sozlesmeler Yonetmeligi',
-      description: '14 gun icinde cayma hakkiniz bulunmaktadir',
+      label: 'Mesafeli Sözleşmeler Yönetmeligi',
+      description: '14 gün içinde cayma hakkınız bulunmaktadır',
       fullText: `Mesafeli Sözleşmeler Yönetmeliği Kapsamında Bilgilendirme
 
 Satıcı Bilgileri:
@@ -58,10 +58,12 @@ Instagram satıcıları için sipariş yönetim, durum takibi ve müşteri bildi
 
 Fiyat:
 Ücretsiz Plan: 50 siparişe kadar
-Pro Plan: [Fiyat belirtilecek]
+Pro Plan: [99 TL/ay] veya [999 TL/yıl]
 
 Ödeme Yöntemi:
-Kredi kartı, banka transferi
+Kredi kartı, stripe üzerinden güvenli ödeme
+
+Hizmet, üyelik onayı ve ödeme sonrası 24 saat içinde aktif edilir
 
 Cayma Hakkı:
 Sözleşmenin imzalanmasından itibaren 14 (on dört) gün içinde cayma hakkınız bulunmaktadır.`

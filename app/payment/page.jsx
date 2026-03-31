@@ -20,7 +20,7 @@ export default function PaymentPage() {
     if (priceParam) setPrice(priceParam);
   }, [searchParams]);
 
-  const handlePayment = async () => {
+  const handleStripeCheckout = async () => {
     setLoading(true);
     setError('');
 
@@ -34,27 +34,36 @@ export default function PaymentPage() {
         return;
       }
 
-      // TODO: Stripe Checkout Session oluştur
-      // Şimdilik direkt success'e git (test amaçlı)
-      
-      // Gerçek uygulamada:
-      // const response = await fetch('/api/create-checkout-session', {
-      //   method: 'POST',
-      //   body: JSON.stringify({
-      //     userId: user.id,
-      //     plan: plan,
-      //     price: parseInt(price),
-      //   }),
-      // });
-      // const { url } = await response.json();
-      // window.location.href = url;
+      // API route'u çağır
+      const response = await fetch('/api/create-checkout-session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-user-id': user.id,
+        },
+        body: JSON.stringify({
+          plan: plan,
+          price: parseInt(price),
+          userEmail: user.email,
+        }),
+      });
 
-      // Test: Direkt success'e git
-      router.push('/success');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Ödeme işlemi başlatılamadı');
+      }
+
+      const data = await response.json();
+      
+      if (data.url) {
+        // Stripe Checkout'a yönlendir
+        window.location.href = data.url;
+      } else {
+        throw new Error('Checkout URL alınamadı');
+      }
     } catch (err) {
-      setError('Ödeme başarısız: ' + err.message);
+      setError('Hata: ' + err.message);
       console.error(err);
-    } finally {
       setLoading(false);
     }
   };
@@ -206,9 +215,9 @@ export default function PaymentPage() {
           </div>
         </div>
 
-        {/* ÖDEME BUTONU */}
+        {/* STRIPE CHECKOUT BUTONU */}
         <button
-          onClick={handlePayment}
+          onClick={handleStripeCheckout}
           disabled={loading}
           style={{
             width: '100%',
@@ -228,7 +237,7 @@ export default function PaymentPage() {
           onMouseEnter={(e) => !loading && (e.target.style.backgroundColor = '#45A049')}
           onMouseLeave={(e) => !loading && (e.target.style.backgroundColor = '#4CAF50')}
         >
-          {loading ? 'İŞLENİYOR...' : '₺' + price + ' ÖDEYIN'}
+          {loading ? 'YÜKLENİYOR...' : '₺' + price + ' STRIPE\'DA ÖDEYIN'}
         </button>
 
         {/* GERİ DÖN */}
