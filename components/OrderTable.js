@@ -95,10 +95,10 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
             return (
               <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
                 <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, fontSize: '14px', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.customer_name}</td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary, width: '80px', textAlign: 'center' }}>📱 {order.customer_phone}</td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '14px' }}>
+                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary, width: '80px', textAlign: 'center' }}>{order.customer_phone}</td>
+                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '15px' }}>
                   {order.product.split(', ').map((prod, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0', fontSize: '14px' }}>{prod}</div>
+                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0', fontSize: '15px' }}>{prod}</div>
                   ))}
                   {order.note && <div style={{ fontSize: '13px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
                 </td>
