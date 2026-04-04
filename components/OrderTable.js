@@ -134,16 +134,16 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                 onClick={cancelComplete}
                 style={{
                   padding: '12px 25px',
-                  background: c.bgSecondary,
-                  color: c.text,
-                  border: `1px solid ${c.border}`,
+                  background: '#dc3545',
+                  color: 'white',
+                  border: 'none',
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
                   fontSize: '14px'
                 }}
               >
-                İptal
+                ✕ İptal
               </button>
               <button
                 onClick={confirmComplete}
@@ -158,7 +158,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                   fontSize: '14px'
                 }}
               >
-                ✓ Teslim Edildi
+                ✓ Onayla
               </button>
             </div>
           </div>
