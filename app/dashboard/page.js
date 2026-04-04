@@ -11,6 +11,7 @@ import OrderForm from '../../components/OrderForm'
 import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
+import Footer from '../../components/Footer'
 
 const UpgradeModal = dynamic(() => import('./UpgradeModal'), { ssr: false })
 
@@ -275,7 +276,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0 }}>
+    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
 
       <Header
@@ -286,7 +287,7 @@ export default function DashboardPage() {
         handleLogout={handleLogout}
       />
 
-      <div style={{ width: '100%', padding: '20px' }}>
+      <div style={{ flex: 1, width: '100%', padding: '20px' }}>
         {/* Limit Warning */}
         {ordersCreatedCount >= 50 && (
           <div style={{ background: theme === 'light' ? '#ffe0e0' : '#4a2626', border: '2px solid #ff6b6b', borderRadius: '8px', padding: '15px', marginBottom: '20px', textAlign: 'center' }}>
@@ -335,6 +336,8 @@ export default function DashboardPage() {
         cancelEdit={cancelEdit}
         theme={theme}
       />
+
+      <Footer theme={theme} />
     </div>
   )
 }

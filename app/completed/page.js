@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
+import Footer from '../../components/Footer'
 
 export default function CompletedPage() {
   const router = useRouter()
@@ -60,7 +61,6 @@ export default function CompletedPage() {
     }
     if (searchProduct.trim()) {
       filtered = filtered.filter(order => {
-        // Ürünleri virgülle ayır ve her birini kontrol et
         const products = order.product.split(', ')
         return products.some(prod => 
           prod.toLowerCase().startsWith(searchProduct.toLowerCase())
@@ -117,7 +117,7 @@ export default function CompletedPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0 }}>
+    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
@@ -155,7 +155,7 @@ export default function CompletedPage() {
         </div>
       </div>
 
-      <div style={{ width: '100%', padding: '20px' }}>
+      <div style={{ flex: 1, width: '100%', padding: '20px' }}>
         {/* Stats Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '20px' }}>
           <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
@@ -266,6 +266,8 @@ export default function CompletedPage() {
           )}
         </div>
       </div>
+
+      <Footer theme={theme} />
     </div>
   )
 }
