@@ -10,9 +10,11 @@ export default function CompletedPage() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [completedOrders, setCompletedOrders] = useState([])
+  const [filteredOrders, setFilteredOrders] = useState([])
   const [theme, setTheme] = useState('light')
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
+  const [searchProduct, setSearchProduct] = useState('')
 
   const c = colors[theme]
 
@@ -42,6 +44,28 @@ export default function CompletedPage() {
     checkUser()
   }, [router])
 
+  // Real-time filter
+  useEffect(() => {
+    let filtered = completedOrders
+    
+    if (searchName.trim()) {
+      filtered = filtered.filter(order => 
+        order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
+      )
+    }
+    if (searchPhone.trim()) {
+      filtered = filtered.filter(order => 
+        order.customer_phone.startsWith(searchPhone)
+      )
+    }
+    if (searchProduct.trim()) {
+      filtered = filtered.filter(order => 
+        order.product.toLowerCase().includes(searchProduct.toLowerCase())
+      )
+    }
+    setFilteredOrders(filtered)
+  }, [searchName, searchPhone, searchProduct, completedOrders])
+
   const fetchCompletedOrders = async (userId) => {
     const { data } = await supabase
       .from('orders')
@@ -63,13 +87,6 @@ export default function CompletedPage() {
     await supabase.auth.signOut()
     router.push('/login')
   }
-
-  // Filter orders
-  const filteredOrders = completedOrders.filter(order => {
-    const nameMatch = !searchName || order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
-    const phoneMatch = !searchPhone || order.customer_phone.startsWith(searchPhone)
-    return nameMatch && phoneMatch
-  })
 
   // Calculate stats
   const totalCompleted = completedOrders.length
@@ -157,7 +174,7 @@ export default function CompletedPage() {
 
         {/* Search Box */}
         <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>🔍 Tamamlanan Siparişlerde Ara</h3>
+          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '14px', fontWeight: 'bold' }}>🔍 Tamamlanan Siparişlerde Ara</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
             <div>
               <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
@@ -181,8 +198,18 @@ export default function CompletedPage() {
               />
             </div>
             <div>
+              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
+              <input
+                type="text"
+                placeholder="Ürün ara..."
+                value={searchProduct}
+                onChange={(e) => setSearchProduct(e.target.value)}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+            <div>
               <button
-                onClick={() => { setSearchName(''); setSearchPhone(''); }}
+                onClick={() => { setSearchName(''); setSearchPhone(''); setSearchProduct(''); }}
                 style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
               >
                 Temizle

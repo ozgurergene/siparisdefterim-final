@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [theme, setTheme] = useState('light')
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
+  const [searchProduct, setSearchProduct] = useState('')
   const [editingId, setEditingId] = useState(null)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [editingData, setEditingData] = useState({
@@ -70,9 +71,10 @@ export default function DashboardPage() {
     checkUser()
   }, [router])
 
-  // Real-time filter
+  // Real-time filter - exclude completed orders
   useEffect(() => {
-    let filtered = orders
+    let filtered = orders.filter(order => order.status !== 'completed')
+    
     if (searchName.trim()) {
       filtered = filtered.filter(order => 
         order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
@@ -83,8 +85,13 @@ export default function DashboardPage() {
         order.customer_phone.startsWith(searchPhone)
       )
     }
+    if (searchProduct.trim()) {
+      filtered = filtered.filter(order => 
+        order.product.toLowerCase().includes(searchProduct.toLowerCase())
+      )
+    }
     setFilteredOrders(filtered)
-  }, [searchName, searchPhone, orders])
+  }, [searchName, searchPhone, searchProduct, orders])
 
   const fetchUserData = async (userId) => {
     try {
@@ -245,7 +252,7 @@ export default function DashboardPage() {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      await supabase.from('orders').update({ status }).eq('id', orderId)
+      await supabase.from('orders').update({ status, updated_at: new Date().toISOString() }).eq('id', orderId)
       await fetchUserData(user.id)
     } catch (error) {
       alert('Hata: ' + error.message)
@@ -295,6 +302,8 @@ export default function DashboardPage() {
           setSearchName={setSearchName}
           searchPhone={searchPhone}
           setSearchPhone={setSearchPhone}
+          searchProduct={searchProduct}
+          setSearchProduct={setSearchProduct}
           filteredCount={filteredOrders.length}
           theme={theme}
         />

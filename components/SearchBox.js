@@ -2,7 +2,7 @@
 
 import { colors } from '../lib/theme'
 
-export default function SearchBox({ searchName, setSearchName, searchPhone, setSearchPhone, filteredCount, theme }) {
+export default function SearchBox({ searchName, setSearchName, searchPhone, setSearchPhone, searchProduct, setSearchProduct, filteredCount, theme }) {
   const c = colors[theme]
 
   return (
@@ -31,8 +31,18 @@ export default function SearchBox({ searchName, setSearchName, searchPhone, setS
           />
         </div>
         <div>
+          <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
+          <input
+            type="text"
+            placeholder="Ürün ara..."
+            value={searchProduct}
+            onChange={(e) => setSearchProduct(e.target.value)}
+            style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+          />
+        </div>
+        <div>
           <button
-            onClick={() => { setSearchName(''); setSearchPhone(''); }}
+            onClick={() => { setSearchName(''); setSearchPhone(''); setSearchProduct(''); }}
             style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
           >
             Temizle
