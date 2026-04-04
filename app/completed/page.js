@@ -229,7 +229,7 @@ export default function CompletedPage() {
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Fiyat</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '110px', color: c.text }}>Sipariş Tarihi</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '110px', color: c.text }}>Tamamlanma</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '110px', color: c.text }}>Tamamlanma Tarihi</th>
               </tr>
             </thead>
             <tbody>
