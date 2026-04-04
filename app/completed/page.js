@@ -1,0 +1,236 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
+import { supabase } from '../../lib/supabase'
+import { colors } from '../../lib/theme'
+
+export default function CompletedPage() {
+  const router = useRouter()
+  const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
+  const [completedOrders, setCompletedOrders] = useState([])
+  const [theme, setTheme] = useState('light')
+  const [searchName, setSearchName] = useState('')
+  const [searchPhone, setSearchPhone] = useState('')
+
+  const c = colors[theme]
+
+  // Load theme
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    setTheme(savedTheme)
+  }, [])
+
+  // Check user and fetch completed orders
+  useEffect(() => {
+    const checkUser = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!data?.session?.user) {
+          router.push('/login')
+          return
+        }
+        setUser(data.session.user)
+        await fetchCompletedOrders(data.session.user.id)
+      } catch (error) {
+        console.error('Auth error:', error)
+        router.push('/login')
+      }
+      setLoading(false)
+    }
+    checkUser()
+  }, [router])
+
+  const fetchCompletedOrders = async (userId) => {
+    const { data } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+      .order('updated_at', { ascending: false })
+    
+    setCompletedOrders(data || [])
+  }
+
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    localStorage.setItem('siparisdefterim-theme', newTheme)
+  }
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
+  // Filter orders
+  const filteredOrders = completedOrders.filter(order => {
+    const nameMatch = !searchName || order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
+    const phoneMatch = !searchPhone || order.customer_phone.startsWith(searchPhone)
+    return nameMatch && phoneMatch
+  })
+
+  // Calculate stats
+  const totalCompleted = completedOrders.length
+  const totalRevenue = completedOrders.reduce((sum, order) => sum + parseFloat(order.price || 0), 0)
+  
+  const now = new Date()
+  const thisMonth = completedOrders.filter(order => {
+    const orderDate = new Date(order.updated_at)
+    return orderDate.getMonth() === now.getMonth() && orderDate.getFullYear() === now.getFullYear()
+  }).length
+
+  const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000)
+  const thisWeek = completedOrders.filter(order => {
+    const orderDate = new Date(order.updated_at)
+    return orderDate >= oneWeekAgo
+  }).length
+
+  if (loading || !user) {
+    return (
+      <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial', background: c.bg, color: c.text, minHeight: '100vh' }}>
+        <h2>Yükleniyor...</h2>
+      </div>
+    )
+  }
+
+  return (
+    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0 }}>
+      {/* Header */}
+      <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+          <h1 style={{ margin: 0, fontSize: '24px', minWidth: '150px', color: c.text }}>📱 SiparişDefterim</h1>
+          
+          <div style={{ display: 'flex', gap: '10px' }}>
+            <button
+              onClick={() => router.push('/dashboard')}
+              style={{ padding: '8px 16px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: c.text }}
+            >
+              📋 Siparişler
+            </button>
+            <button
+              style={{ padding: '8px 16px', background: '#95e1d3', border: '2px solid #1D9E75', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: '#085041' }}
+            >
+              ✓ Tamamlananlar
+            </button>
+          </div>
+
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+            <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
+            <button
+              onClick={toggleTheme}
+              style={{ padding: '8px 12px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
+            >
+              {theme === 'light' ? '🌙' : '☀️'}
+            </button>
+            <button
+              onClick={handleLogout}
+              style={{ padding: '8px 15px', background: '#ff6b6b', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+            >
+              Çıkış
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div style={{ width: '100%', padding: '20px' }}>
+        {/* Stats Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Toplam Tamamlanan</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{totalCompleted}</p>
+          </div>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Toplam Gelir</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>₺{totalRevenue.toFixed(2)}</p>
+          </div>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Bu Ay</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{thisMonth}</p>
+          </div>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Bu Hafta</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{thisWeek}</p>
+          </div>
+        </div>
+
+        {/* Search Box */}
+        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
+          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>🔍 Tamamlanan Siparişlerde Ara</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
+              <input
+                type="text"
+                placeholder="Adı ara..."
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+              <input
+                type="text"
+                placeholder="Telefon ara..."
+                value={searchPhone}
+                onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
+                maxLength="10"
+                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+              />
+            </div>
+            <div>
+              <button
+                onClick={() => { setSearchName(''); setSearchPhone(''); }}
+                style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
+              >
+                Temizle
+              </button>
+            </div>
+          </div>
+          <p style={{ margin: '10px 0 0 0', fontSize: '14px', color: c.textSecondary }}>Bulunan: {filteredOrders.length} sipariş</p>
+        </div>
+
+        {/* Orders Table */}
+        <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '700px' }}>
+            <thead>
+              <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
+                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Fiyat</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>Tamamlanma</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredOrders.map((order, index) => (
+                <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {order.product.split(', ').map((prod, idx) => (
+                      <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0' }}>{prod}</div>
+                    ))}
+                    {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
+                  </td>
+                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: '#1D9E75' }}>₺{order.price}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', fontSize: '13px', color: c.textSecondary }}>
+                    {new Date(order.updated_at).toLocaleDateString('tr-TR')}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+          
+          {filteredOrders.length === 0 && (
+            <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px' }}>
+              <p>📭 Tamamlanan sipariş bulunamadı.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}
