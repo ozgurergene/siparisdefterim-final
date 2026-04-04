@@ -221,14 +221,15 @@ export default function CompletedPage() {
 
         {/* Orders Table */}
         <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '700px' }}>
+          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '800px' }}>
             <thead>
               <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
                 <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
                 <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Fiyat</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>Tamamlanma</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '110px', color: c.text }}>Sipariş Tarihi</th>
+                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '110px', color: c.text }}>Tamamlanma</th>
               </tr>
             </thead>
             <tbody>
@@ -243,8 +244,11 @@ export default function CompletedPage() {
                     {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
                   </td>
                   <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: '#1D9E75' }}>₺{order.price}</td>
-                  <td style={{ padding: '12px', textAlign: 'center', fontSize: '13px', color: c.textSecondary }}>
-                    {new Date(order.updated_at).toLocaleDateString('tr-TR')}
+                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>
+                    📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
+                  </td>
+                  <td style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: '#1D9E75', fontWeight: 'bold' }}>
+                    ✅ {new Date(order.updated_at).toLocaleDateString('tr-TR')}
                   </td>
                 </tr>
               ))}
