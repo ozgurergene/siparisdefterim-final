@@ -12,6 +12,7 @@ import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
 import Footer from '../../components/Footer'
+import { DashboardSkeleton } from '../../components/Loading'
 
 const UpgradeModal = dynamic(() => import('./UpgradeModal'), { ssr: false })
 
@@ -268,11 +269,7 @@ export default function DashboardPage() {
   }
 
   if (loading || !user) {
-    return (
-      <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial', background: c.bg, color: c.text, minHeight: '100vh' }}>
-        <h2>Yükleniyor...</h2>
-      </div>
-    )
+    return <DashboardSkeleton theme={theme} />
   }
 
   return (

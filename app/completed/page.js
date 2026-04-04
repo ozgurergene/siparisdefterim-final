@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
+import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
 export default function CompletedPage() {
   const router = useRouter()
@@ -110,8 +111,21 @@ export default function CompletedPage() {
 
   if (loading || !user) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial', background: c.bg, color: c.text, minHeight: '100vh' }}>
-        <h2>Yükleniyor...</h2>
+      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial' }}>
+        <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
+            <div style={{ display: 'flex', gap: '15px' }}>
+              <div style={{ width: 100, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
+              <div style={{ width: 120, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: '20px' }}>
+          <StatsCardsSkeleton theme={theme} />
+          <SearchBoxSkeleton theme={theme} />
+          <TableSkeleton rows={5} theme={theme} />
+        </div>
       </div>
     )
   }

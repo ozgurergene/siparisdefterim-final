@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
+import { Spinner } from '../../components/Loading'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -125,14 +126,24 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div style={{ textAlign: 'center', padding: '50px', fontFamily: 'Arial', background: c.bg, color: c.text, minHeight: '100vh' }}>
-        <h2>Yükleniyor...</h2>
+      <div style={{ 
+        minHeight: '100vh', 
+        background: 'linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%)', 
+        display: 'flex', 
+        flexDirection: 'column',
+        alignItems: 'center', 
+        justifyContent: 'center', 
+        fontFamily: 'Arial',
+        gap: '20px'
+      }}>
+        <Spinner size={50} color="#007bff" />
+        <p style={{ color: '#888', fontSize: '16px', margin: 0 }}>Yükleniyor...</p>
       </div>
     )
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 25%, #0f3460 50%, #1a1a2e 75%, #0d0d1a 100%)', display: 'flex', flexDirection: 'column', fontFamily: 'Arial' }}>
+    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%)', display: 'flex', flexDirection: 'column', fontFamily: 'Arial' }}>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
         <div style={{ maxWidth: '400px', width: '100%', padding: '40px', border: `1px solid ${c.border}`, borderRadius: '12px', background: c.header, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
           <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
