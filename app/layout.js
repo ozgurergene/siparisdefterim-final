@@ -1,3 +1,4 @@
+import './globals.css'
 import { Suspense } from 'react';
 
 export const metadata = {

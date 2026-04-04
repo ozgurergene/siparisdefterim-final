@@ -1,0 +1,24 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  font-size: 13px;
+  font-family: Arial, sans-serif;
+}
+
+h1 { font-size: 22px; }
+h2 { font-size: 18px; }
+h3 { font-size: 15px; }
+h4 { font-size: 14px; }
+
+label { font-size: 13px; }
+input, textarea, select, button { font-size: 13px; }
+
+table { font-size: 12px; }
+td, th { padding: 8px 5px; }
+
+p { font-size: 13px; }
+a { font-size: 13px; }
