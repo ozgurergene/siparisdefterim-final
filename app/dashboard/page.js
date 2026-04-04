@@ -211,7 +211,8 @@ export default function DashboardPage() {
           products_json: productsJson,
           price: totalPrice,
           note: editingData.note,
-          status: editingData.status
+          status: editingData.status,
+          updated_at: new Date().toISOString()
         })
         .eq('id', editingId)
 
