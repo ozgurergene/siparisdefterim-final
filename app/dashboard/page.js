@@ -288,6 +288,38 @@ export default function DashboardPage() {
       />
 
       <div style={{ flex: 1, width: '100%', padding: '20px' }}>
+        {/* Stats Cards */}
+        {(() => {
+          const activeOrders = orders.filter(o => o.status !== 'completed')
+          const paymentPending = activeOrders.filter(o => o.status === 'payment_pending')
+          const inShipping = activeOrders.filter(o => o.status === 'shipped')
+          const today = new Date().toDateString()
+          const todayOrders = activeOrders.filter(o => new Date(o.created_at).toDateString() === today)
+          const pendingTotal = paymentPending.reduce((sum, o) => sum + parseFloat(o.price || 0), 0)
+          
+          return (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+              <div style={{ background: c.header, padding: '15px', borderRadius: '8px', border: `1px solid ${c.border}`, textAlign: 'center' }}>
+                <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: c.textSecondary }}>📦 Aktif Sipariş</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: c.text }}>{activeOrders.length}</p>
+              </div>
+              <div style={{ background: c.header, padding: '15px', borderRadius: '8px', border: `1px solid ${c.border}`, textAlign: 'center' }}>
+                <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: c.textSecondary }}>💰 Bekleyen Ödeme</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#ffa502' }}>{paymentPending.length}</p>
+                <p style={{ margin: '5px 0 0 0', fontSize: '11px', color: c.textSecondary }}>₺{pendingTotal.toFixed(0)}</p>
+              </div>
+              <div style={{ background: c.header, padding: '15px', borderRadius: '8px', border: `1px solid ${c.border}`, textAlign: 'center' }}>
+                <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: c.textSecondary }}>🚚 Kargoda</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#e84393' }}>{inShipping.length}</p>
+              </div>
+              <div style={{ background: c.header, padding: '15px', borderRadius: '8px', border: `1px solid ${c.border}`, textAlign: 'center' }}>
+                <p style={{ margin: '0 0 5px 0', fontSize: '12px', color: c.textSecondary }}>📅 Bugün Eklenen</p>
+                <p style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: '#1D9E75' }}>{todayOrders.length}</p>
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Limit Warning */}
         {ordersCreatedCount >= 50 && (
           <div style={{ background: theme === 'light' ? '#ffe0e0' : '#4a2626', border: '2px solid #ff6b6b', borderRadius: '8px', padding: '15px', marginBottom: '20px', textAlign: 'center' }}>
