@@ -1,21 +1,11 @@
 'use client'
 
+import { useState } from 'react'
 import { colors, statusColors } from '../lib/theme'
 
 export default function OrderTable({ filteredOrders, user, theme, startEditing, deleteOrder, updateOrderStatus }) {
   const c = colors[theme]
-
-  const formatDate = (dateString) => {
-    if (!dateString) return '-'
-    const date = new Date(dateString)
-    const turkeyTime = new Date(date.getTime() + (3 * 60 * 60 * 1000))
-    const day = String(turkeyTime.getDate()).padStart(2, '0')
-    const month = String(turkeyTime.getMonth() + 1).padStart(2, '0')
-    const year = turkeyTime.getFullYear()
-    const hours = String(turkeyTime.getHours()).padStart(2, '0')
-    const minutes = String(turkeyTime.getMinutes()).padStart(2, '0')
-    return `${day}.${month}.${year} ${hours}:${minutes}`
-  }
+  const [confirmModal, setConfirmModal] = useState({ show: false, orderId: null, customerName: '' })
 
   const getWhatsAppMessage = (order) => {
     const name = order.customer_name
@@ -23,7 +13,7 @@ export default function OrderTable({ filteredOrders, user, theme, startEditing, 
     const price = order.price
     
     const messages = {
-      payment_pending: `Merhaba :) ${name},
+      payment_pending: `Merhaba ${name},
 
 Siparişiniz başarıyla oluşturuldu, teşekkür ederiz!
 
@@ -36,77 +26,156 @@ Toplam Tutar: ${price} TL
 
 İyi günler dileriz!`,
       
-      paid: `Merhaba :) ${name},
+      paid: `Merhaba ${name},
 
-Ödemeniz başarıyla alındı, teşekkür ederiz! :)
+Ödemeniz başarıyla alındı, teşekkür ederiz!
 
-Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size bilgi vereceğiz.
+Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz.
 
-İyi günler dileriz! :)`,
+İyi günler dileriz!`,
       
-      preparing: `Merhaba :) ${name},
+      preparing: `Merhaba ${name},
 
-Siparişiniz şu anda özenle hazırlanıyor! :)
+Siparişiniz şu anda özenle hazırlanıyor!
 
 Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
 
-Bizi tercih ettiğiniz için teşekkür ederiz!`,
+Bizi tercih ettiğiniz için teşekkürler!`,
       
-      shipped: `Merhaba :) ${name},
+      shipped: `Merhaba ${name},
 
 Harika haber! Siparişiniz kargoya verildi!
 
-Paketiniz yolda, çok yakında sizlere ulaştırılacak.
+Paketiniz yolda, çok yakında elinizde olacak.
 
-Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler dileriz! :)`,
+Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler!`,
       
-      completed: `Merhaba :) ${name},
+      completed: `Merhaba ${name},
 
-Siparişiniz tamamlandı! :)
+Siparişiniz tamamlandı!
 
-Umarız ürünlerimizi beğenirsiniz. :) Memnuniyetiniz bizim için çok değerli!
+Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli!
 
-Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
+Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
     }
     
     return messages[order.status] || messages.payment_pending
   }
 
+  const handleStatusChange = (orderId, newStatus, customerName) => {
+    if (newStatus === 'completed') {
+      setConfirmModal({ show: true, orderId, customerName })
+    } else {
+      updateOrderStatus(orderId, newStatus)
+    }
+  }
+
+  const confirmComplete = () => {
+    updateOrderStatus(confirmModal.orderId, 'completed')
+    setConfirmModal({ show: false, orderId: null, customerName: '' })
+  }
+
+  const cancelComplete = () => {
+    setConfirmModal({ show: false, orderId: null, customerName: '' })
+  }
+
   return (
-    <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '1000px' }}>
-        <thead>
-          <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
-            <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '120px' }}>Müşteri</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '80px' }}>Telefon</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '140px', color: c.text }}>📅 İşlem Tarihi</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>İşlem</th>
-          </tr>
-        </thead>
-        <tbody>
-          {filteredOrders.map((order, index) => {
-            const createdDate = formatDate(order.created_at)
-            const updatedDate = formatDate(order.updated_at)
-            const isEdited = order.updated_at && new Date(order.updated_at) > new Date(order.created_at)
-            
-            return (
+    <>
+      {/* Confirmation Modal */}
+      {confirmModal.show && (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.6)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          zIndex: 1000
+        }}>
+          <div style={{
+            background: c.header,
+            padding: '30px',
+            borderRadius: '12px',
+            maxWidth: '400px',
+            width: '90%',
+            textAlign: 'center',
+            border: `1px solid ${c.border}`,
+            boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
+          }}>
+            <div style={{ fontSize: '48px', marginBottom: '15px' }}>✅</div>
+            <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '18px' }}>Siparişi Tamamla</h3>
+            <p style={{ margin: '0 0 25px 0', color: c.textSecondary, fontSize: '14px', lineHeight: '1.5' }}>
+              <strong style={{ color: c.text }}>{confirmModal.customerName}</strong> adlı müşterinin siparişini tamamlamak istediğinize emin misiniz?
+              <br /><br />
+              <span style={{ color: '#ff6b6b', fontSize: '13px' }}>⚠️ Bu işlem geri alınamaz. Sipariş "Tamamlananlar" sayfasına taşınacaktır.</span>
+            </p>
+            <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+              <button
+                onClick={cancelComplete}
+                style={{
+                  padding: '12px 25px',
+                  background: c.bgSecondary,
+                  color: c.text,
+                  border: `1px solid ${c.border}`,
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px'
+                }}
+              >
+                İptal
+              </button>
+              <button
+                onClick={confirmComplete}
+                style={{
+                  padding: '12px 25px',
+                  background: '#1D9E75',
+                  color: 'white',
+                  border: 'none',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: 'bold',
+                  fontSize: '14px'
+                }}
+              >
+                ✓ Tamamla
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px', minWidth: '800px' }}>
+          <thead>
+            <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
+              <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
+              <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
+              <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
+              <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>İşlem</th>
+            </tr>
+          </thead>
+          <tbody>
+            {filteredOrders.map((order, index) => (
               <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, fontSize: '14px', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.customer_name}</td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary, width: '80px', textAlign: 'center' }}>{order.customer_phone}</td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '14px' }}>
+                <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>{order.customer_name}</td>
+                <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '16px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
+                <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
                   {order.product.split(', ').map((prod, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0', fontSize: '14px' }}>{prod}</div>
+                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>{prod}</div>
                   ))}
-                  {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
+                  {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
                 </td>
-                <td style={{ padding: '10px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text, fontSize: '14px' }}>₺{order.price}</td>
-                <td style={{ padding: '10px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontSize: '14px' }}>
+                <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
+                <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
                   <select
                     value={order.status}
-                    onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                    onChange={(e) => handleStatusChange(order.id, e.target.value, order.customer_name)}
                     style={{
                       padding: '4px 6px',
                       border: `2px solid ${statusColors[order.status]}`,
@@ -125,15 +194,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
                     <option value="completed">🎉 Tamamlandı</option>
                   </select>
                 </td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontSize: '14px', color: c.text }}>
-                  <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{createdDate}</div>
-                  {isEdited && (
-                    <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '4px', fontWeight: 'bold' }}>
-                      Düzenlendi: {updatedDate}
-                    </div>
-                  )}
-                </td>
-                <td style={{ padding: '10px', textAlign: 'center', fontSize: '14px' }}>
+                <td style={{ padding: '12px', textAlign: 'center' }}>
                   <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
                     <button
                       onClick={() => {
@@ -148,7 +209,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
                       <img 
                         src="https://dcqdgklkrjvmfjzhliph.supabase.co/storage/v1/object/sign/wp%20logo/pngwing.com.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lNjA2YmZmMy04N2Q0LTRmMjAtYjRmMC01MGRiZDM3OWI1NGYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3cCBsb2dvL3BuZ3dpbmcuY29tLnBuZyIsImlhdCI6MTc3NDcyNTQxMSwiZXhwIjoxODA2MjYxNDExfQ.p5yP8eFZijbKeH4XwfggFNDvI6vpPPsU756s2t4vZKI"
                         alt="WhatsApp"
-                        style={{ width: '16px', height: '16px' }}
+                        style={{ width: '20px', height: '20px' }}
                       />
                     </button>
                     <button
@@ -166,16 +227,16 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
                   </div>
                 </td>
               </tr>
-            )
-          })}
-        </tbody>
-      </table>
-      
-      {filteredOrders.length === 0 && (
-        <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px' }}>
-          <p style={{ fontSize: '14px' }}>📭 Sipariş bulunamadı.</p>
-        </div>
-      )}
-    </div>
+            ))}
+          </tbody>
+        </table>
+        
+        {filteredOrders.length === 0 && (
+          <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px' }}>
+            <p>📭 Sipariş bulunamadı.</p>
+          </div>
+        )}
+      </div>
+    </>
   )
 }
