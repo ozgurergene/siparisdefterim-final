@@ -60,7 +60,7 @@ export default function CompletedPage() {
     }
     if (searchProduct.trim()) {
       filtered = filtered.filter(order => 
-        order.product.toLowerCase().includes(searchProduct.toLowerCase())
+        order.product.toLowerCase().startsWith(searchProduct.toLowerCase())
       )
     }
     setFilteredOrders(filtered)
