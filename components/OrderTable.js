@@ -77,13 +77,13 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
       <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '1000px' }}>
         <thead>
           <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
-            <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '120px' }}>Müşteri</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '80px' }}>Telefon</th>
-            <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '140px', color: c.text }}>📅 İşlem Tarihi</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>İşlem</th>
+            <th style={{ padding: '11px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '120px' }}>Müşteri</th>
+            <th style={{ padding: '11px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '80px' }}>Telefon</th>
+            <th style={{ padding: '11px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
+            <th style={{ padding: '11px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
+            <th style={{ padding: '11px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
+            <th style={{ padding: '11px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '140px', color: c.text }}>İşlem Tarihi</th>
+            <th style={{ padding: '11px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>İşlem</th>
           </tr>
         </thead>
         <tbody>
