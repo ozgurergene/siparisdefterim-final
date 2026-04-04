@@ -3,7 +3,24 @@
 import { useState } from 'react'
 import { colors, statusColors } from '../lib/theme'
 
-export default function OrderTable({ filteredOrders, user, theme, startEditing, deleteOrder, updateOrderStatus }) {
+// Yeni durum isimleri
+const statusLabels = {
+  payment_pending: 'Ödeme Bekleniyor',
+  paid: 'Ödeme Alındı',
+  preparing: 'Paketlendi',
+  shipped: 'Kargoda',
+  completed: 'Teslim Edildi'
+}
+
+const statusEmojis = {
+  payment_pending: '💰',
+  paid: '✅',
+  preparing: '📦',
+  shipped: '🚚',
+  completed: '🎉'
+}
+
+export default function OrderTable({ filteredOrders, user, theme, startEditing, deleteOrder, updateOrderStatus, statusFilter, setStatusFilter }) {
   const c = colors[theme]
   const [confirmModal, setConfirmModal] = useState({ show: false, orderId: null, customerName: '' })
 
@@ -36,7 +53,7 @@ Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size heme
       
       preparing: `Merhaba ${name},
 
-Siparişiniz şu anda özenle hazırlanıyor!
+Siparişiniz paketlendi!
 
 Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
 
@@ -52,7 +69,7 @@ Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler!`,
       
       completed: `Merhaba ${name},
 
-Siparişiniz tamamlandı!
+Siparişiniz teslim edildi!
 
 Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli!
 
@@ -106,9 +123,9 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
             boxShadow: '0 10px 40px rgba(0,0,0,0.3)'
           }}>
             <div style={{ fontSize: '48px', marginBottom: '15px' }}>✅</div>
-            <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '18px' }}>Siparişi Tamamla</h3>
+            <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '18px' }}>Siparişi Teslim Et</h3>
             <p style={{ margin: '0 0 25px 0', color: c.textSecondary, fontSize: '14px', lineHeight: '1.5' }}>
-              <strong style={{ color: c.text }}>{confirmModal.customerName}</strong> adlı müşterinin siparişini tamamlamak istediğinize emin misiniz?
+              <strong style={{ color: c.text }}>{confirmModal.customerName}</strong> adlı müşterinin siparişini teslim edildi olarak işaretlemek istediğinize emin misiniz?
               <br /><br />
               <span style={{ color: '#ff6b6b', fontSize: '13px' }}>⚠️ Bu işlem geri alınamaz. Sipariş "Tamamlananlar" sayfasına taşınacaktır.</span>
             </p>
@@ -141,7 +158,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                   fontSize: '14px'
                 }}
               >
-                ✓ Tamamla
+                ✓ Teslim Edildi
               </button>
             </div>
           </div>
@@ -156,7 +173,30 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
               <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
-              <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
+              <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '140px', color: c.text }}>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
+                  <span>Durum</span>
+                  <select
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value)}
+                    style={{
+                      padding: '2px 4px',
+                      border: `1px solid ${c.border}`,
+                      borderRadius: '4px',
+                      background: c.input,
+                      color: c.text,
+                      fontSize: '12px',
+                      cursor: 'pointer'
+                    }}
+                  >
+                    <option value="all">▼ Hepsi</option>
+                    <option value="payment_pending">💰 Ödeme Bekleniyor</option>
+                    <option value="paid">✅ Ödeme Alındı</option>
+                    <option value="preparing">📦 Paketlendi</option>
+                    <option value="shipped">🚚 Kargoda</option>
+                  </select>
+                </div>
+              </th>
               <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>İşlem</th>
             </tr>
           </thead>
@@ -184,14 +224,15 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                       borderRadius: '4px',
                       cursor: 'pointer',
                       fontWeight: 'bold',
-                      fontSize: '12px'
+                      fontSize: '11px',
+                      width: '100%'
                     }}
                   >
-                    <option value="payment_pending">💰 Ödeme</option>
-                    <option value="paid">✅ Ödendi</option>
-                    <option value="preparing">📦 Hazır.</option>
-                    <option value="shipped">🚚 Kargo</option>
-                    <option value="completed">🎉 Tamamlandı</option>
+                    <option value="payment_pending">{statusEmojis.payment_pending} Ödeme Bekleniyor</option>
+                    <option value="paid">{statusEmojis.paid} Ödeme Alındı</option>
+                    <option value="preparing">{statusEmojis.preparing} Paketlendi</option>
+                    <option value="shipped">{statusEmojis.shipped} Kargoda</option>
+                    <option value="completed">{statusEmojis.completed} Teslim Edildi</option>
                   </select>
                 </td>
                 <td style={{ padding: '12px', textAlign: 'center' }}>

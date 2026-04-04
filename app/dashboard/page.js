@@ -25,6 +25,7 @@ export default function DashboardPage() {
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
+  const [statusFilter, setStatusFilter] = useState('all')
   const [editingId, setEditingId] = useState(null)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [editingData, setEditingData] = useState({
@@ -87,15 +88,17 @@ export default function DashboardPage() {
     }
     if (searchProduct.trim()) {
       filtered = filtered.filter(order => {
-        // Ürünleri virgülle ayır ve her birini kontrol et
         const products = order.product.split(', ')
         return products.some(prod => 
           prod.toLowerCase().startsWith(searchProduct.toLowerCase())
         )
       })
     }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === statusFilter)
+    }
     setFilteredOrders(filtered)
-  }, [searchName, searchPhone, searchProduct, orders])
+  }, [searchName, searchPhone, searchProduct, statusFilter, orders])
 
   const fetchUserData = async (userId) => {
     try {
@@ -319,6 +322,8 @@ export default function DashboardPage() {
           startEditing={startEditing}
           deleteOrder={deleteOrder}
           updateOrderStatus={updateOrderStatus}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
         />
       </div>
 
