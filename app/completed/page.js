@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
-import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '@/components/Loading'
+import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../components/Loading'
 
 export default function CompletedPage() {
   const router = useRouter()
