@@ -26,48 +26,48 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
 
   return (
     <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-      <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '16px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
+      <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '14px', fontWeight: 'bold' }}>📋 Sipariş Oluştur</h3>
       
       {/* Customer Info */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginBottom: '15px' }}>
         <div>
-          <label style={{ display: 'block', fontSize: '16px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
+          <label style={{ display: 'block', fontSize: '13px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı Soyadı</label>
           <input
             type="text"
             placeholder="Adı Soyadı"
             value={newOrder.customer_name}
             onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
-            style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text }}
+            style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
           />
         </div>
         <div>
-          <label style={{ display: 'block', fontSize: '16px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+          <label style={{ display: 'block', fontSize: '13px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
           <input
             type="text"
             placeholder="5551234567"
             value={newOrder.customer_phone}
             onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
             maxLength="10"
-            style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text }}
+            style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
           />
         </div>
       </div>
 
       {/* Address Row */}
       <div style={{ marginBottom: '15px' }}>
-        <label style={{ display: 'block', fontSize: '16px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
+        <label style={{ display: 'block', fontSize: '13px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Adres</label>
         <input
           type="text"
           placeholder="Adres"
           value={newOrder.customer_address}
           onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
-          style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text }}
+          style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }}
         />
       </div>
 
       {/* Product Lines Table */}
       <div style={{ marginBottom: '15px', overflowX: 'auto' }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px', fontSize: '16px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px', fontSize: '13px' }}>
           <thead>
             <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
               <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
@@ -84,22 +84,22 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
             {newOrder.products.map((product, index) => (
               <tr key={index} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}` }}>
-                  <input type="text" placeholder="Ürün adı" value={product.product} onChange={(e) => updateProductLine(index, 'product', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text }} />
+                  <input type="text" placeholder="Ürün adı" value={product.product} onChange={(e) => updateProductLine(index, 'product', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
-                  <input type="number" placeholder="1" min="1" value={product.quantity} onChange={(e) => updateProductLine(index, 'quantity', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
+                  <input type="number" placeholder="1" min="1" value={product.quantity} onChange={(e) => updateProductLine(index, 'quantity', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
-                  <input type="number" placeholder="0" value={product.unit_price} onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
+                  <input type="number" placeholder="0" value={product.unit_price} onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>₺{calculateSubtotal(product)}</td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
-                  <input type="number" placeholder="0" value={product.kdv_rate} onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)} style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
+                  <input type="number" placeholder="0" value={product.kdv_rate} onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)} style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>₺{calculateKDVAmount(product)}</td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: '#007bff' }}>₺{calculateLineTotal(product)}</td>
                 <td style={{ padding: '8px', textAlign: 'center' }}>
-                  <button type="button" onClick={() => removeProductLine(index)} disabled={newOrder.products.length === 1} style={{ padding: '4px 6px', background: newOrder.products.length === 1 ? '#ccc' : '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: newOrder.products.length === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '16px' }}>🗑️</button>
+                  <button type="button" onClick={() => removeProductLine(index)} disabled={newOrder.products.length === 1} style={{ padding: '4px 6px', background: newOrder.products.length === 1 ? '#ccc' : '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: newOrder.products.length === 1 ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '13px' }}>🗑️</button>
                 </td>
               </tr>
             ))}
@@ -107,31 +107,31 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
         </table>
       </div>
 
-      <button type="button" onClick={addProductLine} style={{ padding: '6px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '16px', marginBottom: '15px' }}>➕</button>
+      <button type="button" onClick={addProductLine} style={{ padding: '6px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '13px', marginBottom: '15px' }}>➕</button>
 
       {/* Summary */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '16px' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '13px' }}>
         <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
           <div style={{ color: c.textSecondary, marginBottom: '5px' }}>Tutar</div>
-          <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateTotalSubtotal(newOrder.products)}</div>
+          <div style={{ fontWeight: 'bold', color: c.text, fontSize: '13px' }}>₺{calculateTotalSubtotal(newOrder.products)}</div>
         </div>
         <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
           <div style={{ color: c.textSecondary, marginBottom: '5px' }}>KDV</div>
-          <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateTotalKDV(newOrder.products)}</div>
+          <div style={{ fontWeight: 'bold', color: c.text, fontSize: '13px' }}>₺{calculateTotalKDV(newOrder.products)}</div>
         </div>
         <div style={{ padding: '10px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '4px', textAlign: 'center' }}>
-          <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '16px' }}>Toplam</div>
-          <div style={{ fontWeight: 'bold', color: c.text, fontSize: '16px' }}>₺{calculateGrandTotal(newOrder.products)}</div>
+          <div style={{ color: c.textSecondary, marginBottom: '5px', fontSize: '13px' }}>Toplam</div>
+          <div style={{ fontWeight: 'bold', color: c.text, fontSize: '13px' }}>₺{calculateGrandTotal(newOrder.products)}</div>
         </div>
       </div>
 
       {/* Note */}
       <div style={{ marginBottom: '15px' }}>
-        <label style={{ display: 'block', fontSize: '16px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
-        <input type="text" placeholder="Özel talep, açıklama..." value={newOrder.note} onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })} style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '16px', boxSizing: 'border-box', background: c.input, color: c.text }} />
+        <label style={{ display: 'block', fontSize: '13px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Not (Opsiyonel)</label>
+        <input type="text" placeholder="Özel talep, açıklama..." value={newOrder.note} onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })} style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '13px', boxSizing: 'border-box', background: c.input, color: c.text }} />
       </div>
 
-      <button onClick={handleAddOrder} disabled={ordersCreatedCount >= 50} style={{ width: '100%', padding: '12px', background: ordersCreatedCount >= 50 ? '#ccc' : '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '16px' }}>Onayla</button>
+      <button onClick={handleAddOrder} disabled={ordersCreatedCount >= 50} style={{ width: '100%', padding: '12px', background: ordersCreatedCount >= 50 ? '#ccc' : '#007bff', color: 'white', border: 'none', borderRadius: '6px', cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer', fontWeight: 'bold', fontSize: '13px' }}>Onayla</button>
     </div>
   )
 }
