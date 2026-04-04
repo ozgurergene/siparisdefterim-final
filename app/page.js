@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
+import ContactForm from './components/ContactForm'
 
 export default function Home() {
   const router = useRouter()
@@ -45,9 +46,15 @@ export default function Home() {
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
-      justifyContent: 'center'
+      justifyContent: 'center',
+      flexDirection: 'column'
     }}>
       <h2>Yükleniyor...</h2>
+      
+      <div style={{ marginTop: '60px', borderTop: '1px solid #444', paddingTop: '40px', width: '100%' }}>
+        <h3>Destek / İletişim</h3>
+        <ContactForm />
+      </div>
     </div>
   )
 }
