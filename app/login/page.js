@@ -15,6 +15,7 @@ export default function LoginPage() {
   const [resetEmail, setResetEmail] = useState('')
   const [resetMessage, setResetMessage] = useState('')
   const [theme, setTheme] = useState('light')
+  const [termsAccepted, setTermsAccepted] = useState(false)
 
   const c = colors[theme]
 
@@ -56,6 +57,10 @@ export default function LoginPage() {
   }
 
   const handleGoogleSignIn = async () => {
+    if (!termsAccepted) {
+      alert('Devam etmek için Gizlilik Politikası ve Kullanım Koşullarını kabul etmelisiniz.')
+      return
+    }
     await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
@@ -86,6 +91,13 @@ export default function LoginPage() {
 
 const handleAuth = async (e) => {
   e.preventDefault()
+  
+  // Kayıt olurken checkbox kontrolü
+  if (!isLogin && !termsAccepted) {
+    alert('Kayıt olmak için Gizlilik Politikası ve Kullanım Koşullarını kabul etmelisiniz.')
+    return
+  }
+  
   setLoading(true)
 
   try {
@@ -141,6 +153,22 @@ const handleAuth = async (e) => {
           <>
             <h1 style={{ textAlign: 'center', color: c.text, marginBottom: '10px' }}>📱 SiparişDefterim</h1>
             <p style={{ textAlign: 'center', color: c.textSecondary, marginBottom: '30px' }}>Instagram siparişlerini yönet</p>
+
+            {/* Terms Checkbox - Her zaman göster */}
+            <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
+              <input
+                type="checkbox"
+                id="terms"
+                checked={termsAccepted}
+                onChange={(e) => setTermsAccepted(e.target.checked)}
+                style={{ marginTop: '3px', cursor: 'pointer', width: '18px', height: '18px' }}
+              />
+              <label htmlFor="terms" style={{ fontSize: '13px', color: c.textSecondary, cursor: 'pointer', lineHeight: '1.4' }}>
+                <a href="/privacy-policy" target="_blank" style={{ color: '#007bff', textDecoration: 'underline' }}>Gizlilik Politikası</a>,{' '}
+                <a href="/terms-of-use" target="_blank" style={{ color: '#007bff', textDecoration: 'underline' }}>Kullanım Koşulları</a> ve{' '}
+                <a href="/gdpr-disclosure" target="_blank" style={{ color: '#007bff', textDecoration: 'underline' }}>KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum.
+              </label>
+            </div>
 
             <button
               onClick={handleGoogleSignIn}
