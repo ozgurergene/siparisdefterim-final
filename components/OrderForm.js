@@ -70,7 +70,12 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
         <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '900px', fontSize: '14px' }}>
           <thead>
             <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
-              <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürün</th>
+              <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                  <span>Ürün</span>
+                  <button type="button" onClick={addProductLine} style={{ padding: '4px 8px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', lineHeight: '1' }}>➕</button>
+                </div>
+              </th>
               <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '70px', color: c.text }}>Adet</th>
               <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '100px', color: c.text }}>Birim Fiyatı</th>
               <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Tutar</th>
@@ -106,8 +111,6 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
           </tbody>
         </table>
       </div>
-
-      <button type="button" onClick={addProductLine} style={{ padding: '6px 10px', background: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginBottom: '15px' }}>➕</button>
 
       {/* Summary */}
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px', marginBottom: '15px', fontSize: '14px' }}>
