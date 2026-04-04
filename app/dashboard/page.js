@@ -86,9 +86,13 @@ export default function DashboardPage() {
       )
     }
     if (searchProduct.trim()) {
-      filtered = filtered.filter(order => 
-        order.product.toLowerCase().startsWith(searchProduct.toLowerCase())
-      )
+      filtered = filtered.filter(order => {
+        // Ürünleri virgülle ayır ve her birini kontrol et
+        const products = order.product.split(', ')
+        return products.some(prod => 
+          prod.toLowerCase().startsWith(searchProduct.toLowerCase())
+        )
+      })
     }
     setFilteredOrders(filtered)
   }, [searchName, searchPhone, searchProduct, orders])
