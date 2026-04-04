@@ -73,7 +73,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
 
   return (
     <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
-      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '13px', minWidth: '1000px' }}>
+      <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '1000px' }}>
         <thead>
           <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
             <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '120px' }}>Müşteri</th>
@@ -81,7 +81,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
             <th style={{ padding: '10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
             <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '60px', color: c.text }}>Fiyat</th>
             <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '90px', color: c.text }}>Durum</th>
-            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '150px', color: '#ff6b6b', backgroundColor: theme === 'light' ? 'rgba(255, 107, 107, 0.1)' : 'rgba(255, 107, 107, 0.15)' }}>📅 İşlem Tarihi</th>
+            <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '140px', color: c.text }}>📅 İşlem Tarihi</th>
             <th style={{ padding: '10px', textAlign: 'center', fontWeight: 'bold', width: '120px', color: c.text }}>İşlem</th>
           </tr>
         </thead>
@@ -93,16 +93,16 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
             
             return (
               <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, fontSize: '13px', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.customer_name}</td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, fontSize: '13px', color: c.textSecondary, width: '80px', textAlign: 'center' }}>📱 {order.customer_phone}</td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '13px' }}>
+                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, fontSize: '14px', maxWidth: '120px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{order.customer_name}</td>
+                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary, width: '80px', textAlign: 'center' }}>📱 {order.customer_phone}</td>
+                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word', fontSize: '14px' }}>
                   {order.product.split(', ').map((prod, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0', fontSize: '13px' }}>{prod}</div>
+                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0', fontSize: '14px' }}>{prod}</div>
                   ))}
-                  {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
+                  {order.note && <div style={{ fontSize: '13px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
                 </td>
-                <td style={{ padding: '10px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text, fontSize: '13px' }}>₺{order.price}</td>
-                <td style={{ padding: '10px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontSize: '13px' }}>
+                <td style={{ padding: '10px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text, fontSize: '14px' }}>₺{order.price}</td>
+                <td style={{ padding: '10px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontSize: '14px' }}>
                   <select
                     value={order.status}
                     onChange={(e) => updateOrderStatus(order.id, e.target.value)}
@@ -124,15 +124,15 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
                     <option value="completed">🎉 Tamamlandı</option>
                   </select>
                 </td>
-                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontSize: '13px', color: c.text }}>
-                  <div style={{ fontSize: '13px', fontWeight: 'bold' }}>{createdDate}</div>
+                <td style={{ padding: '10px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontSize: '14px', color: c.text }}>
+                  <div style={{ fontSize: '14px', fontWeight: 'bold' }}>{createdDate}</div>
                   {isEdited && (
-                    <div style={{ fontSize: '11px', color: '#ff6b6b', marginTop: '4px', fontWeight: 'bold' }}>
+                    <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '4px', fontWeight: 'bold' }}>
                       Düzenlendi: {updatedDate}
                     </div>
                   )}
                 </td>
-                <td style={{ padding: '10px', textAlign: 'center', fontSize: '13px' }}>
+                <td style={{ padding: '10px', textAlign: 'center', fontSize: '14px' }}>
                   <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
                     <button
                       onClick={() => {
@@ -172,7 +172,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere! :)`
       
       {filteredOrders.length === 0 && (
         <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px' }}>
-          <p style={{ fontSize: '13px' }}>📭 Sipariş bulunamadı.</p>
+          <p style={{ fontSize: '14px' }}>📭 Sipariş bulunamadı.</p>
         </div>
       )}
     </div>
