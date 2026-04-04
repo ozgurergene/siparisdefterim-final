@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
-import { Spinner } from '../components/Loading'
+import { Spinner } from '../../components/Loading'
 
 export default function LoginPage() {
   const router = useRouter()

@@ -12,7 +12,7 @@ import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
 import Footer from '../../components/Footer'
-import { DashboardSkeleton } from '../components/Loading'
+import { DashboardSkeleton } from '../../components/Loading'
 
 const UpgradeModal = dynamic(() => import('./UpgradeModal'), { ssr: false })
 
