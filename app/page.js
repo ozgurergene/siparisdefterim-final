@@ -3,9 +3,8 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
-import ContactForm from './components/ContactForm'
 
-export default function Home() {
+export default function RootPage() {
   const router = useRouter()
 
   useEffect(() => {
@@ -23,7 +22,7 @@ export default function Home() {
         const { data } = await supabase.auth.getSession()
         
         if (data?.session?.user) {
-          router.push('/dashboard')
+          router.push('/home')
         } else {
           router.push('/login')
         }
@@ -38,22 +37,17 @@ export default function Home() {
 
   return (
     <div style={{ 
-      textAlign: 'center', 
-      padding: '50px', 
-      fontFamily: 'Arial', 
-      background: '#1a1a1a', 
-      color: '#e0e0e0', 
       minHeight: '100vh',
+      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
-      flexDirection: 'column'
+      fontFamily: 'Arial'
     }}>
-      <h2>Yükleniyor...</h2>
-      
-      <div style={{ marginTop: '60px', borderTop: '1px solid #444', paddingTop: '40px', width: '100%' }}>
-        <h3>Destek / İletişim</h3>
-        <ContactForm />
+      <div style={{ textAlign: 'center', color: 'white' }}>
+        <div style={{ fontSize: '48px', marginBottom: '20px' }}>📱</div>
+        <h1 style={{ margin: '0 0 10px 0', fontSize: '24px' }}>SiparişDefterim</h1>
+        <p style={{ margin: 0, opacity: 0.8 }}>Yükleniyor...</p>
       </div>
     </div>
   )
