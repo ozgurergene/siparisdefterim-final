@@ -17,8 +17,12 @@ export default function CompletedPage() {
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
+  const [isSearchOpen, setIsSearchOpen] = useState(false)
 
   const c = colors[theme]
+
+  // Aktif arama var mı?
+  const hasActiveSearch = searchName || searchPhone || searchProduct
 
   // Load theme
   useEffect(() => {
@@ -135,7 +139,38 @@ export default function CompletedPage() {
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <h1 style={{ margin: 0, fontSize: '24px', minWidth: '150px', color: c.text }}>📱 SiparişDefterim</h1>
+          
+          {/* Logo + Home Icon */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <button
+              onClick={() => router.push('/home')}
+              style={{
+                padding: '6px 10px',
+                background: c.bgSecondary,
+                border: `1px solid ${c.border}`,
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '18px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}
+              title="Ana Sayfa"
+            >
+              🏠
+            </button>
+            <h1 
+              onClick={() => router.push('/home')}
+              style={{ 
+                margin: 0, 
+                fontSize: '24px', 
+                color: c.text,
+                cursor: 'pointer'
+              }}
+            >
+              📱 SiparişDefterim
+            </h1>
+          </div>
           
           <div style={{ display: 'flex', gap: '10px' }}>
             <button
@@ -190,51 +225,100 @@ export default function CompletedPage() {
           </div>
         </div>
 
-        {/* Search Box */}
-        <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
-          <h3 style={{ margin: '0 0 15px 0', color: c.text, fontSize: '14px', fontWeight: 'bold' }}>🔍 Tamamlanan Siparişlerde Ara</h3>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
-              <input
-                type="text"
-                placeholder="Adı ara..."
-                value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
+        {/* Search Box - Collapsible */}
+        <div style={{ background: c.header, borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
+          {/* Header - Always visible */}
+          <div 
+            onClick={() => setIsSearchOpen(!isSearchOpen)}
+            style={{ 
+              padding: '12px 15px', 
+              display: 'flex', 
+              justifyContent: 'space-between', 
+              alignItems: 'center',
+              cursor: 'pointer',
+              background: isSearchOpen ? c.bgSecondary : c.header,
+              transition: 'background 0.2s'
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '14px', fontWeight: 'bold', color: c.text }}>🔍 Tamamlanan Siparişlerde Ara</span>
+              {hasActiveSearch && (
+                <span style={{ 
+                  background: '#007bff', 
+                  color: 'white', 
+                  fontSize: '11px', 
+                  padding: '2px 8px', 
+                  borderRadius: '10px',
+                  fontWeight: 'bold'
+                }}>
+                  Aktif
+                </span>
+              )}
             </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
-              <input
-                type="text"
-                placeholder="Telefon ara..."
-                value={searchPhone}
-                onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
-                maxLength="10"
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
-              <input
-                type="text"
-                placeholder="Ürün ara..."
-                value={searchProduct}
-                onChange={(e) => setSearchProduct(e.target.value)}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <button
-                onClick={() => { setSearchName(''); setSearchPhone(''); setSearchProduct(''); }}
-                style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
-              >
-                Temizle
-              </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '13px', color: c.textSecondary }}>{filteredOrders.length} sonuç</span>
+              <span style={{ 
+                fontSize: '12px', 
+                color: c.textSecondary,
+                transform: isSearchOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                transition: 'transform 0.2s'
+              }}>
+                ▼
+              </span>
             </div>
           </div>
-          <p style={{ margin: '10px 0 0 0', fontSize: '14px', color: c.textSecondary }}>Bulunan: {filteredOrders.length} sipariş</p>
+
+          {/* Collapsible Content */}
+          {isSearchOpen && (
+            <div style={{ padding: '15px', borderTop: `1px solid ${c.border}` }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
+                  <input
+                    type="text"
+                    placeholder="Adı ara..."
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+                  <input
+                    type="text"
+                    placeholder="Telefon ara..."
+                    value={searchPhone}
+                    onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
+                    maxLength="10"
+                    style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
+                  <input
+                    type="text"
+                    placeholder="Ürün ara..."
+                    value={searchProduct}
+                    onChange={(e) => setSearchProduct(e.target.value)}
+                    style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                  />
+                </div>
+                <div>
+                  <button
+                    onClick={(e) => { 
+                      e.stopPropagation()
+                      setSearchName('')
+                      setSearchPhone('')
+                      setSearchProduct('')
+                    }}
+                    style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
+                  >
+                    Temizle
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Orders Table */}
