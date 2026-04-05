@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
-import { Spinner } from '../../components/Loading'
+import { Spinner } from '@/components/Loading'
 
 export default function LoginPage() {
   const router = useRouter()
@@ -41,7 +41,7 @@ export default function LoginPage() {
 
         const { data } = await supabase.auth.getSession()
         if (data?.session?.user) {
-          router.push('/home')
+          router.push('/dashboard')
           return
         }
       } catch (error) {
@@ -106,7 +106,7 @@ export default function LoginPage() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw new Error(error.message)
-        router.push('/home')
+        router.push('/dashboard')
       } else {
         // KAYIT OL
         const { error } = await supabase.auth.signUp({ email, password })
@@ -156,6 +156,15 @@ export default function LoginPage() {
                 borderRadius: '20px',
                 cursor: 'pointer',
                 fontSize: '18px',
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)'
+                e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(255, 193, 7, 0.5)' : '0 4px 15px rgba(102, 126, 234, 0.4)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = 'none'
               }}
             >
               {theme === 'light' ? '☀️' : '🌙'}
@@ -200,6 +209,15 @@ export default function LoginPage() {
                   justifyContent: 'center',
                   gap: '10px',
                   marginBottom: '20px',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(66, 133, 244, 0.3)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 <svg width="18" height="18" viewBox="0 0 18 18">
@@ -270,6 +288,15 @@ export default function LoginPage() {
                     cursor: 'pointer',
                     fontWeight: 'bold',
                     fontSize: '16px',
+                    transition: 'transform 0.2s, box-shadow 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)'
+                    e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
                   {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
@@ -288,6 +315,15 @@ export default function LoginPage() {
                   cursor: 'pointer',
                   color: '#007bff',
                   fontWeight: 'bold',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.3)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 {isLogin ? 'Kayıt Ol' : 'Giriş Yap'}
@@ -306,6 +342,15 @@ export default function LoginPage() {
                   fontWeight: 'bold',
                   fontSize: '14px',
                   textDecoration: 'underline',
+                  transition: 'transform 0.2s, text-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                  e.currentTarget.style.textShadow = '0 0 10px rgba(255, 107, 107, 0.5)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.textShadow = 'none'
                 }}
               >
                 Şifremi Unuttum
@@ -364,6 +409,15 @@ export default function LoginPage() {
                     fontWeight: 'bold',
                     fontSize: '16px',
                     marginBottom: '10px',
+                    transition: 'transform 0.2s, box-shadow 0.2s'
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.transform = 'scale(1.02)'
+                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(40, 167, 69, 0.5)'
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.transform = 'scale(1)'
+                    e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
                   Şifre Sıfırlama Linki Gönder
@@ -385,6 +439,15 @@ export default function LoginPage() {
                   cursor: 'pointer',
                   color: '#007bff',
                   fontWeight: 'bold',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.02)'
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.3)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 ← Geri Dön

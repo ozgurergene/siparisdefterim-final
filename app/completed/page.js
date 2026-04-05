@@ -186,9 +186,18 @@ export default function CompletedPage() {
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'transform 0.2s, box-shadow 0.2s'
               }}
               title="Ana Sayfa"
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             >
               <HomeIcon size={22} />
             </button>
@@ -198,8 +207,11 @@ export default function CompletedPage() {
                 margin: 0, 
                 fontSize: '24px', 
                 color: c.text,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                transition: 'opacity 0.2s'
               }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
             >
               📱 SiparişDefterim
             </h1>
@@ -223,13 +235,46 @@ export default function CompletedPage() {
             <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
             <button
               onClick={toggleTheme}
-              style={{ padding: '8px 12px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
+              style={{ 
+                padding: '8px 12px', 
+                background: c.bgSecondary, 
+                border: `1px solid ${c.border}`, 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontSize: '16px',
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : '0 4px 15px rgba(255, 193, 7, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             >
               {theme === 'light' ? '🌙' : '☀️'}
             </button>
             <button
               onClick={handleLogout}
-              style={{ padding: '8px 15px', background: '#ff6b6b', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+              style={{ 
+                padding: '8px 15px', 
+                background: '#ff6b6b', 
+                color: 'white', 
+                border: 'none', 
+                borderRadius: '6px', 
+                cursor: 'pointer', 
+                fontWeight: 'bold',
+                transition: 'transform 0.2s, box-shadow 0.2s'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = 'none'
+              }}
             >
               Çıkış
             </button>
