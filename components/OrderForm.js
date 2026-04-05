@@ -9,7 +9,7 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
   const addProductLine = () => {
     setNewOrder({
       ...newOrder,
-      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv_rate: 0 }]
+      products: [...newOrder.products, { product: '', quantity: 1, unit_price: '', kdv_rate: '' }]
     })
   }
 

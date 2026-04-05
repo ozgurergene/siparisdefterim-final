@@ -42,7 +42,7 @@ export default function DashboardPage() {
     customer_name: '',
     customer_phone: '',
     customer_address: '',
-    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
+    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
     note: ''
   })
 
@@ -191,7 +191,7 @@ export default function DashboardPage() {
         customer_name: '',
         customer_phone: '',
         customer_address: '',
-        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
+        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
         note: ''
       })
       await fetchUserData(user.id)
