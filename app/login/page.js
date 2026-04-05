@@ -41,7 +41,7 @@ export default function LoginPage() {
 
         const { data } = await supabase.auth.getSession()
         if (data?.session?.user) {
-          router.push('/dashboard')
+          router.push('/home')
           return
         }
       } catch (error) {
@@ -106,7 +106,7 @@ export default function LoginPage() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw new Error(error.message)
-        router.push('/dashboard')
+        router.push('/home')
       } else {
         // KAYIT OL
         const { error } = await supabase.auth.signUp({ email, password })
