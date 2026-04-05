@@ -10,7 +10,41 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
   return (
     <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-        <h1 style={{ margin: 0, fontSize: '24px', minWidth: '150px', color: c.text }}>📱 SiparişDefterim</h1>
+        
+        {/* Logo + Home Icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <button
+            onClick={() => router.push('/home')}
+            style={{
+              padding: '6px 10px',
+              background: c.bgSecondary,
+              border: `1px solid ${c.border}`,
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontSize: '18px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+            title="Ana Sayfa"
+          >
+            🏠
+          </button>
+          <h1 
+            onClick={() => router.push('/home')}
+            style={{ 
+              margin: 0, 
+              fontSize: '24px', 
+              color: c.text,
+              cursor: 'pointer',
+              transition: 'opacity 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
+            onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            📱 SiparişDefterim
+          </h1>
+        </div>
         
         <div style={{ display: 'flex', gap: '10px' }}>
           <button
