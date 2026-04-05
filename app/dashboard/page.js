@@ -12,7 +12,7 @@ import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
 import Footer from '../../components/Footer'
-import { DashboardSkeleton } from '../../components/Loading'
+import { DashboardSkeleton } from '@/components/Loading'
 
 const UpgradeModal = dynamic(() => import('./UpgradeModal'), { ssr: false })
 
@@ -74,9 +74,9 @@ export default function DashboardPage() {
     checkUser()
   }, [router])
 
-  // Real-time filter - exclude completed orders
+  // Real-time filter
   useEffect(() => {
-    let filtered = orders.filter(order => order.status !== 'completed')
+    let filtered = orders
     
     if (searchName.trim()) {
       filtered = filtered.filter(order => 
@@ -104,6 +104,7 @@ export default function DashboardPage() {
 
   const fetchUserData = async (userId) => {
     try {
+      // Check if user exists in users table
       const { data: userData, error: userError } = await supabase
         .from('users')
         .select('*')
@@ -112,18 +113,18 @@ export default function DashboardPage() {
       
       if (userError && userError.code === 'PGRST116') {
         await supabase.from('users').insert([{ id: userId, orders_created_count: 0 }])
-        setOrdersCreatedCount(0)
-      } else {
-        setOrdersCreatedCount(userData?.orders_created_count || 0)
       }
 
+      // Fetch orders and use actual count
       const { data: ordersData } = await supabase
         .from('orders')
         .select('*')
         .eq('user_id', userId)
         .order('created_at', { ascending: false })
 
-      setOrders(ordersData || [])
+      const allOrders = ordersData || []
+      setOrders(allOrders.filter(o => o.status !== 'completed'))
+      setOrdersCreatedCount(allOrders.length) // Use actual orders count
     } catch (error) {
       console.error('fetchUserData error:', error)
     }
