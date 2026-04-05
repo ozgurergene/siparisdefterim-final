@@ -149,7 +149,7 @@ export default function CompletedPage() {
 
   if (loading || !user) {
     return (
-      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial' }}>
+      <div style={{ minHeight: '100vh', background: c.bgGradient, fontFamily: 'Arial' }}>
         <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
@@ -169,7 +169,7 @@ export default function CompletedPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: c.bgGradient, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>

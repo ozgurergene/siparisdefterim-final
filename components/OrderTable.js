@@ -3,15 +3,6 @@
 import { useState } from 'react'
 import { colors, statusColors } from '../lib/theme'
 
-// Yeni durum isimleri
-const statusLabels = {
-  payment_pending: 'Ödeme Bekleniyor',
-  paid: 'Ödeme Alındı',
-  preparing: 'Paketlendi',
-  shipped: 'Kargoda',
-  completed: 'Teslim Edildi'
-}
-
 const statusEmojis = {
   payment_pending: '💰',
   paid: '✅',
@@ -140,7 +131,16 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)'
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.5)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 ✕ İptal
@@ -155,7 +155,16 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                   borderRadius: '6px',
                   cursor: 'pointer',
                   fontWeight: 'bold',
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  transition: 'transform 0.2s, box-shadow 0.2s'
+                }}
+                onMouseOver={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.05)'
+                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(29, 158, 117, 0.5)'
+                }}
+                onMouseOut={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
                 ✓ Onayla
@@ -237,6 +246,7 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                 </td>
                 <td style={{ padding: '12px', textAlign: 'center' }}>
                   <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                    {/* WhatsApp Button - Green Glow */}
                     <button
                       onClick={() => {
                         if (order.customer_phone) {
@@ -245,7 +255,28 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                           window.open(url, '_blank')
                         }
                       }}
-                      style={{ padding: '6px 10px', background: '#25d366', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+                      style={{ 
+                        padding: '6px 10px', 
+                        background: '#25d366', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '4px', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold', 
+                        fontSize: '12px', 
+                        display: 'flex', 
+                        alignItems: 'center', 
+                        justifyContent: 'center',
+                        transition: 'transform 0.2s, box-shadow 0.2s'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)'
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.5)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
                     >
                       <img 
                         src="https://dcqdgklkrjvmfjzhliph.supabase.co/storage/v1/object/sign/wp%20logo/pngwing.com.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lNjA2YmZmMy04N2Q0LTRmMjAtYjRmMC01MGRiZDM3OWI1NGYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3cCBsb2dvL3BuZ3dpbmcuY29tLnBuZyIsImlhdCI6MTc3NDcyNTQxMSwiZXhwIjoxODA2MjYxNDExfQ.p5yP8eFZijbKeH4XwfggFNDvI6vpPPsU756s2t4vZKI"
@@ -253,15 +284,53 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
                         style={{ width: '20px', height: '20px' }}
                       />
                     </button>
+                    {/* Edit Button - Blue Glow */}
                     <button
                       onClick={() => startEditing(order)}
-                      style={{ padding: '6px 10px', background: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}
+                      style={{ 
+                        padding: '6px 10px', 
+                        background: '#007bff', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '4px', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold', 
+                        fontSize: '12px',
+                        transition: 'transform 0.2s, box-shadow 0.2s'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)'
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
                     >
                       ✎
                     </button>
+                    {/* Delete Button - Red Glow */}
                     <button
                       onClick={() => deleteOrder(order.id)}
-                      style={{ padding: '6px 10px', background: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '12px' }}
+                      style={{ 
+                        padding: '6px 10px', 
+                        background: '#dc3545', 
+                        color: 'white', 
+                        border: 'none', 
+                        borderRadius: '4px', 
+                        cursor: 'pointer', 
+                        fontWeight: 'bold', 
+                        fontSize: '12px',
+                        transition: 'transform 0.2s, box-shadow 0.2s'
+                      }}
+                      onMouseOver={(e) => {
+                        e.currentTarget.style.transform = 'scale(1.1)'
+                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.5)'
+                      }}
+                      onMouseOut={(e) => {
+                        e.currentTarget.style.transform = 'scale(1)'
+                        e.currentTarget.style.boxShadow = 'none'
+                      }}
                     >
                       🗑️
                     </button>

@@ -42,7 +42,7 @@ export default function DashboardPage() {
     customer_name: '',
     customer_phone: '',
     customer_address: '',
-    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
     note: ''
   })
 
@@ -191,7 +191,7 @@ export default function DashboardPage() {
         customer_name: '',
         customer_phone: '',
         customer_address: '',
-        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+        products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: 0 }],
         note: ''
       })
       await fetchUserData(user.id)
@@ -274,7 +274,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ minHeight: '100vh', background: c.bgGradient, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} />
 
       <Header

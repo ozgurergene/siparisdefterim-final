@@ -63,7 +63,7 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
             title="Ana Sayfa"
             onMouseOver={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)'
-              e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)'
             }}
             onMouseOut={(e) => {
               e.currentTarget.style.transform = 'scale(1)'
@@ -110,6 +110,8 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
             </div>
           </div>
           <span style={{ color: c.textSecondary, fontSize: '16px', minWidth: '120px' }}>{user.email}</span>
+          
+          {/* Theme Toggle Button with Yellow/Orange glow */}
           <button
             onClick={toggleTheme}
             style={{
@@ -119,10 +121,21 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
               borderRadius: '6px',
               cursor: 'pointer',
               fontSize: '16px',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : '0 4px 15px rgba(255, 193, 7, 0.5)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
             }}
           >
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
+          
+          {/* Logout Button with Red glow */}
           <button
             onClick={handleLogout}
             style={{
@@ -133,6 +146,15 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
               borderRadius: '6px',
               cursor: 'pointer',
               fontWeight: 'bold',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.5)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
             }}
           >
             Çıkış
