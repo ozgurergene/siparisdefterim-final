@@ -7,6 +7,40 @@ import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
+// Gradient Home Icon SVG Component
+function HomeIcon({ size = 24 }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#667eea" />
+          <stop offset="100%" stopColor="#764ba2" />
+        </linearGradient>
+      </defs>
+      <path 
+        d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" 
+        stroke="url(#homeGradient)" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      <path 
+        d="M9 22V12H15V22" 
+        stroke="url(#homeGradient)" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
 export default function CompletedPage() {
   const router = useRouter()
   const [user, setUser] = useState(null)
@@ -141,23 +175,22 @@ export default function CompletedPage() {
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           
           {/* Logo + Home Icon */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <button
               onClick={() => router.push('/home')}
               style={{
-                padding: '6px 10px',
+                padding: '8px',
                 background: c.bgSecondary,
                 border: `1px solid ${c.border}`,
-                borderRadius: '6px',
+                borderRadius: '8px',
                 cursor: 'pointer',
-                fontSize: '18px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
               title="Ana Sayfa"
             >
-              🏠
+              <HomeIcon size={22} />
             </button>
             <h1 
               onClick={() => router.push('/home')}
