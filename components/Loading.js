@@ -1,54 +1,143 @@
 ﻿'use client'
 
-export function Spinner({ size = 40, color = '#667eea' }) {
+import { colors } from '../lib/theme'
+
+// Spinner Component
+export function Spinner({ size = 40, color = '#007bff' }) {
   return (
     <div style={{
-      width: size, height: size, border: `3px solid rgba(102, 126, 234, 0.1)`,
-      borderTop: `3px solid ${color}`, borderRadius: '50%', animation: 'spin 0.8s linear infinite',
-    }} />
-  )
-}
-
-export function SkeletonBox({ width = '100%', height = 20, borderRadius = 8 }) {
-  return (
-    <div style={{
-      width, height, borderRadius,
-      background: 'linear-gradient(90deg, rgba(102, 126, 234, 0.1) 25%, rgba(118, 75, 162, 0.15) 50%, rgba(102, 126, 234, 0.1) 75%)',
-      backgroundSize: '200% 100%', animation: 'shimmer 1.5s ease-in-out infinite',
-    }} />
-  )
-}
-
-export function DashboardSkeleton() {
-  return (
-    <div style={{ animation: 'fadeIn 0.3s ease-out' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
-        {[...Array(4)].map((_, i) => (
-          <div key={i} style={{ background: '#16161f', borderRadius: 16, padding: 20 }}>
-            <SkeletonBox width={80} height={14} borderRadius={4} />
-            <div style={{ marginTop: 12 }}><SkeletonBox width={60} height={32} borderRadius={6} /></div>
-          </div>
-        ))}
-      </div>
-      <style jsx global>{`
-        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+      width: size,
+      height: size,
+      border: `3px solid rgba(0,0,0,0.1)`,
+      borderTop: `3px solid ${color}`,
+      borderRadius: '50%',
+      animation: 'spin 0.8s linear infinite'
+    }}>
+      <style>{`
+        @keyframes spin {
+          0% { transform: rotate(0deg); }
+          100% { transform: rotate(360deg); }
+        }
       `}</style>
     </div>
   )
 }
 
-export function PageLoading() {
+// Skeleton Box
+export function SkeletonBox({ width = '100%', height = 20, borderRadius = 4, theme = 'light' }) {
+  const bgColor = theme === 'light' ? '#e0e0e0' : '#3a3a3a'
+  const shimmerColor = theme === 'light' ? '#f0f0f0' : '#4a4a4a'
+  
   return (
     <div style={{
-      position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
-      background: 'linear-gradient(135deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-      display: 'flex', alignItems: 'center', justifyContent: 'center', flexDirection: 'column', gap: 20, zIndex: 9999,
+      width,
+      height,
+      borderRadius,
+      background: `linear-gradient(90deg, ${bgColor} 25%, ${shimmerColor} 50%, ${bgColor} 75%)`,
+      backgroundSize: '200% 100%',
+      animation: 'shimmer 1.5s infinite'
     }}>
-      <Spinner size={50} />
-      <p style={{ color: 'rgba(255, 255, 255, 0.6)', fontSize: 14 }}>Yükleniyor...</p>
-      <style jsx global>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+      <style>{`
+        @keyframes shimmer {
+          0% { background-position: 200% 0; }
+          100% { background-position: -200% 0; }
+        }
+      `}</style>
+    </div>
+  )
+}
+
+// Stats Cards Skeleton
+export function StatsCardsSkeleton({ theme = 'light' }) {
+  const c = colors[theme]
+  
+  return (
+    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} style={{ background: c.header, padding: '15px', borderRadius: '8px', border: `1px solid ${c.border}`, textAlign: 'center' }}>
+          <SkeletonBox width={80} height={12} theme={theme} />
+          <div style={{ marginTop: '10px', display: 'flex', justifyContent: 'center' }}>
+            <SkeletonBox width={60} height={28} theme={theme} />
+          </div>
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Search Box Skeleton
+export function SearchBoxSkeleton({ theme = 'light' }) {
+  const c = colors[theme]
+  
+  return (
+    <div style={{ background: c.header, padding: '15px 20px', borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}` }}>
+      <SkeletonBox width={80} height={14} theme={theme} />
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px', marginTop: '15px' }}>
+        {[1, 2, 3].map(i => (
+          <div key={i}>
+            <SkeletonBox width={80} height={12} theme={theme} />
+            <div style={{ marginTop: '8px' }}><SkeletonBox height={36} theme={theme} /></div>
+          </div>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+// Table Skeleton
+export function TableSkeleton({ rows = 5, theme = 'light' }) {
+  const c = colors[theme]
+  
+  return (
+    <div style={{ background: c.header, borderRadius: '8px', overflow: 'hidden', border: `1px solid ${c.border}` }}>
+      <div style={{ background: c.bgSecondary, padding: '12px 15px', borderBottom: `2px solid ${c.border}`, display: 'flex', gap: '15px' }}>
+        <SkeletonBox width={100} height={14} theme={theme} />
+        <SkeletonBox width={80} height={14} theme={theme} />
+        <SkeletonBox width={150} height={14} theme={theme} />
+        <SkeletonBox width={60} height={14} theme={theme} />
+        <SkeletonBox width={100} height={14} theme={theme} />
+      </div>
+      {Array.from({ length: rows }).map((_, i) => (
+        <div key={i} style={{ 
+          padding: '12px 15px', 
+          borderBottom: `1px solid ${c.border}`, 
+          display: 'flex', 
+          gap: '15px',
+          background: i % 2 === 0 ? c.header : c.bgSecondary
+        }}>
+          <SkeletonBox width={100} height={16} theme={theme} />
+          <SkeletonBox width={80} height={16} theme={theme} />
+          <SkeletonBox width={150} height={16} theme={theme} />
+          <SkeletonBox width={60} height={16} theme={theme} />
+          <SkeletonBox width={100} height={28} borderRadius={4} theme={theme} />
+        </div>
+      ))}
+    </div>
+  )
+}
+
+// Dashboard Full Skeleton
+export function DashboardSkeleton({ theme = 'light' }) {
+  const c = colors[theme]
+  
+  return (
+    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial' }}>
+      <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <SkeletonBox width={180} height={28} theme={theme} />
+          <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+            <SkeletonBox width={150} height={16} theme={theme} />
+            <SkeletonBox width={40} height={36} borderRadius={6} theme={theme} />
+            <SkeletonBox width={60} height={36} borderRadius={6} theme={theme} />
+          </div>
+        </div>
+      </div>
+      
+      <div style={{ padding: '20px' }}>
+        <StatsCardsSkeleton theme={theme} />
+        <SearchBoxSkeleton theme={theme} />
+        <TableSkeleton rows={4} theme={theme} />
+      </div>
     </div>
   )
 }
