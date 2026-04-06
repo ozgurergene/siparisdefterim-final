@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { colors, statusColors, glowEffects, getAvatarGradient, getInitials } from '../lib/theme'
+import { colors, statusColors, glowEffects, getAvatarGradient, getInitials } from '../../lib/theme'
 
 export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, theme }) {
   const c = colors[theme]
@@ -37,15 +37,14 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
       <div
         style={{
           background: c.bgCard,
-          backdropFilter: 'blur(20px)',
-          borderRadius: 20,
+          borderRadius: 16,
           padding: 60,
           textAlign: 'center',
           border: `1px solid ${c.border}`,
         }}
       >
         <span style={{ fontSize: 48, display: 'block', marginBottom: 16 }}>📭</span>
-        <p style={{ color: c.textSecondary, fontSize: 16 }}>Henüz sipariş bulunmuyor</p>
+        <p style={{ color: c.textSecondary, fontSize: 15, fontWeight: 500, margin: 0 }}>Henüz sipariş bulunmuyor</p>
       </div>
     )
   }
@@ -54,11 +53,10 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
     <div
       style={{
         background: c.bgCard,
-        backdropFilter: 'blur(20px)',
-        borderRadius: 20,
+        borderRadius: 16,
         overflow: 'hidden',
         border: `1px solid ${c.border}`,
-        boxShadow: `0 10px 40px ${c.shadow}`,
+        boxShadow: c.shadow,
       }}
     >
       {/* Table Header */}
@@ -67,24 +65,21 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
           display: 'grid',
           gridTemplateColumns: '50px 2fr 1.5fr 100px 140px 130px',
           gap: 16,
-          padding: '16px 24px',
-          background: 'rgba(102, 126, 234, 0.05)',
+          padding: '14px 20px',
+          background: c.bgTertiary,
           borderBottom: `1px solid ${c.border}`,
-          position: 'sticky',
-          top: 0,
-          zIndex: 10,
         }}
       >
-        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}></span>
-        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Müşteri</span>
-        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5 }}>Ürünler</span>
-        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'right' }}>Fiyat</span>
-        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'center' }}>Durum</span>
-        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', letterSpacing: 0.5, textAlign: 'right' }}>İşlem</span>
+        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}></span>
+        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Müşteri</span>
+        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px' }}>Ürünler</span>
+        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'right' }}>Fiyat</span>
+        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'center' }}>Durum</span>
+        <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', textAlign: 'right' }}>İşlem</span>
       </div>
 
       {/* Table Body */}
-      {orders.map((order, index) => {
+      {orders.map((order) => {
         const status = statusColors[order.status] || statusColors.payment_pending
         const isHovered = hoveredRow === order.id
         
@@ -97,31 +92,26 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
               display: 'grid',
               gridTemplateColumns: '50px 2fr 1.5fr 100px 140px 130px',
               gap: 16,
-              padding: '16px 24px',
+              padding: '14px 20px',
               borderBottom: `1px solid ${c.borderLight}`,
               alignItems: 'center',
               background: isHovered ? c.bgCardHover : 'transparent',
-              transition: 'all 0.2s ease',
-              animation: 'fadeIn 0.3s ease-out',
-              animationDelay: `${index * 0.05}s`,
-              animationFillMode: 'both',
+              transition: 'background 0.15s ease',
             }}
           >
             {/* Avatar */}
             <div
               style={{
-                width: 40,
-                height: 40,
+                width: 38,
+                height: 38,
                 borderRadius: '50%',
                 background: getAvatarGradient(order.customer_name),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: 13,
-                fontWeight: 600,
+                fontWeight: 700,
                 color: 'white',
-                boxShadow: isHovered ? '0 4px 15px rgba(102, 126, 234, 0.4)' : '0 2px 8px rgba(0,0,0,0.1)',
-                transition: 'all 0.3s ease',
               }}
             >
               {getInitials(order.customer_name)}
@@ -129,41 +119,23 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
 
             {/* Customer Info */}
             <div>
-              <p style={{ 
-                margin: 0, 
-                fontSize: 14, 
-                fontWeight: 500, 
-                color: c.text,
-              }}>
+              <p style={{ margin: 0, fontSize: 14, fontWeight: 600, color: c.text }}>
                 {order.customer_name}
               </p>
-              <p style={{ 
-                margin: '4px 0 0', 
-                fontSize: 12, 
-                color: c.textMuted,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-              }}>
-                <span style={{ color: '#667eea' }}>📱</span>
-                {order.phone}
+              <p style={{ margin: '3px 0 0', fontSize: 12, color: c.textMuted, fontWeight: 500 }}>
+                📱 {order.phone}
               </p>
             </div>
 
             {/* Products */}
-            <div style={{ fontSize: 13, color: c.textSecondary, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 13, color: c.textSecondary, lineHeight: 1.5 }}>
               {order.products?.map((p, i) => (
-                <div key={i}>
-                  {p.name} x{p.quantity} <span style={{ color: c.textMuted }}>(₺{p.total?.toFixed(2) || '0.00'})</span>
+                <div key={i} style={{ fontWeight: 500 }}>
+                  {p.name} x{p.quantity} <span style={{ color: c.textMuted }}>(₺{p.total?.toFixed(0) || '0'})</span>
                 </div>
               ))}
               {order.notes && (
-                <div style={{ 
-                  marginTop: 4, 
-                  fontSize: 11, 
-                  color: '#f093fb',
-                  fontStyle: 'italic',
-                }}>
+                <div style={{ marginTop: 4, fontSize: 11, color: '#f093fb', fontStyle: 'italic', fontWeight: 500 }}>
                   Not: {order.notes}
                 </div>
               )}
@@ -171,11 +143,7 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
 
             {/* Price */}
             <div style={{ textAlign: 'right' }}>
-              <span style={{ 
-                fontSize: 16, 
-                fontWeight: 600, 
-                color: '#43e97b',
-              }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#43e97b' }}>
                 ₺{order.total_amount?.toFixed(0) || '0'}
               </span>
             </div>
@@ -188,17 +156,14 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
                 style={{
                   padding: '8px 12px',
                   borderRadius: 20,
-                  border: `1px solid ${status.border}`,
-                  background: status.bgSolid,
+                  border: `2px solid ${status.border}`,
+                  background: status.bg,
                   color: status.text,
                   fontSize: 12,
-                  fontWeight: 500,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   outline: 'none',
-                  appearance: 'none',
-                  textAlign: 'center',
                   minWidth: 130,
-                  transition: 'all 0.3s ease',
                 }}
               >
                 <option value="payment_pending">💰 Ödeme Bekleniyor</option>
@@ -215,19 +180,19 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
               <button
                 onClick={() => sendWhatsApp(order)}
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 8,
                   border: 'none',
-                  background: 'rgba(37, 211, 102, 0.15)',
+                  background: '#1a3d2a',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  transition: 'all 0.3s ease',
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.15)'
+                  e.currentTarget.style.transform = 'scale(1.1)'
                   e.currentTarget.style.boxShadow = glowEffects.whatsapp
                 }}
                 onMouseLeave={(e) => {
@@ -236,27 +201,27 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
                 }}
                 title="WhatsApp'tan Mesaj Gönder"
               >
-                <img src={whatsappLogo} alt="WhatsApp" style={{ width: 20, height: 20 }} />
+                <img src={whatsappLogo} alt="WhatsApp" style={{ width: 18, height: 18 }} />
               </button>
 
               {/* Edit */}
               <button
                 onClick={() => onEdit(order)}
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 8,
                   border: 'none',
-                  background: 'rgba(79, 172, 254, 0.15)',
+                  background: '#1a2a3e',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 16,
-                  transition: 'all 0.3s ease',
+                  fontSize: 14,
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.15)'
+                  e.currentTarget.style.transform = 'scale(1.1)'
                   e.currentTarget.style.boxShadow = glowEffects.info
                 }}
                 onMouseLeave={(e) => {
@@ -272,22 +237,20 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
               <button
                 onClick={() => handleDelete(order)}
                 style={{
-                  width: 36,
-                  height: 36,
-                  borderRadius: 10,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 8,
                   border: 'none',
-                  background: confirmDelete === order.id 
-                    ? 'rgba(245, 87, 108, 0.3)' 
-                    : 'rgba(245, 87, 108, 0.15)',
+                  background: confirmDelete === order.id ? '#3d1f2a' : '#2d1f2f',
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
-                  fontSize: 16,
-                  transition: 'all 0.3s ease',
+                  fontSize: 14,
+                  transition: 'all 0.2s ease',
                 }}
                 onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.15)'
+                  e.currentTarget.style.transform = 'scale(1.1)'
                   e.currentTarget.style.boxShadow = glowEffects.danger
                 }}
                 onMouseLeave={(e) => {
@@ -302,13 +265,6 @@ export default function OrderTable({ orders, onStatusChange, onDelete, onEdit, t
           </div>
         )
       })}
-
-      <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-      `}</style>
     </div>
   )
 }

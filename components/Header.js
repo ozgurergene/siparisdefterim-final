@@ -1,6 +1,6 @@
 'use client'
 import { useRouter, usePathname } from 'next/navigation'
-import { colors, getInitials, getAvatarGradient, glowEffects } from '../lib/theme'
+import { colors, getInitials, getAvatarGradient, glowEffects } from '../../lib/theme'
 
 export default function Header({ user, orderCount = 0, maxOrders = 50, theme, setTheme, onLogout }) {
   const router = useRouter()
@@ -10,7 +10,6 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
   const progressPercent = Math.min((orderCount / maxOrders) * 100, 100)
   const progressColor = progressPercent > 80 ? '#f5576c' : progressPercent > 60 ? '#f093fb' : '#667eea'
   
-  // Get user initials from email
   const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U'
   const userName = user?.email?.split('@')[0] || 'Kullanıcı'
 
@@ -18,7 +17,6 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
     <header
       style={{
         background: c.header,
-        backdropFilter: 'blur(20px)',
         borderBottom: `1px solid ${c.border}`,
         padding: '12px 24px',
         display: 'flex',
@@ -27,7 +25,7 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
         position: 'sticky',
         top: 0,
         zIndex: 100,
-        boxShadow: `0 4px 20px ${c.shadow}`,
+        boxShadow: c.shadow,
       }}
     >
       {/* Left: Logo & Nav */}
@@ -44,25 +42,17 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
-            transition: 'all 0.3s ease',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
             e.currentTarget.style.transform = 'scale(1.1)'
-            e.currentTarget.style.boxShadow = glowEffects.primary
           }}
           onMouseLeave={(e) => {
             e.currentTarget.style.transform = 'scale(1)'
-            e.currentTarget.style.boxShadow = 'none'
           }}
           title="Ana Sayfa"
         >
-          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="url(#homeGradient)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <defs>
-              <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#667eea" />
-                <stop offset="100%" stopColor="#764ba2" />
-              </linearGradient>
-            </defs>
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
             <polyline points="9 22 9 12 15 12 15 22" />
           </svg>
@@ -70,14 +60,13 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
 
         {/* Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 20 }}>📱</span>
+          <span style={{ fontSize: 22 }}>📱</span>
           <h1 style={{ 
             fontSize: 18, 
-            fontWeight: 600, 
+            fontWeight: 700, 
             color: c.text,
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            WebkitBackgroundClip: 'text',
-            WebkitTextFillColor: 'transparent',
+            margin: 0,
+            letterSpacing: '-0.02em',
           }}>
             SiparişDefterim
           </h1>
@@ -88,8 +77,8 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
           <button
             onClick={() => router.push('/dashboard')}
             style={{
-              padding: '10px 20px',
-              borderRadius: 10,
+              padding: '10px 18px',
+              borderRadius: 8,
               border: 'none',
               cursor: 'pointer',
               fontSize: 14,
@@ -97,22 +86,12 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              transition: 'all 0.3s ease',
+              transition: 'all 0.2s ease',
               background: pathname === '/dashboard' 
                 ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-                : 'rgba(102, 126, 234, 0.1)',
+                : c.bgCard,
               color: pathname === '/dashboard' ? 'white' : c.text,
-              boxShadow: pathname === '/dashboard' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (pathname !== '/dashboard') {
-                e.currentTarget.style.background = 'rgba(102, 126, 234, 0.2)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (pathname !== '/dashboard') {
-                e.currentTarget.style.background = 'rgba(102, 126, 234, 0.1)'
-              }
+              boxShadow: pathname === '/dashboard' ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none',
             }}
           >
             <span>📦</span>
@@ -122,8 +101,8 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
           <button
             onClick={() => router.push('/completed')}
             style={{
-              padding: '10px 20px',
-              borderRadius: 10,
+              padding: '10px 18px',
+              borderRadius: 8,
               border: 'none',
               cursor: 'pointer',
               fontSize: 14,
@@ -131,22 +110,12 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
               display: 'flex',
               alignItems: 'center',
               gap: 8,
-              transition: 'all 0.3s ease',
+              transition: 'all 0.2s ease',
               background: pathname === '/completed' 
                 ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' 
-                : 'rgba(67, 233, 123, 0.1)',
+                : c.bgCard,
               color: pathname === '/completed' ? 'white' : c.text,
-              boxShadow: pathname === '/completed' ? '0 4px 15px rgba(67, 233, 123, 0.4)' : 'none',
-            }}
-            onMouseEnter={(e) => {
-              if (pathname !== '/completed') {
-                e.currentTarget.style.background = 'rgba(67, 233, 123, 0.2)'
-              }
-            }}
-            onMouseLeave={(e) => {
-              if (pathname !== '/completed') {
-                e.currentTarget.style.background = 'rgba(67, 233, 123, 0.1)'
-              }
+              boxShadow: pathname === '/completed' ? '0 4px 12px rgba(67, 233, 123, 0.3)' : 'none',
             }}
           >
             <span>✅</span>
@@ -160,14 +129,14 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
         
         {/* Order Progress */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 12, color: c.textSecondary }}>
+          <span style={{ fontSize: 13, fontWeight: 500, color: c.textSecondary }}>
             {orderCount}/{maxOrders}
           </span>
           <div
             style={{
               width: 80,
               height: 6,
-              background: c.borderLight,
+              background: c.border,
               borderRadius: 3,
               overflow: 'hidden',
             }}
@@ -190,25 +159,21 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
           style={{
             width: 40,
             height: 40,
-            borderRadius: 10,
-            border: 'none',
-            background: 'rgba(255, 255, 255, 0.05)',
+            borderRadius: 8,
+            border: `1px solid ${c.border}`,
+            background: c.bgCard,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             fontSize: 18,
-            transition: 'all 0.3s ease',
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)'
-            e.currentTarget.style.boxShadow = theme === 'dark' 
-              ? '0 0 20px rgba(250, 204, 21, 0.5)' 
-              : '0 0 20px rgba(139, 92, 246, 0.5)'
+            e.currentTarget.style.borderColor = '#667eea'
           }}
           onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-            e.currentTarget.style.boxShadow = 'none'
+            e.currentTarget.style.borderColor = c.border
           }}
           title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
         >
@@ -218,8 +183,8 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
         {/* User Avatar & Info */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 12, color: c.textMuted, margin: 0 }}>Hoş geldin,</p>
-            <p style={{ fontSize: 13, color: c.text, margin: 0, fontWeight: 500 }}>{userName}</p>
+            <p style={{ fontSize: 11, color: c.textMuted, margin: 0, fontWeight: 500 }}>Hoş geldin,</p>
+            <p style={{ fontSize: 13, color: c.text, margin: 0, fontWeight: 600 }}>{userName}</p>
           </div>
           <div
             style={{
@@ -231,9 +196,9 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: 14,
-              fontWeight: 600,
+              fontWeight: 700,
               color: 'white',
-              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+              boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
             }}
           >
             {userInitials}
@@ -244,21 +209,21 @@ export default function Header({ user, orderCount = 0, maxOrders = 50, theme, se
         <button
           onClick={onLogout}
           style={{
-            padding: '10px 20px',
-            borderRadius: 10,
+            padding: '10px 18px',
+            borderRadius: 8,
             border: 'none',
             background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
             color: 'white',
             fontSize: 14,
-            fontWeight: 500,
+            fontWeight: 600,
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
-            gap: 8,
-            transition: 'all 0.3s ease',
+            gap: 6,
+            transition: 'all 0.2s ease',
           }}
           onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.05)'
+            e.currentTarget.style.transform = 'scale(1.02)'
             e.currentTarget.style.boxShadow = glowEffects.danger
           }}
           onMouseLeave={(e) => {

@@ -1,6 +1,6 @@
 'use client'
 import { useState } from 'react'
-import { colors, statusColors, glowEffects } from '../lib/theme'
+import { colors } from '../../lib/theme'
 
 export default function SearchBox({ 
   onSearch, 
@@ -34,13 +34,11 @@ export default function SearchBox({
     <div
       style={{
         background: c.bgCard,
-        backdropFilter: 'blur(20px)',
-        borderRadius: 20,
-        padding: 20,
-        marginBottom: 24,
+        borderRadius: 16,
+        padding: 18,
+        marginBottom: 20,
         border: `1px solid ${c.border}`,
-        boxShadow: `0 10px 40px ${c.shadow}`,
-        transition: 'all 0.3s ease',
+        boxShadow: c.shadow,
       }}
     >
       {/* Header */}
@@ -55,23 +53,18 @@ export default function SearchBox({
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
           <span style={{ fontSize: 18 }}>🔍</span>
-          <h3 style={{ 
-            fontSize: 15, 
-            fontWeight: 600, 
-            color: c.text, 
-            margin: 0,
-          }}>
+          <h3 style={{ fontSize: 14, fontWeight: 700, color: c.text, margin: 0 }}>
             Sipariş Ara
           </h3>
           {(searchTerm || activeStatus !== 'all') && (
             <span
               style={{
-                padding: '4px 12px',
-                borderRadius: 12,
-                background: 'rgba(102, 126, 234, 0.15)',
+                padding: '3px 10px',
+                borderRadius: 10,
+                background: '#1f1f3d',
                 color: '#667eea',
-                fontSize: 12,
-                fontWeight: 500,
+                fontSize: 11,
+                fontWeight: 600,
               }}
             >
               Aktif
@@ -80,13 +73,13 @@ export default function SearchBox({
         </div>
         
         <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <span style={{ fontSize: 13, color: c.textMuted }}>
+          <span style={{ fontSize: 13, color: c.textSecondary, fontWeight: 500 }}>
             {resultCount} sonuç
           </span>
           <span
             style={{
               transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.3s ease',
+              transition: 'transform 0.2s ease',
               fontSize: 12,
               color: c.textMuted,
             }}
@@ -99,20 +92,14 @@ export default function SearchBox({
       {/* Expanded Content */}
       <div
         style={{
-          maxHeight: isExpanded ? 200 : 0,
+          maxHeight: isExpanded ? 180 : 0,
           overflow: 'hidden',
-          transition: 'all 0.3s ease',
+          transition: 'all 0.25s ease',
           opacity: isExpanded ? 1 : 0,
         }}
       >
         {/* Status Tabs */}
-        <div style={{ 
-          display: 'flex', 
-          gap: 8, 
-          marginTop: 16,
-          marginBottom: 16,
-          flexWrap: 'wrap',
-        }}>
+        <div style={{ display: 'flex', gap: 8, marginTop: 16, marginBottom: 14, flexWrap: 'wrap' }}>
           {statusTabs.map((tab) => {
             const count = tab.key === 'all' ? totalCount : (statusCounts[tab.key] || 0)
             const isActive = activeStatus === tab.key
@@ -125,41 +112,29 @@ export default function SearchBox({
                   onStatusFilter(tab.key)
                 }}
                 style={{
-                  padding: '8px 16px',
-                  borderRadius: 10,
-                  border: 'none',
-                  background: isActive 
-                    ? `linear-gradient(135deg, ${tab.color}dd, ${tab.color}99)`
-                    : 'rgba(255, 255, 255, 0.05)',
+                  padding: '8px 14px',
+                  borderRadius: 8,
+                  border: isActive ? 'none' : `1px solid ${c.border}`,
+                  background: isActive ? `linear-gradient(135deg, ${tab.color}dd, ${tab.color}99)` : c.bgTertiary,
                   color: isActive ? 'white' : c.textSecondary,
-                  fontSize: 13,
-                  fontWeight: 500,
+                  fontSize: 12,
+                  fontWeight: 600,
                   cursor: 'pointer',
                   display: 'flex',
                   alignItems: 'center',
                   gap: 6,
-                  transition: 'all 0.3s ease',
-                  boxShadow: isActive ? `0 4px 15px ${tab.color}40` : 'none',
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
-                  }
+                  transition: 'all 0.2s ease',
                 }}
               >
                 <span>{tab.icon}</span>
                 {tab.label}
                 <span
                   style={{
-                    padding: '2px 8px',
-                    borderRadius: 8,
-                    background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
+                    padding: '2px 7px',
+                    borderRadius: 6,
+                    background: isActive ? 'rgba(255,255,255,0.2)' : c.bgCard,
                     fontSize: 11,
+                    fontWeight: 700,
                   }}
                 >
                   {count}
@@ -181,23 +156,22 @@ export default function SearchBox({
             placeholder="Ad, telefon veya ürün ara..."
             style={{
               width: '100%',
-              padding: '14px 16px 14px 44px',
-              borderRadius: 12,
-              border: `2px solid ${focusedField === 'search' ? 'transparent' : c.inputBorder}`,
-              background: focusedField === 'search'
-                ? `linear-gradient(${c.input}, ${c.input}) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box`
-                : c.input,
+              padding: '12px 14px 12px 42px',
+              borderRadius: 8,
+              border: `2px solid ${focusedField === 'search' ? '#667eea' : c.border}`,
+              background: c.bgInput,
               color: c.text,
               fontSize: 14,
+              fontWeight: 500,
               outline: 'none',
-              transition: 'all 0.3s ease',
-              boxShadow: focusedField === 'search' ? '0 0 20px rgba(102, 126, 234, 0.2)' : 'none',
+              transition: 'border-color 0.2s ease',
+              boxSizing: 'border-box',
             }}
           />
           <span
             style={{
               position: 'absolute',
-              left: 16,
+              left: 14,
               top: '50%',
               transform: 'translateY(-50%)',
               fontSize: 16,
@@ -215,27 +189,21 @@ export default function SearchBox({
               }}
               style={{
                 position: 'absolute',
-                right: 12,
+                right: 10,
                 top: '50%',
                 transform: 'translateY(-50%)',
-                background: 'rgba(245, 87, 108, 0.15)',
+                background: '#2d1f2f',
                 border: 'none',
-                borderRadius: 8,
-                width: 28,
-                height: 28,
+                borderRadius: 6,
+                width: 26,
+                height: 26,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: 12,
+                fontSize: 11,
                 color: '#f5576c',
-                transition: 'all 0.3s ease',
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = 'rgba(245, 87, 108, 0.25)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'rgba(245, 87, 108, 0.15)'
+                fontWeight: 700,
               }}
             >
               ✕
