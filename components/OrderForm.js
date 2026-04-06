@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
-import { colors, glowEffects, buttonGradients } from '../lib/theme'
-import { calculateProductTotal } from '../lib/calculations'
+import { colors, glowEffects, buttonGradients } from '../../lib/theme'
+import { calculateProductTotal } from '../../lib/calculations'
 
 export default function OrderForm({ onSubmit, theme }) {
   const c = colors[theme]
@@ -67,24 +67,23 @@ export default function OrderForm({ onSubmit, theme }) {
 
   const inputStyle = (fieldName) => ({
     width: '100%',
-    padding: '14px 16px',
-    borderRadius: 12,
-    border: `2px solid ${focusedField === fieldName ? 'transparent' : c.inputBorder}`,
-    background: focusedField === fieldName 
-      ? `linear-gradient(${c.input}, ${c.input}) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box`
-      : c.input,
+    padding: '12px 14px',
+    borderRadius: 8,
+    border: `2px solid ${focusedField === fieldName ? '#667eea' : c.border}`,
+    background: c.bgInput,
     color: c.text,
     fontSize: 14,
+    fontWeight: 500,
     outline: 'none',
-    transition: 'all 0.3s ease',
-    boxShadow: focusedField === fieldName ? '0 0 20px rgba(102, 126, 234, 0.2)' : 'none',
+    transition: 'border-color 0.2s ease',
+    boxSizing: 'border-box',
   })
 
   const labelStyle = {
     display: 'block',
-    marginBottom: 8,
+    marginBottom: 6,
     fontSize: 13,
-    fontWeight: 500,
+    fontWeight: 600,
     color: c.textSecondary,
   }
 
@@ -93,19 +92,19 @@ export default function OrderForm({ onSubmit, theme }) {
       <div
         style={{
           background: c.bgCard,
-          backdropFilter: 'blur(20px)',
-          borderRadius: 20,
+          borderRadius: 16,
           padding: 24,
           marginBottom: 24,
           border: `1px solid ${c.border}`,
-          boxShadow: `0 10px 40px ${c.shadow}`,
+          boxShadow: c.shadow,
         }}
       >
         <h2 style={{ 
-          fontSize: 18, 
-          fontWeight: 600, 
+          fontSize: 16, 
+          fontWeight: 700, 
           color: c.text, 
           marginBottom: 20,
+          marginTop: 0,
           display: 'flex',
           alignItems: 'center',
           gap: 10,
@@ -115,7 +114,7 @@ export default function OrderForm({ onSubmit, theme }) {
         </h2>
 
         {/* Customer Info */}
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 16 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
           <div>
             <label style={labelStyle}>Müşteri Adı Soyadı</label>
             <input
@@ -166,11 +165,12 @@ export default function OrderForm({ onSubmit, theme }) {
           paddingTop: 20,
           marginTop: 20,
         }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <h3 style={{ 
-              fontSize: 15, 
-              fontWeight: 600, 
+              fontSize: 14, 
+              fontWeight: 700, 
               color: c.text,
+              margin: 0,
               display: 'flex',
               alignItems: 'center',
               gap: 8,
@@ -182,30 +182,27 @@ export default function OrderForm({ onSubmit, theme }) {
               type="button"
               onClick={addProduct}
               style={{
-                padding: '8px 16px',
-                borderRadius: 10,
+                padding: '8px 14px',
+                borderRadius: 6,
                 border: 'none',
                 background: buttonGradients.success,
                 color: 'white',
                 fontSize: 13,
-                fontWeight: 500,
+                fontWeight: 600,
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 gap: 6,
-                transition: 'all 0.3s ease',
+                transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)'
-                e.currentTarget.style.boxShadow = glowEffects.success
+                e.currentTarget.style.transform = 'scale(1.02)'
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              <span>➕</span>
-              Ürün Ekle
+              ➕ Ürün Ekle
             </button>
           </div>
 
@@ -213,20 +210,20 @@ export default function OrderForm({ onSubmit, theme }) {
           <div
             style={{
               display: 'grid',
-              gridTemplateColumns: '2fr 80px 100px 100px 80px 100px 100px 40px',
-              gap: 12,
-              padding: '10px 0',
+              gridTemplateColumns: '2fr 70px 90px 80px 70px 80px 80px 36px',
+              gap: 8,
+              padding: '8px 0',
               borderBottom: `1px solid ${c.border}`,
-              marginBottom: 12,
+              marginBottom: 10,
             }}
           >
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500 }}>Ürün Adı</span>
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500, textAlign: 'center' }}>Adet</span>
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500, textAlign: 'center' }}>Birim Fiyatı</span>
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500, textAlign: 'center' }}>Tutar</span>
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500, textAlign: 'center' }}>KDV %</span>
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500, textAlign: 'center' }}>KDV Tutarı</span>
-            <span style={{ fontSize: 12, color: c.textMuted, fontWeight: 500, textAlign: 'center' }}>Toplam</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase' }}>Ürün Adı</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Adet</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Birim Fiyatı</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Tutar</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV %</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV Tutarı</span>
+            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Toplam</span>
             <span></span>
           </div>
 
@@ -238,11 +235,10 @@ export default function OrderForm({ onSubmit, theme }) {
                 key={index}
                 style={{
                   display: 'grid',
-                  gridTemplateColumns: '2fr 80px 100px 100px 80px 100px 100px 40px',
-                  gap: 12,
-                  padding: '8px 0',
+                  gridTemplateColumns: '2fr 70px 90px 80px 70px 80px 80px 36px',
+                  gap: 8,
+                  padding: '6px 0',
                   alignItems: 'center',
-                  animation: 'fadeIn 0.3s ease-out',
                 }}
               >
                 <input
@@ -251,10 +247,7 @@ export default function OrderForm({ onSubmit, theme }) {
                   onChange={(e) => handleProductChange(index, 'name', e.target.value)}
                   placeholder="Ürün adı"
                   required
-                  style={{
-                    ...inputStyle(`product_name_${index}`),
-                    padding: '10px 12px',
-                  }}
+                  style={{ ...inputStyle(`product_name_${index}`), padding: '10px 12px' }}
                   onFocus={() => setFocusedField(`product_name_${index}`)}
                   onBlur={() => setFocusedField(null)}
                 />
@@ -263,11 +256,7 @@ export default function OrderForm({ onSubmit, theme }) {
                   value={product.quantity}
                   onChange={(e) => handleProductChange(index, 'quantity', parseInt(e.target.value) || 1)}
                   min="1"
-                  style={{
-                    ...inputStyle(`quantity_${index}`),
-                    padding: '10px 8px',
-                    textAlign: 'center',
-                  }}
+                  style={{ ...inputStyle(`quantity_${index}`), padding: '10px 6px', textAlign: 'center' }}
                   onFocus={() => setFocusedField(`quantity_${index}`)}
                   onBlur={() => setFocusedField(null)}
                 />
@@ -277,20 +266,11 @@ export default function OrderForm({ onSubmit, theme }) {
                   onChange={(e) => handleProductChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
                   min="0"
                   step="0.01"
-                  style={{
-                    ...inputStyle(`unit_price_${index}`),
-                    padding: '10px 8px',
-                    textAlign: 'center',
-                  }}
+                  style={{ ...inputStyle(`unit_price_${index}`), padding: '10px 6px', textAlign: 'center' }}
                   onFocus={() => setFocusedField(`unit_price_${index}`)}
                   onBlur={() => setFocusedField(null)}
                 />
-                <span style={{ 
-                  textAlign: 'center', 
-                  fontSize: 14, 
-                  color: c.text,
-                  fontWeight: 500,
-                }}>
+                <span style={{ textAlign: 'center', fontSize: 14, color: c.text, fontWeight: 600 }}>
                   ₺{subtotal.toFixed(2)}
                 </span>
                 <input
@@ -300,27 +280,14 @@ export default function OrderForm({ onSubmit, theme }) {
                   min="0"
                   max="100"
                   placeholder="0"
-                  style={{
-                    ...inputStyle(`kdv_rate_${index}`),
-                    padding: '10px 8px',
-                    textAlign: 'center',
-                  }}
+                  style={{ ...inputStyle(`kdv_rate_${index}`), padding: '10px 6px', textAlign: 'center' }}
                   onFocus={() => setFocusedField(`kdv_rate_${index}`)}
                   onBlur={() => setFocusedField(null)}
                 />
-                <span style={{ 
-                  textAlign: 'center', 
-                  fontSize: 14, 
-                  color: c.textSecondary,
-                }}>
+                <span style={{ textAlign: 'center', fontSize: 14, color: c.textSecondary }}>
                   ₺{kdvAmount.toFixed(2)}
                 </span>
-                <span style={{ 
-                  textAlign: 'center', 
-                  fontSize: 14, 
-                  color: '#43e97b',
-                  fontWeight: 600,
-                }}>
+                <span style={{ textAlign: 'center', fontSize: 14, color: '#43e97b', fontWeight: 700 }}>
                   ₺{total.toFixed(2)}
                 </span>
                 <button
@@ -328,31 +295,19 @@ export default function OrderForm({ onSubmit, theme }) {
                   onClick={() => removeProduct(index)}
                   disabled={formData.products.length === 1}
                   style={{
-                    width: 36,
-                    height: 36,
-                    borderRadius: 8,
+                    width: 32,
+                    height: 32,
+                    borderRadius: 6,
                     border: 'none',
-                    background: formData.products.length === 1 
-                      ? 'rgba(255, 255, 255, 0.05)' 
-                      : 'rgba(245, 87, 108, 0.15)',
-                    color: formData.products.length === 1 ? c.textMuted : '#f5576c',
+                    background: formData.products.length === 1 ? 'transparent' : '#2d1f2f',
+                    color: '#f5576c',
                     cursor: formData.products.length === 1 ? 'not-allowed' : 'pointer',
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    fontSize: 16,
-                    transition: 'all 0.3s ease',
-                    opacity: formData.products.length === 1 ? 0.5 : 1,
-                  }}
-                  onMouseEnter={(e) => {
-                    if (formData.products.length > 1) {
-                      e.currentTarget.style.transform = 'scale(1.1)'
-                      e.currentTarget.style.boxShadow = glowEffects.danger
-                    }
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)'
-                    e.currentTarget.style.boxShadow = 'none'
+                    fontSize: 14,
+                    transition: 'all 0.2s ease',
+                    opacity: formData.products.length === 1 ? 0.3 : 1,
                   }}
                 >
                   🗑️
@@ -366,39 +321,23 @@ export default function OrderForm({ onSubmit, theme }) {
             style={{
               display: 'grid',
               gridTemplateColumns: '1fr 1fr 1fr',
-              gap: 16,
+              gap: 12,
               marginTop: 20,
               padding: '16px 0',
               borderTop: `1px solid ${c.border}`,
             }}
           >
-            <div style={{ 
-              background: 'rgba(102, 126, 234, 0.1)', 
-              padding: 16, 
-              borderRadius: 12,
-              textAlign: 'center',
-            }}>
-              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0' }}>Tutar</p>
-              <p style={{ fontSize: 20, fontWeight: 600, color: c.text, margin: 0 }}>₺{totals.subtotal.toFixed(2)}</p>
+            <div style={{ background: c.bgTertiary, padding: 14, borderRadius: 10, textAlign: 'center' }}>
+              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>Tutar</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: c.text, margin: 0 }}>₺{totals.subtotal.toFixed(2)}</p>
             </div>
-            <div style={{ 
-              background: 'rgba(240, 147, 251, 0.1)', 
-              padding: 16, 
-              borderRadius: 12,
-              textAlign: 'center',
-            }}>
-              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0' }}>KDV</p>
-              <p style={{ fontSize: 20, fontWeight: 600, color: '#f093fb', margin: 0 }}>₺{totals.kdv.toFixed(2)}</p>
+            <div style={{ background: c.bgTertiary, padding: 14, borderRadius: 10, textAlign: 'center' }}>
+              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>KDV</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#f093fb', margin: 0 }}>₺{totals.kdv.toFixed(2)}</p>
             </div>
-            <div style={{ 
-              background: 'rgba(67, 233, 123, 0.15)', 
-              padding: 16, 
-              borderRadius: 12,
-              textAlign: 'center',
-              border: '1px solid rgba(67, 233, 123, 0.3)',
-            }}>
-              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0' }}>Toplam</p>
-              <p style={{ fontSize: 20, fontWeight: 600, color: '#43e97b', margin: 0 }}>₺{totals.total.toFixed(2)}</p>
+            <div style={{ background: '#1a2e1f', padding: 14, borderRadius: 10, textAlign: 'center', border: '1px solid #43e97b' }}>
+              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>Toplam</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#43e97b', margin: 0 }}>₺{totals.total.toFixed(2)}</p>
             </div>
           </div>
         </div>
@@ -414,11 +353,7 @@ export default function OrderForm({ onSubmit, theme }) {
             onBlur={() => setFocusedField(null)}
             placeholder="Özel talep, açıklama..."
             rows={3}
-            style={{
-              ...inputStyle('notes'),
-              resize: 'vertical',
-              minHeight: 80,
-            }}
+            style={{ ...inputStyle('notes'), resize: 'vertical', minHeight: 70 }}
           />
         </div>
 
@@ -428,25 +363,25 @@ export default function OrderForm({ onSubmit, theme }) {
           disabled={isSubmitting}
           style={{
             width: '100%',
-            padding: '16px 24px',
+            padding: '14px 24px',
             marginTop: 20,
-            borderRadius: 12,
+            borderRadius: 10,
             border: 'none',
             background: buttonGradients.primary,
             color: 'white',
-            fontSize: 16,
-            fontWeight: 600,
+            fontSize: 15,
+            fontWeight: 700,
             cursor: isSubmitting ? 'not-allowed' : 'pointer',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
             gap: 10,
-            transition: 'all 0.3s ease',
+            transition: 'all 0.2s ease',
             opacity: isSubmitting ? 0.7 : 1,
           }}
           onMouseEnter={(e) => {
             if (!isSubmitting) {
-              e.currentTarget.style.transform = 'scale(1.02)'
+              e.currentTarget.style.transform = 'scale(1.01)'
               e.currentTarget.style.boxShadow = glowEffects.primary
             }
           }}
@@ -458,8 +393,8 @@ export default function OrderForm({ onSubmit, theme }) {
           {isSubmitting ? (
             <>
               <span style={{
-                width: 20,
-                height: 20,
+                width: 18,
+                height: 18,
                 border: '2px solid rgba(255,255,255,0.3)',
                 borderTop: '2px solid white',
                 borderRadius: '50%',
@@ -468,19 +403,12 @@ export default function OrderForm({ onSubmit, theme }) {
               Kaydediliyor...
             </>
           ) : (
-            <>
-              <span>✓</span>
-              Onayla
-            </>
+            <>✓ Onayla</>
           )}
         </button>
       </div>
 
       <style jsx global>{`
-        @keyframes fadeIn {
-          from { opacity: 0; transform: translateY(-10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
         @keyframes spin {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
