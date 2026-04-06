@@ -1,8 +1,8 @@
 'use client'
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from './lib/supabase'
-import { PageLoading } from './components/Loading'
+import { supabase } from '../lib/supabase'
+import { PageLoading } from '../components/Loading'
 
 export default function RootPage() {
   const router = useRouter()

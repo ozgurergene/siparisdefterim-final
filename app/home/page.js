@@ -1,11 +1,11 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../lib/supabase'
-import { colors, metricGradients, glowEffects, buttonGradients, keyframesCSS } from '../lib/theme'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import { PageLoading } from '../components/Loading'
+import { supabase } from '../../lib/supabase'
+import { colors, metricGradients, glowEffects, buttonGradients, keyframesCSS } from '../../lib/theme'
+import Header from '../../components/Header'
+import Footer from '../../components/Footer'
+import { PageLoading } from '../../components/Loading'
 
 export default function HomePage() {
   const router = useRouter()

@@ -1,12 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../lib/supabase'
-import { colors, metricGradients, glowEffects, keyframesCSS, getAvatarGradient, getInitials } from '../lib/theme'
-import Header from '../components/Header'
-import Footer from '../components/Footer'
-import SearchBox from '../components/SearchBox'
-import { DashboardSkeleton } from '../components/Loading'
+import { supabase } from '../../lib/supabase'
+import { colors, metricGradients, glowEffects, keyframesCSS, getAvatarGradient, getInitials } from '../../lib/theme'
+import Header from '../../components/Header'
+import Footer from '../../components/Footer'
+import SearchBox from '../../components/SearchBox'
+import { DashboardSkeleton } from '../../components/Loading'
 
 export default function CompletedPage() {
   const router = useRouter()
