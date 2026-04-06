@@ -1,239 +1,202 @@
 'use client'
-import { useRouter, usePathname } from 'next/navigation'
-import { colors, getInitials, getAvatarGradient, glowEffects } from '../../lib/theme'
+import { useState } from 'react'
+import { colors, glowEffects, buttonGradients } from '../lib/theme'
+import { calculateProductTotal } from '../lib/calculations'
 
-export default function Header({ user, orderCount = 0, maxOrders = 50, theme, setTheme, onLogout }) {
-  const router = useRouter()
-  const pathname = usePathname()
+export default function OrderForm({ onSubmit, theme }) {
   const c = colors[theme]
-  
-  const progressPercent = Math.min((orderCount / maxOrders) * 100, 100)
-  const progressColor = progressPercent > 80 ? '#f5576c' : progressPercent > 60 ? '#f093fb' : '#667eea'
-  
-  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U'
-  const userName = user?.email?.split('@')[0] || 'Kullanıcı'
+  const [formData, setFormData] = useState({
+    customer_name: '', phone: '', address: '', notes: '',
+    products: [{ name: '', quantity: 1, unit_price: 0, kdv_rate: '' }]
+  })
+  const [focusedField, setFocusedField] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  const handleChange = (e) => setFormData({ ...formData, [e.target.name]: e.target.value })
+
+  const handleProductChange = (index, field, value) => {
+    const newProducts = [...formData.products]
+    newProducts[index][field] = value
+    setFormData({ ...formData, products: newProducts })
+  }
+
+  const addProduct = () => setFormData({ ...formData, products: [...formData.products, { name: '', quantity: 1, unit_price: 0, kdv_rate: '' }] })
+
+  const removeProduct = (index) => {
+    if (formData.products.length > 1) setFormData({ ...formData, products: formData.products.filter((_, i) => i !== index) })
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    setIsSubmitting(true)
+    await onSubmit(formData)
+    setIsSubmitting(false)
+    setFormData({ customer_name: '', phone: '', address: '', notes: '', products: [{ name: '', quantity: 1, unit_price: 0, kdv_rate: '' }] })
+  }
+
+  const totals = formData.products.reduce((acc, product) => {
+    const { subtotal, kdvAmount, total } = calculateProductTotal(product)
+    return { subtotal: acc.subtotal + subtotal, kdv: acc.kdv + kdvAmount, total: acc.total + total }
+  }, { subtotal: 0, kdv: 0, total: 0 })
+
+  const inputStyle = (fieldName) => ({
+    width: '100%',
+    padding: '12px 14px',
+    borderRadius: 8,
+    border: `2px solid ${focusedField === fieldName ? '#667eea' : c.border}`,
+    background: c.bgInput,
+    color: c.text,
+    fontSize: 14,
+    fontWeight: 500,
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+    boxSizing: 'border-box',
+  })
+
+  const labelStyle = { display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: c.textSecondary }
 
   return (
-    <header
-      style={{
-        background: c.header,
-        borderBottom: `1px solid ${c.border}`,
-        padding: '12px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        boxShadow: c.shadow,
-      }}
-    >
-      {/* Left: Logo & Nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        {/* Home Button */}
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 8,
-            borderRadius: 10,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.1)'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-          }}
-          title="Ana Sayfa"
-        >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-        </button>
+    <form onSubmit={handleSubmit}>
+      <div style={{ background: c.bgCard, borderRadius: 16, padding: 24, marginBottom: 24, border: `1px solid ${c.border}`, boxShadow: c.shadow }}>
+        <h2 style={{ fontSize: 16, fontWeight: 700, color: c.text, marginBottom: 20, marginTop: 0, display: 'flex', alignItems: 'center', gap: 10 }}>
+          <span>📝</span>Sipariş Oluştur
+        </h2>
 
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 22 }}>📱</span>
-          <h1 style={{ 
-            fontSize: 18, 
-            fontWeight: 700, 
-            color: c.text,
-            margin: 0,
-            letterSpacing: '-0.02em',
-          }}>
-            SiparişDefterim
-          </h1>
-        </div>
-
-        {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', gap: 8, marginLeft: 20 }}>
-          <button
-            onClick={() => router.push('/dashboard')}
-            style={{
-              padding: '10px 18px',
-              borderRadius: 8,
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.2s ease',
-              background: pathname === '/dashboard' 
-                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-                : c.bgCard,
-              color: pathname === '/dashboard' ? 'white' : c.text,
-              boxShadow: pathname === '/dashboard' ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none',
-            }}
-          >
-            <span>📦</span>
-            Siparişler
-          </button>
-
-          <button
-            onClick={() => router.push('/completed')}
-            style={{
-              padding: '10px 18px',
-              borderRadius: 8,
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.2s ease',
-              background: pathname === '/completed' 
-                ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' 
-                : c.bgCard,
-              color: pathname === '/completed' ? 'white' : c.text,
-              boxShadow: pathname === '/completed' ? '0 4px 12px rgba(67, 233, 123, 0.3)' : 'none',
-            }}
-          >
-            <span>✅</span>
-            Tamamlananlar
-          </button>
-        </nav>
-      </div>
-
-      {/* Right: Progress, Theme, User, Logout */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        
-        {/* Order Progress */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: c.textSecondary }}>
-            {orderCount}/{maxOrders}
-          </span>
-          <div
-            style={{
-              width: 80,
-              height: 6,
-              background: c.border,
-              borderRadius: 3,
-              overflow: 'hidden',
-            }}
-          >
-            <div
-              style={{
-                width: `${progressPercent}%`,
-                height: '100%',
-                background: `linear-gradient(90deg, #667eea, ${progressColor})`,
-                borderRadius: 3,
-                transition: 'width 0.5s ease',
-              }}
-            />
+        {/* Customer Info */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
+          <div>
+            <label style={labelStyle}>Müşteri Adı Soyadı</label>
+            <input type="text" name="customer_name" value={formData.customer_name} onChange={handleChange} onFocus={() => setFocusedField('customer_name')} onBlur={() => setFocusedField(null)} placeholder="Adı Soyadı" required style={inputStyle('customer_name')} />
+          </div>
+          <div>
+            <label style={labelStyle}>Telefon</label>
+            <input type="tel" name="phone" value={formData.phone} onChange={handleChange} onFocus={() => setFocusedField('phone')} onBlur={() => setFocusedField(null)} placeholder="5551234567" required style={inputStyle('phone')} />
           </div>
         </div>
 
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          style={{
-            width: 40,
-            height: 40,
-            borderRadius: 8,
-            border: `1px solid ${c.border}`,
-            background: c.bgCard,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: 18,
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.borderColor = '#667eea'
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.borderColor = c.border
-          }}
-          title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
-        >
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
+        <div style={{ marginBottom: 20 }}>
+          <label style={labelStyle}>Adres</label>
+          <input type="text" name="address" value={formData.address} onChange={handleChange} onFocus={() => setFocusedField('address')} onBlur={() => setFocusedField(null)} placeholder="Adres" style={inputStyle('address')} />
+        </div>
 
-        {/* User Avatar & Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 11, color: c.textMuted, margin: 0, fontWeight: 500 }}>Hoş geldin,</p>
-            <p style={{ fontSize: 13, color: c.text, margin: 0, fontWeight: 600 }}>{userName}</p>
+        {/* Products Section */}
+        <div style={{ borderTop: `1px solid ${c.border}`, paddingTop: 20, marginTop: 20 }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+            <h3 style={{ fontSize: 14, fontWeight: 700, color: c.text, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}><span>📦</span>Ürünler</h3>
+            <button type="button" onClick={addProduct} style={{ padding: '8px 14px', borderRadius: 6, border: 'none', background: buttonGradients.success, color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>➕ Ürün Ekle</button>
           </div>
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: '50%',
-              background: getAvatarGradient(user?.email),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: 14,
-              fontWeight: 700,
-              color: 'white',
-              boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
-            }}
-          >
-            {userInitials}
+
+          {/* Products Header - Fixed widths */}
+          <div style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: `1px solid ${c.border}`, marginBottom: 10 }}>
+            <span style={{ width: 120, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase' }}>Ürün Adı</span>
+            <span style={{ width: 60, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Adet</span>
+            <span style={{ width: 80, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Birim Fiyat</span>
+            <span style={{ width: 70, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Tutar</span>
+            <span style={{ width: 55, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV %</span>
+            <span style={{ width: 70, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV Tutarı</span>
+            <span style={{ width: 70, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Toplam</span>
+            <span style={{ width: 32 }}></span>
+          </div>
+
+          {/* Product Rows - Fixed widths matching header */}
+          {formData.products.map((product, index) => {
+            const { subtotal, kdvAmount, total } = calculateProductTotal(product)
+            return (
+              <div key={index} style={{ display: 'flex', gap: 10, padding: '6px 0', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  value={product.name}
+                  onChange={(e) => handleProductChange(index, 'name', e.target.value)}
+                  placeholder="Ürün adı"
+                  required
+                  style={{ ...inputStyle(`product_name_${index}`), width: 120, padding: '10px 8px' }}
+                  onFocus={() => setFocusedField(`product_name_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <input
+                  type="number"
+                  value={product.quantity}
+                  onChange={(e) => handleProductChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                  min="1"
+                  style={{ ...inputStyle(`quantity_${index}`), width: 60, padding: '10px 4px', textAlign: 'center' }}
+                  onFocus={() => setFocusedField(`quantity_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <input
+                  type="number"
+                  value={product.unit_price}
+                  onChange={(e) => handleProductChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  style={{ ...inputStyle(`unit_price_${index}`), width: 80, padding: '10px 4px', textAlign: 'center' }}
+                  onFocus={() => setFocusedField(`unit_price_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <span style={{ width: 70, textAlign: 'center', fontSize: 13, color: c.text, fontWeight: 600 }}>₺{subtotal.toFixed(2)}</span>
+                <input
+                  type="number"
+                  value={product.kdv_rate}
+                  onChange={(e) => handleProductChange(index, 'kdv_rate', e.target.value)}
+                  min="0"
+                  max="100"
+                  placeholder="0"
+                  style={{ ...inputStyle(`kdv_rate_${index}`), width: 55, padding: '10px 4px', textAlign: 'center' }}
+                  onFocus={() => setFocusedField(`kdv_rate_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <span style={{ width: 70, textAlign: 'center', fontSize: 13, color: c.textSecondary }}>₺{kdvAmount.toFixed(2)}</span>
+                <span style={{ width: 70, textAlign: 'center', fontSize: 13, color: '#43e97b', fontWeight: 700 }}>₺{total.toFixed(2)}</span>
+                <button
+                  type="button"
+                  onClick={() => removeProduct(index)}
+                  disabled={formData.products.length === 1}
+                  style={{
+                    width: 32, height: 32, borderRadius: 6, border: 'none',
+                    background: formData.products.length === 1 ? 'transparent' : '#2d1f2f',
+                    color: '#f5576c', cursor: formData.products.length === 1 ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                    opacity: formData.products.length === 1 ? 0.3 : 1,
+                  }}
+                >🗑️</button>
+              </div>
+            )
+          })}
+
+          {/* Totals */}
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 20, padding: '16px 0', borderTop: `1px solid ${c.border}` }}>
+            <div style={{ background: c.bgTertiary, padding: 14, borderRadius: 10, textAlign: 'center' }}>
+              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>Tutar</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: c.text, margin: 0 }}>₺{totals.subtotal.toFixed(2)}</p>
+            </div>
+            <div style={{ background: c.bgTertiary, padding: 14, borderRadius: 10, textAlign: 'center' }}>
+              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>KDV</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#f093fb', margin: 0 }}>₺{totals.kdv.toFixed(2)}</p>
+            </div>
+            <div style={{ background: '#1a2e1f', padding: 14, borderRadius: 10, textAlign: 'center', border: '1px solid #43e97b' }}>
+              <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>Toplam</p>
+              <p style={{ fontSize: 18, fontWeight: 700, color: '#43e97b', margin: 0 }}>₺{totals.total.toFixed(2)}</p>
+            </div>
           </div>
         </div>
 
-        {/* Logout Button */}
-        <button
-          onClick={onLogout}
-          style={{
-            padding: '10px 18px',
-            borderRadius: 8,
-            border: 'none',
-            background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)',
-            color: 'white',
-            fontSize: 14,
-            fontWeight: 600,
-            cursor: 'pointer',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 6,
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.transform = 'scale(1.02)'
-            e.currentTarget.style.boxShadow = glowEffects.danger
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.transform = 'scale(1)'
-            e.currentTarget.style.boxShadow = 'none'
-          }}
-        >
-          Çıkış
+        {/* Notes */}
+        <div style={{ marginTop: 20 }}>
+          <label style={labelStyle}>Not (Opsiyonel)</label>
+          <textarea name="notes" value={formData.notes} onChange={handleChange} onFocus={() => setFocusedField('notes')} onBlur={() => setFocusedField(null)} placeholder="Özel talep, açıklama..." rows={3} style={{ ...inputStyle('notes'), resize: 'vertical', minHeight: 70 }} />
+        </div>
+
+        {/* Submit */}
+        <button type="submit" disabled={isSubmitting} style={{
+          width: '100%', padding: '14px 24px', marginTop: 20, borderRadius: 10, border: 'none',
+          background: buttonGradients.primary, color: 'white', fontSize: 15, fontWeight: 700,
+          cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: isSubmitting ? 0.7 : 1,
+        }}
+          onMouseEnter={(e) => { if (!isSubmitting) { e.currentTarget.style.transform = 'scale(1.01)'; e.currentTarget.style.boxShadow = glowEffects.primary } }}
+          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none' }}>
+          {isSubmitting ? (<><span style={{ width: 18, height: 18, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />Kaydediliyor...</>) : (<>✓ Onayla</>)}
         </button>
       </div>
-    </header>
+      <style jsx global>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>
+    </form>
   )
 }
