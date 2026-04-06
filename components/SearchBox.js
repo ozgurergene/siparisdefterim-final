@@ -1,109 +1,248 @@
 'use client'
-
 import { useState } from 'react'
-import { colors } from '../lib/theme'
+import { colors, statusColors, glowEffects } from '../lib/theme'
 
-export default function SearchBox({ searchName, setSearchName, searchPhone, setSearchPhone, searchProduct, setSearchProduct, filteredCount, theme }) {
+export default function SearchBox({ 
+  onSearch, 
+  onStatusFilter,
+  activeStatus = 'all',
+  statusCounts = {},
+  resultCount = 0,
+  theme 
+}) {
   const c = colors[theme]
-  const [isOpen, setIsOpen] = useState(false)
-  
-  // Aktif arama var mı?
-  const hasActiveSearch = searchName || searchPhone || searchProduct
+  const [searchTerm, setSearchTerm] = useState('')
+  const [isExpanded, setIsExpanded] = useState(false)
+  const [focusedField, setFocusedField] = useState(null)
+
+  const handleSearch = (value) => {
+    setSearchTerm(value)
+    onSearch(value)
+  }
+
+  const statusTabs = [
+    { key: 'all', label: 'Tümü', icon: '📋', color: '#667eea' },
+    { key: 'payment_pending', label: 'Bekleyen', icon: '💰', color: '#f5576c' },
+    { key: 'paid', label: 'Ödendi', icon: '✅', color: '#43e97b' },
+    { key: 'preparing', label: 'Paketlendi', icon: '📦', color: '#667eea' },
+    { key: 'shipped', label: 'Kargoda', icon: '🚚', color: '#4facfe' },
+  ]
+
+  const totalCount = Object.values(statusCounts).reduce((a, b) => a + b, 0)
 
   return (
-    <div style={{ background: c.header, borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
-      {/* Header - Always visible */}
+    <div
+      style={{
+        background: c.bgCard,
+        backdropFilter: 'blur(20px)',
+        borderRadius: 20,
+        padding: 20,
+        marginBottom: 24,
+        border: `1px solid ${c.border}`,
+        boxShadow: `0 10px 40px ${c.shadow}`,
+        transition: 'all 0.3s ease',
+      }}
+    >
+      {/* Header */}
       <div 
-        onClick={() => setIsOpen(!isOpen)}
         style={{ 
-          padding: '12px 15px', 
           display: 'flex', 
           justifyContent: 'space-between', 
           alignItems: 'center',
           cursor: 'pointer',
-          background: isOpen ? c.bgSecondary : c.header,
-          transition: 'background 0.2s'
         }}
+        onClick={() => setIsExpanded(!isExpanded)}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '14px', fontWeight: 'bold', color: c.text }}>🔍 Sipariş Ara</span>
-          {hasActiveSearch && (
-            <span style={{ 
-              background: '#007bff', 
-              color: 'white', 
-              fontSize: '11px', 
-              padding: '2px 8px', 
-              borderRadius: '10px',
-              fontWeight: 'bold'
-            }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 18 }}>🔍</span>
+          <h3 style={{ 
+            fontSize: 15, 
+            fontWeight: 600, 
+            color: c.text, 
+            margin: 0,
+          }}>
+            Sipariş Ara
+          </h3>
+          {(searchTerm || activeStatus !== 'all') && (
+            <span
+              style={{
+                padding: '4px 12px',
+                borderRadius: 12,
+                background: 'rgba(102, 126, 234, 0.15)',
+                color: '#667eea',
+                fontSize: 12,
+                fontWeight: 500,
+              }}
+            >
               Aktif
             </span>
           )}
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <span style={{ fontSize: '13px', color: c.textSecondary }}>{filteredCount} sonuç</span>
-          <span style={{ 
-            fontSize: '12px', 
-            color: c.textSecondary,
-            transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-            transition: 'transform 0.2s'
-          }}>
+        
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          <span style={{ fontSize: 13, color: c.textMuted }}>
+            {resultCount} sonuç
+          </span>
+          <span
+            style={{
+              transform: isExpanded ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform 0.3s ease',
+              fontSize: 12,
+              color: c.textMuted,
+            }}
+          >
             ▼
           </span>
         </div>
       </div>
 
-      {/* Collapsible Content */}
-      {isOpen && (
-        <div style={{ padding: '15px', borderTop: `1px solid ${c.border}` }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
-              <input
-                type="text"
-                placeholder="Adı ara..."
-                value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
-              <input
-                type="text"
-                placeholder="Telefon ara..."
-                value={searchPhone}
-                onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
-                maxLength="10"
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
-              <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
-              <input
-                type="text"
-                placeholder="Ürün ara..."
-                value={searchProduct}
-                onChange={(e) => setSearchProduct(e.target.value)}
-                style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-              />
-            </div>
-            <div>
+      {/* Expanded Content */}
+      <div
+        style={{
+          maxHeight: isExpanded ? 200 : 0,
+          overflow: 'hidden',
+          transition: 'all 0.3s ease',
+          opacity: isExpanded ? 1 : 0,
+        }}
+      >
+        {/* Status Tabs */}
+        <div style={{ 
+          display: 'flex', 
+          gap: 8, 
+          marginTop: 16,
+          marginBottom: 16,
+          flexWrap: 'wrap',
+        }}>
+          {statusTabs.map((tab) => {
+            const count = tab.key === 'all' ? totalCount : (statusCounts[tab.key] || 0)
+            const isActive = activeStatus === tab.key
+            
+            return (
               <button
-                onClick={(e) => { 
+                key={tab.key}
+                onClick={(e) => {
                   e.stopPropagation()
-                  setSearchName('')
-                  setSearchPhone('')
-                  setSearchProduct('')
+                  onStatusFilter(tab.key)
                 }}
-                style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 10,
+                  border: 'none',
+                  background: isActive 
+                    ? `linear-gradient(135deg, ${tab.color}dd, ${tab.color}99)`
+                    : 'rgba(255, 255, 255, 0.05)',
+                  color: isActive ? 'white' : c.textSecondary,
+                  fontSize: 13,
+                  fontWeight: 500,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  transition: 'all 0.3s ease',
+                  boxShadow: isActive ? `0 4px 15px ${tab.color}40` : 'none',
+                }}
+                onMouseEnter={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.1)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (!isActive) {
+                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)'
+                  }
+                }}
               >
-                Temizle
+                <span>{tab.icon}</span>
+                {tab.label}
+                <span
+                  style={{
+                    padding: '2px 8px',
+                    borderRadius: 8,
+                    background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.05)',
+                    fontSize: 11,
+                  }}
+                >
+                  {count}
+                </span>
               </button>
-            </div>
-          </div>
+            )
+          })}
         </div>
-      )}
+
+        {/* Search Input */}
+        <div style={{ position: 'relative' }}>
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => handleSearch(e.target.value)}
+            onFocus={() => setFocusedField('search')}
+            onBlur={() => setFocusedField(null)}
+            onClick={(e) => e.stopPropagation()}
+            placeholder="Ad, telefon veya ürün ara..."
+            style={{
+              width: '100%',
+              padding: '14px 16px 14px 44px',
+              borderRadius: 12,
+              border: `2px solid ${focusedField === 'search' ? 'transparent' : c.inputBorder}`,
+              background: focusedField === 'search'
+                ? `linear-gradient(${c.input}, ${c.input}) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box`
+                : c.input,
+              color: c.text,
+              fontSize: 14,
+              outline: 'none',
+              transition: 'all 0.3s ease',
+              boxShadow: focusedField === 'search' ? '0 0 20px rgba(102, 126, 234, 0.2)' : 'none',
+            }}
+          />
+          <span
+            style={{
+              position: 'absolute',
+              left: 16,
+              top: '50%',
+              transform: 'translateY(-50%)',
+              fontSize: 16,
+              opacity: 0.5,
+            }}
+          >
+            🔍
+          </span>
+          
+          {searchTerm && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation()
+                handleSearch('')
+              }}
+              style={{
+                position: 'absolute',
+                right: 12,
+                top: '50%',
+                transform: 'translateY(-50%)',
+                background: 'rgba(245, 87, 108, 0.15)',
+                border: 'none',
+                borderRadius: 8,
+                width: 28,
+                height: 28,
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: 12,
+                color: '#f5576c',
+                transition: 'all 0.3s ease',
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = 'rgba(245, 87, 108, 0.25)'
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = 'rgba(245, 87, 108, 0.15)'
+              }}
+            >
+              ✕
+            </button>
+          )}
+        </div>
+      </div>
     </div>
   )
 }

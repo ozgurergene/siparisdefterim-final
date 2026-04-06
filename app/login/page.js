@@ -1,463 +1,437 @@
 'use client'
-
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
-import { colors } from '../../lib/theme'
-import Footer from '../../components/Footer'
-import { Spinner } from '@/components/Loading'
+import { supabase } from '../lib/supabase'
+import { colors, glowEffects, buttonGradients, keyframesCSS } from '../lib/theme'
 
 export default function LoginPage() {
   const router = useRouter()
-  const [loading, setLoading] = useState(true)
   const [isLogin, setIsLogin] = useState(true)
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
-  const [isForgotPassword, setIsForgotPassword] = useState(false)
-  const [resetEmail, setResetEmail] = useState('')
-  const [resetMessage, setResetMessage] = useState('')
-  const [theme, setTheme] = useState('light')
-  const [termsAccepted, setTermsAccepted] = useState(false)
+  const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [focusedField, setFocusedField] = useState(null)
+  const [agreedToTerms, setAgreedToTerms] = useState(false)
+  
+  const c = colors.dark
 
-  const c = colors[theme]
-
-  // Load theme
-  useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
-    setTheme(savedTheme)
-  }, [])
-
-  // Check if already logged in
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const urlParams = new URLSearchParams(window.location.search)
-        const code = urlParams.get('code')
-        
-        if (code) {
-          window.history.replaceState({}, '', '/login')
-          await supabase.auth.exchangeCodeForSession(code)
-        }
-
-        const { data } = await supabase.auth.getSession()
-        if (data?.session?.user) {
-          router.push('/dashboard')
-          return
-        }
-      } catch (error) {
-        console.error('Auth error:', error)
-      }
-      setLoading(false)
-    }
-    checkUser()
-  }, [router])
-
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    localStorage.setItem('siparisdefterim-theme', newTheme)
-  }
-
-  const handleGoogleSignIn = async () => {
-    if (!termsAccepted) {
-      alert('Devam etmek için Gizlilik Politikası ve Kullanım Koşullarını kabul etmelisiniz.')
-      return
-    }
-    await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: 'https://siparisdefterim-final.vercel.app/login'
-      }
-    })
-  }
-
-  const handleForgotPassword = async (e) => {
+  const handleEmailAuth = async (e) => {
     e.preventDefault()
-    setResetMessage('')
-    
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: 'https://siparisdefterim-final.vercel.app/reset-password',
-    })
-
-    if (error) {
-      setResetMessage('Hata: ' + error.message)
-    } else {
-      setResetMessage('Şifre sıfırlama linki gönderildi! Email kutunuzu kontrol edin.')
-      setTimeout(() => {
-        setIsForgotPassword(false)
-        setResetMessage('')
-        setResetEmail('')
-      }, 3000)
-    }
-  }
-
-  const handleAuth = async (e) => {
-    e.preventDefault()
-    
-    // Kayıt olurken checkbox kontrolü
-    if (!isLogin && !termsAccepted) {
-      alert('Kayıt olmak için Gizlilik Politikası ve Kullanım Koşullarını kabul etmelisiniz.')
-      return
-    }
-    
+    setError('')
+    setMessage('')
     setLoading(true)
 
     try {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
-        if (error) throw new Error(error.message)
-        router.push('/dashboard')
+        if (error) throw error
+        router.push('/home')
       } else {
-        // KAYIT OL
-        const { error } = await supabase.auth.signUp({ email, password })
-        if (error) throw new Error(error.message)
-        
-        // Kayıt başarılı - Direkt legal-confirm'e yönlendir (email confirmation kapalı)
-        router.push('/legal-confirm')
-        return
+        if (!agreedToTerms) {
+          throw new Error('Lütfen kullanım koşullarını kabul edin')
+        }
+        const { error } = await supabase.auth.signUp({ 
+          email, 
+          password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/`
+          }
+        })
+        if (error) throw error
+        setMessage('Kayıt başarılı! Lütfen e-postanızı doğrulayın.')
       }
-      setEmail('')
-      setPassword('')
-    } catch (error) {
-      alert('Hata: ' + error.message)
+    } catch (err) {
+      setError(err.message)
+    } finally {
       setLoading(false)
     }
   }
 
-  if (loading) {
-    return (
-      <div style={{ 
-        minHeight: '100vh', 
-        background: 'linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%)', 
-        display: 'flex', 
-        flexDirection: 'column',
-        alignItems: 'center', 
-        justifyContent: 'center', 
-        fontFamily: 'Arial',
-        gap: '20px'
-      }}>
-        <Spinner size={50} color="#007bff" />
-        <p style={{ color: '#888', fontSize: '16px', margin: 0 }}>Yükleniyor...</p>
-      </div>
-    )
+  const handleGoogleLogin = async () => {
+    setError('')
+    setLoading(true)
+    
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: `${window.location.origin}/`
+        }
+      })
+      if (error) throw error
+    } catch (err) {
+      setError(err.message)
+      setLoading(false)
+    }
   }
 
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError('Lütfen e-posta adresinizi girin')
+      return
+    }
+    
+    setLoading(true)
+    setError('')
+    
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`
+      })
+      if (error) throw error
+      setMessage('Şifre sıfırlama linki e-postanıza gönderildi')
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const inputStyle = (fieldName) => ({
+    width: '100%',
+    padding: '16px 20px',
+    borderRadius: 14,
+    border: `2px solid ${focusedField === fieldName ? 'transparent' : c.inputBorder}`,
+    background: focusedField === fieldName 
+      ? `linear-gradient(${c.input}, ${c.input}) padding-box, linear-gradient(135deg, #667eea, #764ba2) border-box`
+      : c.input,
+    color: c.text,
+    fontSize: 15,
+    outline: 'none',
+    transition: 'all 0.3s ease',
+    boxShadow: focusedField === fieldName ? '0 0 30px rgba(102, 126, 234, 0.3)' : 'none',
+  })
+
   return (
-    <div style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%)', display: 'flex', flexDirection: 'column', fontFamily: 'Arial' }}>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-        <div style={{ maxWidth: '400px', width: '100%', padding: '40px', border: `1px solid ${c.border}`, borderRadius: '12px', background: c.header, boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-          <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '30px' }}>
-            <button
-              onClick={toggleTheme}
-              style={{
-                padding: '8px 12px',
-                background: c.bgSecondary,
-                border: `1px solid ${c.border}`,
-                borderRadius: '20px',
-                cursor: 'pointer',
-                fontSize: '18px',
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.1)'
-                e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(255, 193, 7, 0.5)' : '0 4px 15px rgba(102, 126, 234, 0.4)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            >
-              {theme === 'light' ? '☀️' : '🌙'}
-            </button>
+    <div
+      style={{
+        minHeight: '100vh',
+        background: c.bgGradient,
+        backgroundSize: '400% 400%',
+        animation: 'gradientShift 15s ease infinite',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: 20,
+      }}
+    >
+      <div
+        style={{
+          background: c.bgCard,
+          backdropFilter: 'blur(30px)',
+          borderRadius: 28,
+          padding: 40,
+          width: '100%',
+          maxWidth: 440,
+          border: `1px solid ${c.border}`,
+          boxShadow: '0 25px 80px rgba(0, 0, 0, 0.5)',
+          animation: 'scaleIn 0.4s ease-out',
+        }}
+      >
+        {/* Logo */}
+        <div style={{ textAlign: 'center', marginBottom: 32 }}>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>📱</div>
+          <h1 style={{ 
+            fontSize: 28, 
+            fontWeight: 700, 
+            margin: 0,
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+          }}>
+            SiparişDefterim
+          </h1>
+          <p style={{ color: c.textMuted, fontSize: 14, marginTop: 8 }}>
+            Instagram siparişlerinizi kolayca yönetin
+          </p>
+        </div>
+
+        {/* Tabs */}
+        <div style={{ 
+          display: 'flex', 
+          gap: 8, 
+          marginBottom: 28,
+          background: 'rgba(255, 255, 255, 0.03)',
+          padding: 6,
+          borderRadius: 14,
+        }}>
+          <button
+            onClick={() => setIsLogin(true)}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: 10,
+              border: 'none',
+              background: isLogin ? buttonGradients.primary : 'transparent',
+              color: isLogin ? 'white' : c.textMuted,
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: isLogin ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
+            }}
+          >
+            Giriş Yap
+          </button>
+          <button
+            onClick={() => setIsLogin(false)}
+            style={{
+              flex: 1,
+              padding: '12px',
+              borderRadius: 10,
+              border: 'none',
+              background: !isLogin ? buttonGradients.primary : 'transparent',
+              color: !isLogin ? 'white' : c.textMuted,
+              fontSize: 14,
+              fontWeight: 500,
+              cursor: 'pointer',
+              transition: 'all 0.3s ease',
+              boxShadow: !isLogin ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
+            }}
+          >
+            Kayıt Ol
+          </button>
+        </div>
+
+        {/* Error/Message */}
+        {error && (
+          <div style={{
+            background: 'rgba(245, 87, 108, 0.15)',
+            border: '1px solid rgba(245, 87, 108, 0.3)',
+            borderRadius: 12,
+            padding: '12px 16px',
+            marginBottom: 20,
+            color: '#f5576c',
+            fontSize: 13,
+            animation: 'fadeIn 0.3s ease-out',
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
+        
+        {message && (
+          <div style={{
+            background: 'rgba(67, 233, 123, 0.15)',
+            border: '1px solid rgba(67, 233, 123, 0.3)',
+            borderRadius: 12,
+            padding: '12px 16px',
+            marginBottom: 20,
+            color: '#43e97b',
+            fontSize: 13,
+            animation: 'fadeIn 0.3s ease-out',
+          }}>
+            ✓ {message}
+          </div>
+        )}
+
+        {/* Form */}
+        <form onSubmit={handleEmailAuth}>
+          <div style={{ marginBottom: 16 }}>
+            <input
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              onFocus={() => setFocusedField('email')}
+              onBlur={() => setFocusedField(null)}
+              placeholder="E-posta"
+              required
+              style={inputStyle('email')}
+            />
+          </div>
+          
+          <div style={{ marginBottom: 16 }}>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onFocus={() => setFocusedField('password')}
+              onBlur={() => setFocusedField(null)}
+              placeholder="Şifre"
+              required
+              minLength={6}
+              style={inputStyle('password')}
+            />
           </div>
 
-          {!isForgotPassword ? (
-            <>
-              <h1 style={{ textAlign: 'center', color: c.text, marginBottom: '10px' }}>📱 SiparişDefterim</h1>
-              <p style={{ textAlign: 'center', color: c.textSecondary, marginBottom: '30px' }}>Instagram siparişlerini yönet</p>
+          {/* Terms checkbox for signup */}
+          {!isLogin && (
+            <label style={{ 
+              display: 'flex', 
+              alignItems: 'flex-start', 
+              gap: 10, 
+              marginBottom: 20,
+              cursor: 'pointer',
+            }}>
+              <input
+                type="checkbox"
+                checked={agreedToTerms}
+                onChange={(e) => setAgreedToTerms(e.target.checked)}
+                style={{ 
+                  width: 18, 
+                  height: 18, 
+                  marginTop: 2,
+                  accentColor: '#667eea',
+                }}
+              />
+              <span style={{ fontSize: 13, color: c.textSecondary, lineHeight: 1.5 }}>
+                <a href="/terms-of-use" target="_blank" style={{ color: '#667eea' }}>Kullanım Koşulları</a>,{' '}
+                <a href="/privacy-policy" target="_blank" style={{ color: '#667eea' }}>Gizlilik Politikası</a> ve{' '}
+                <a href="/gdpr-disclosure" target="_blank" style={{ color: '#667eea' }}>KVKK Aydınlatma Metni</a>'ni 
+                okudum, kabul ediyorum.
+              </span>
+            </label>
+          )}
 
-              {/* Terms Checkbox */}
-              <div style={{ marginBottom: '20px', display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                <input
-                  type="checkbox"
-                  id="terms"
-                  checked={termsAccepted}
-                  onChange={(e) => setTermsAccepted(e.target.checked)}
-                  style={{ marginTop: '3px', cursor: 'pointer', width: '18px', height: '18px' }}
-                />
-                <label htmlFor="terms" style={{ fontSize: '13px', color: c.textSecondary, cursor: 'pointer', lineHeight: '1.4' }}>
-                  <a href="/privacy-policy" target="_blank" style={{ color: '#007bff', textDecoration: 'underline' }}>Gizlilik Politikası</a>,{' '}
-                  <a href="/terms-of-use" target="_blank" style={{ color: '#007bff', textDecoration: 'underline' }}>Kullanım Koşulları</a> ve{' '}
-                  <a href="/gdpr-disclosure" target="_blank" style={{ color: '#007bff', textDecoration: 'underline' }}>KVKK Aydınlatma Metni</a>'ni okudum ve kabul ediyorum.
-                </label>
-              </div>
-
+          {/* Forgot password */}
+          {isLogin && (
+            <div style={{ textAlign: 'right', marginBottom: 20 }}>
               <button
-                onClick={handleGoogleSignIn}
+                type="button"
+                onClick={handleForgotPassword}
                 style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: '#fff',
-                  color: '#333',
-                  border: '1px solid #ddd',
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  fontWeight: '500',
-                  fontSize: '15px',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  gap: '10px',
-                  marginBottom: '20px',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)'
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(66, 133, 244, 0.3)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              >
-                <svg width="18" height="18" viewBox="0 0 18 18">
-                  <g fill="none">
-                    <path d="M17.64 9.205c0-.639-.057-1.252-.164-1.841H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-                    <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z" fill="#34A853"/>
-                    <path d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-                    <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-                  </g>
-                </svg>
-                Google ile Giriş Yap
-              </button>
-
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '20px' }}>
-                <div style={{ flex: 1, height: '1px', background: c.border }}></div>
-                <span style={{ padding: '0 15px', color: c.textSecondary, fontSize: '13px' }}>veya</span>
-                <div style={{ flex: 1, height: '1px', background: c.border }}></div>
-              </div>
-
-              <form onSubmit={handleAuth}>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Email</label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    placeholder="email@example.com"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: `1px solid ${c.inputBorder}`,
-                      borderRadius: '6px',
-                      boxSizing: 'border-box',
-                      background: c.input,
-                      color: c.text,
-                    }}
-                  />
-                </div>
-
-                <div style={{ marginBottom: '20px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Şifre</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="••••••••"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: `1px solid ${c.inputBorder}`,
-                      borderRadius: '6px',
-                      boxSizing: 'border-box',
-                      background: c.input,
-                      color: c.text,
-                    }}
-                  />
-                </div>
-
-                <button
-                  type="submit"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    background: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.02)'
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
-                >
-                  {isLogin ? 'Giriş Yap' : 'Kayıt Ol'}
-                </button>
-              </form>
-
-              <button
-                onClick={() => setIsLogin(!isLogin)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  marginTop: '10px',
-                  background: 'transparent',
-                  border: `1px solid ${c.border}`,
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  color: '#007bff',
-                  fontWeight: 'bold',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)'
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.3)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              >
-                {isLogin ? 'Kayıt Ol' : 'Giriş Yap'}
-              </button>
-
-              <button
-                onClick={() => setIsForgotPassword(true)}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  marginTop: '10px',
-                  background: 'transparent',
+                  background: 'none',
                   border: 'none',
+                  color: '#667eea',
+                  fontSize: 13,
                   cursor: 'pointer',
-                  color: '#ff6b6b',
-                  fontWeight: 'bold',
-                  fontSize: '14px',
-                  textDecoration: 'underline',
-                  transition: 'transform 0.2s, text-shadow 0.2s'
+                  transition: 'opacity 0.2s ease',
                 }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)'
-                  e.currentTarget.style.textShadow = '0 0 10px rgba(255, 107, 107, 0.5)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)'
-                  e.currentTarget.style.textShadow = 'none'
-                }}
+                onMouseEnter={(e) => e.currentTarget.style.opacity = '0.7'}
+                onMouseLeave={(e) => e.currentTarget.style.opacity = '1'}
               >
                 Şifremi Unuttum
               </button>
-            </>
-          ) : (
-            <>
-              <h2 style={{ textAlign: 'center', color: c.text, marginBottom: '20px' }}>🔐 Şifremi Unuttum</h2>
-              <p style={{ textAlign: 'center', color: c.textSecondary, marginBottom: '20px', fontSize: '14px' }}>
-                Email adresinizi girin, şifre sıfırlama linki göndereceğiz.
-              </p>
-              
-              <form onSubmit={handleForgotPassword}>
-                <div style={{ marginBottom: '15px' }}>
-                  <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Email</label>
-                  <input
-                    type="email"
-                    value={resetEmail}
-                    onChange={(e) => setResetEmail(e.target.value)}
-                    placeholder="email@example.com"
-                    style={{
-                      width: '100%',
-                      padding: '10px',
-                      border: `1px solid ${c.inputBorder}`,
-                      borderRadius: '6px',
-                      boxSizing: 'border-box',
-                      background: c.input,
-                      color: c.text,
-                    }}
-                  />
-                </div>
-
-                {resetMessage && (
-                  <div style={{
-                    marginBottom: '15px',
-                    padding: '12px',
-                    background: resetMessage.includes('gönderildi') ? '#d4edda' : '#f8d7da',
-                    color: resetMessage.includes('gönderildi') ? '#155724' : '#721c24',
-                    borderRadius: '6px',
-                    fontSize: '14px',
-                  }}>
-                    {resetMessage}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  style={{
-                    width: '100%',
-                    padding: '12px',
-                    background: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    fontWeight: 'bold',
-                    fontSize: '16px',
-                    marginBottom: '10px',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.transform = 'scale(1.02)'
-                    e.currentTarget.style.boxShadow = '0 4px 15px rgba(40, 167, 69, 0.5)'
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.transform = 'scale(1)'
-                    e.currentTarget.style.boxShadow = 'none'
-                  }}
-                >
-                  Şifre Sıfırlama Linki Gönder
-                </button>
-              </form>
-
-              <button
-                onClick={() => {
-                  setIsForgotPassword(false)
-                  setResetMessage('')
-                  setResetEmail('')
-                }}
-                style={{
-                  width: '100%',
-                  padding: '12px',
-                  background: 'transparent',
-                  border: `1px solid ${c.border}`,
-                  borderRadius: '6px',
-                  cursor: 'pointer',
-                  color: '#007bff',
-                  fontWeight: 'bold',
-                  transition: 'transform 0.2s, box-shadow 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.transform = 'scale(1.02)'
-                  e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.3)'
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.transform = 'scale(1)'
-                  e.currentTarget.style.boxShadow = 'none'
-                }}
-              >
-                ← Geri Dön
-              </button>
-            </>
+            </div>
           )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '16px',
+              borderRadius: 14,
+              border: 'none',
+              background: buttonGradients.primary,
+              color: 'white',
+              fontSize: 16,
+              fontWeight: 600,
+              cursor: loading ? 'not-allowed' : 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 10,
+              transition: 'all 0.3s ease',
+              opacity: loading ? 0.7 : 1,
+            }}
+            onMouseEnter={(e) => {
+              if (!loading) {
+                e.currentTarget.style.transform = 'scale(1.02)'
+                e.currentTarget.style.boxShadow = glowEffects.primary
+              }
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            {loading ? (
+              <>
+                <span style={{
+                  width: 20,
+                  height: 20,
+                  border: '2px solid rgba(255,255,255,0.3)',
+                  borderTop: '2px solid white',
+                  borderRadius: '50%',
+                  animation: 'spin 0.8s linear infinite',
+                }} />
+                İşleniyor...
+              </>
+            ) : (
+              isLogin ? 'Giriş Yap' : 'Kayıt Ol'
+            )}
+          </button>
+        </form>
+
+        {/* Divider */}
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          gap: 16, 
+          margin: '24px 0',
+        }}>
+          <div style={{ flex: 1, height: 1, background: c.border }} />
+          <span style={{ fontSize: 12, color: c.textMuted }}>veya</span>
+          <div style={{ flex: 1, height: 1, background: c.border }} />
+        </div>
+
+        {/* Google Login */}
+        <button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          style={{
+            width: '100%',
+            padding: '14px',
+            borderRadius: 14,
+            border: `1px solid ${c.border}`,
+            background: 'rgba(255, 255, 255, 0.03)',
+            color: c.text,
+            fontSize: 14,
+            fontWeight: 500,
+            cursor: loading ? 'not-allowed' : 'pointer',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 12,
+            transition: 'all 0.3s ease',
+          }}
+          onMouseEnter={(e) => {
+            if (!loading) {
+              e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
+              e.currentTarget.style.borderColor = '#667eea'
+            }
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'
+            e.currentTarget.style.borderColor = c.border
+          }}
+        >
+          <svg width="20" height="20" viewBox="0 0 24 24">
+            <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+            <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+            <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+            <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+          </svg>
+          Google ile Devam Et
+        </button>
+
+        {/* Footer Links */}
+        <div style={{ 
+          marginTop: 28, 
+          textAlign: 'center', 
+          fontSize: 12, 
+          color: c.textMuted,
+        }}>
+          <a href="/privacy-policy" style={{ color: c.textMuted, marginRight: 16 }}>Gizlilik</a>
+          <a href="/terms-of-use" style={{ color: c.textMuted, marginRight: 16 }}>Kullanım</a>
+          <a href="/gdpr-disclosure" style={{ color: c.textMuted }}>KVKK</a>
         </div>
       </div>
-      
-      <Footer theme={theme} />
+
+      <style jsx global>{`
+        ${keyframesCSS}
+        @keyframes gradientShift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.95); }
+          to { opacity: 1; transform: scale(1); }
+        }
+      `}</style>
     </div>
   )
 }

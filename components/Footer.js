@@ -1,43 +1,67 @@
 'use client'
-
+import Link from 'next/link'
 import { colors } from '../lib/theme'
 
-export default function Footer({ theme = 'light' }) {
+export default function Footer({ theme }) {
   const c = colors[theme]
   
   const linkStyle = {
-    color: c.textSecondary,
+    color: c.textMuted,
     textDecoration: 'none',
-    fontSize: '13px',
-    transition: 'color 0.2s'
+    fontSize: 12,
+    transition: 'color 0.2s ease',
   }
 
   return (
-    <footer style={{
-      background: c.header,
-      borderTop: `1px solid ${c.border}`,
-      padding: '20px',
-      marginTop: 'auto'
-    }}>
-      <div style={{
+    <footer
+      style={{
+        borderTop: `1px solid ${c.border}`,
+        padding: '16px 24px',
         display: 'flex',
-        flexWrap: 'wrap',
         justifyContent: 'space-between',
         alignItems: 'center',
-        gap: '16px',
-        maxWidth: '1200px',
-        margin: '0 auto'
-      }}>
-        <div style={{ color: c.textSecondary, fontSize: '13px' }}>
-          © 2025 Deftertut.com - Tüm hakları saklıdır.
-        </div>
-        <div style={{ display: 'flex', gap: '20px', flexWrap: 'wrap' }}>
-          <a href="/privacy-policy" target="_blank" style={linkStyle}>Gizlilik Politikası</a>
-          <a href="/terms-of-use" target="_blank" style={linkStyle}>Kullanım Koşulları</a>
-          <a href="/gdpr-disclosure" target="_blank" style={linkStyle}>KVKK</a>
-          <a href="mailto:destek@deftertut.com" style={linkStyle}>İletişim</a>
-        </div>
-      </div>
+        background: c.header,
+        backdropFilter: 'blur(10px)',
+      }}
+    >
+      <p style={{ fontSize: 12, color: c.textMuted, margin: 0 }}>
+        © 2026 Deftertut.com - Tüm hakları saklıdır
+      </p>
+      
+      <nav style={{ display: 'flex', gap: 20 }}>
+        <Link 
+          href="/privacy-policy" 
+          style={linkStyle}
+          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
+          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
+        >
+          Gizlilik Politikası
+        </Link>
+        <Link 
+          href="/terms-of-use" 
+          style={linkStyle}
+          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
+          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
+        >
+          Kullanım Koşulları
+        </Link>
+        <Link 
+          href="/gdpr-disclosure" 
+          style={linkStyle}
+          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
+          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
+        >
+          KVKK
+        </Link>
+        <Link 
+          href="/disclaimer" 
+          style={linkStyle}
+          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
+          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
+        >
+          İletişim
+        </Link>
+      </nav>
     </footer>
   )
 }
