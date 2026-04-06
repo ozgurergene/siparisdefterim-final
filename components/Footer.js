@@ -4,13 +4,6 @@ import { colors } from '../lib/theme'
 
 export default function Footer({ theme }) {
   const c = colors[theme]
-  
-  const linkStyle = {
-    color: c.textMuted,
-    textDecoration: 'none',
-    fontSize: 12,
-    transition: 'color 0.2s ease',
-  }
 
   return (
     <footer
@@ -21,7 +14,6 @@ export default function Footer({ theme }) {
         justifyContent: 'space-between',
         alignItems: 'center',
         background: c.header,
-        backdropFilter: 'blur(10px)',
       }}
     >
       <p style={{ fontSize: 12, color: c.textMuted, margin: 0 }}>
@@ -29,38 +21,10 @@ export default function Footer({ theme }) {
       </p>
       
       <nav style={{ display: 'flex', gap: 20 }}>
-        <Link 
-          href="/privacy-policy" 
-          style={linkStyle}
-          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
-          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
-        >
-          Gizlilik Politikası
-        </Link>
-        <Link 
-          href="/terms-of-use" 
-          style={linkStyle}
-          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
-          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
-        >
-          Kullanım Koşulları
-        </Link>
-        <Link 
-          href="/gdpr-disclosure" 
-          style={linkStyle}
-          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
-          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
-        >
-          KVKK
-        </Link>
-        <Link 
-          href="/disclaimer" 
-          style={linkStyle}
-          onMouseEnter={(e) => e.currentTarget.style.color = c.text}
-          onMouseLeave={(e) => e.currentTarget.style.color = c.textMuted}
-        >
-          İletişim
-        </Link>
+        <Link href="/privacy-policy" style={{ color: c.textMuted, textDecoration: 'none', fontSize: 12 }}>Gizlilik Politikası</Link>
+        <Link href="/terms-of-use" style={{ color: c.textMuted, textDecoration: 'none', fontSize: 12 }}>Kullanım Koşulları</Link>
+        <Link href="/gdpr-disclosure" style={{ color: c.textMuted, textDecoration: 'none', fontSize: 12 }}>KVKK</Link>
+        <Link href="/disclaimer" style={{ color: c.textMuted, textDecoration: 'none', fontSize: 12 }}>İletişim</Link>
       </nav>
     </footer>
   )
