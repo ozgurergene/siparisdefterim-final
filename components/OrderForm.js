@@ -118,11 +118,11 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
                   <input type="number" placeholder="1" min="1" value={product.quantity} onChange={(e) => updateProductLine(index, 'quantity', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
-                  <input type="number" placeholder="0" value={product.unit_price} onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
+                  <input type="number" placeholder="0" min="0" value={product.unit_price} onChange={(e) => updateProductLine(index, 'unit_price', e.target.value)} style={{ width: '100%', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>₺{calculateSubtotal(product)}</td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center' }}>
-                  <input type="number" placeholder="0" value={product.kdv_rate} onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)} style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
+                  <input type="number" placeholder="0" min="0" value={product.kdv_rate} onChange={(e) => updateProductLine(index, 'kdv_rate', e.target.value)} style={{ width: '50px', padding: '6px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text, textAlign: 'center' }} />
                 </td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: c.text }}>₺{calculateKDVAmount(product)}</td>
                 <td style={{ padding: '8px', borderRight: `1px solid ${c.border}`, textAlign: 'center', fontWeight: 'bold', color: '#007bff' }}>₺{calculateLineTotal(product)}</td>
