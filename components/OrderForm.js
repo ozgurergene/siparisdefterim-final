@@ -40,10 +40,17 @@ export default function OrderForm({ onSubmit, theme }) {
   }, { subtotal: 0, kdv: 0, total: 0 })
 
   const inputStyle = (fieldName) => ({
-    width: '100%', padding: '12px 14px', borderRadius: 8,
+    width: '100%',
+    padding: '12px 14px',
+    borderRadius: 8,
     border: `2px solid ${focusedField === fieldName ? '#667eea' : c.border}`,
-    background: c.bgInput, color: c.text, fontSize: 14, fontWeight: 500, outline: 'none',
-    transition: 'border-color 0.2s ease', boxSizing: 'border-box',
+    background: c.bgInput,
+    color: c.text,
+    fontSize: 14,
+    fontWeight: 500,
+    outline: 'none',
+    transition: 'border-color 0.2s ease',
+    boxSizing: 'border-box',
   })
 
   const labelStyle = { display: 'block', marginBottom: 6, fontSize: 13, fontWeight: 600, color: c.textSecondary }
@@ -55,6 +62,7 @@ export default function OrderForm({ onSubmit, theme }) {
           <span>📝</span>Sipariş Oluştur
         </h2>
 
+        {/* Customer Info */}
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 14, marginBottom: 14 }}>
           <div>
             <label style={labelStyle}>Müşteri Adı Soyadı</label>
@@ -71,39 +79,90 @@ export default function OrderForm({ onSubmit, theme }) {
           <input type="text" name="address" value={formData.address} onChange={handleChange} onFocus={() => setFocusedField('address')} onBlur={() => setFocusedField(null)} placeholder="Adres" style={inputStyle('address')} />
         </div>
 
+        {/* Products Section */}
         <div style={{ borderTop: `1px solid ${c.border}`, paddingTop: 20, marginTop: 20 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
             <h3 style={{ fontSize: 14, fontWeight: 700, color: c.text, margin: 0, display: 'flex', alignItems: 'center', gap: 8 }}><span>📦</span>Ürünler</h3>
             <button type="button" onClick={addProduct} style={{ padding: '8px 14px', borderRadius: 6, border: 'none', background: buttonGradients.success, color: 'white', fontSize: 13, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6 }}>➕ Ürün Ekle</button>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 70px 90px 80px 70px 80px 80px 36px', gap: 8, padding: '8px 0', borderBottom: `1px solid ${c.border}`, marginBottom: 10 }}>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase' }}>Ürün Adı</span>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Adet</span>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Birim Fiyatı</span>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Tutar</span>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV %</span>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV Tutarı</span>
-            <span style={{ fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Toplam</span>
-            <span></span>
+          {/* Products Header - Fixed widths */}
+          <div style={{ display: 'flex', gap: 10, padding: '8px 0', borderBottom: `1px solid ${c.border}`, marginBottom: 10 }}>
+            <span style={{ width: 120, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase' }}>Ürün Adı</span>
+            <span style={{ width: 60, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Adet</span>
+            <span style={{ width: 80, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Birim Fiyat</span>
+            <span style={{ width: 70, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Tutar</span>
+            <span style={{ width: 55, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV %</span>
+            <span style={{ width: 70, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>KDV Tutarı</span>
+            <span style={{ width: 70, fontSize: 11, color: c.textMuted, fontWeight: 600, textTransform: 'uppercase', textAlign: 'center' }}>Toplam</span>
+            <span style={{ width: 32 }}></span>
           </div>
 
+          {/* Product Rows - Fixed widths matching header */}
           {formData.products.map((product, index) => {
             const { subtotal, kdvAmount, total } = calculateProductTotal(product)
             return (
-              <div key={index} style={{ display: 'grid', gridTemplateColumns: '2fr 70px 90px 80px 70px 80px 80px 36px', gap: 8, padding: '6px 0', alignItems: 'center' }}>
-                <input type="text" value={product.name} onChange={(e) => handleProductChange(index, 'name', e.target.value)} placeholder="Ürün adı" required style={{ ...inputStyle(`product_name_${index}`), padding: '10px 12px' }} onFocus={() => setFocusedField(`product_name_${index}`)} onBlur={() => setFocusedField(null)} />
-                <input type="number" value={product.quantity} onChange={(e) => handleProductChange(index, 'quantity', parseInt(e.target.value) || 1)} min="1" style={{ ...inputStyle(`quantity_${index}`), padding: '10px 6px', textAlign: 'center' }} onFocus={() => setFocusedField(`quantity_${index}`)} onBlur={() => setFocusedField(null)} />
-                <input type="number" value={product.unit_price} onChange={(e) => handleProductChange(index, 'unit_price', parseFloat(e.target.value) || 0)} min="0" step="0.01" style={{ ...inputStyle(`unit_price_${index}`), padding: '10px 6px', textAlign: 'center' }} onFocus={() => setFocusedField(`unit_price_${index}`)} onBlur={() => setFocusedField(null)} />
-                <span style={{ textAlign: 'center', fontSize: 14, color: c.text, fontWeight: 600 }}>₺{subtotal.toFixed(2)}</span>
-                <input type="number" value={product.kdv_rate} onChange={(e) => handleProductChange(index, 'kdv_rate', e.target.value)} min="0" max="100" placeholder="0" style={{ ...inputStyle(`kdv_rate_${index}`), padding: '10px 6px', textAlign: 'center' }} onFocus={() => setFocusedField(`kdv_rate_${index}`)} onBlur={() => setFocusedField(null)} />
-                <span style={{ textAlign: 'center', fontSize: 14, color: c.textSecondary }}>₺{kdvAmount.toFixed(2)}</span>
-                <span style={{ textAlign: 'center', fontSize: 14, color: '#43e97b', fontWeight: 700 }}>₺{total.toFixed(2)}</span>
-                <button type="button" onClick={() => removeProduct(index)} disabled={formData.products.length === 1} style={{ width: 32, height: 32, borderRadius: 6, border: 'none', background: formData.products.length === 1 ? 'transparent' : '#2d1f2f', color: '#f5576c', cursor: formData.products.length === 1 ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, opacity: formData.products.length === 1 ? 0.3 : 1 }}>🗑️</button>
+              <div key={index} style={{ display: 'flex', gap: 10, padding: '6px 0', alignItems: 'center' }}>
+                <input
+                  type="text"
+                  value={product.name}
+                  onChange={(e) => handleProductChange(index, 'name', e.target.value)}
+                  placeholder="Ürün adı"
+                  required
+                  style={{ ...inputStyle(`product_name_${index}`), width: 120, padding: '10px 8px' }}
+                  onFocus={() => setFocusedField(`product_name_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <input
+                  type="number"
+                  value={product.quantity}
+                  onChange={(e) => handleProductChange(index, 'quantity', parseInt(e.target.value) || 1)}
+                  min="1"
+                  style={{ ...inputStyle(`quantity_${index}`), width: 60, padding: '10px 4px', textAlign: 'center' }}
+                  onFocus={() => setFocusedField(`quantity_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <input
+                  type="number"
+                  value={product.unit_price}
+                  onChange={(e) => handleProductChange(index, 'unit_price', parseFloat(e.target.value) || 0)}
+                  min="0"
+                  step="0.01"
+                  style={{ ...inputStyle(`unit_price_${index}`), width: 80, padding: '10px 4px', textAlign: 'center' }}
+                  onFocus={() => setFocusedField(`unit_price_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <span style={{ width: 70, textAlign: 'center', fontSize: 13, color: c.text, fontWeight: 600 }}>₺{subtotal.toFixed(2)}</span>
+                <input
+                  type="number"
+                  value={product.kdv_rate}
+                  onChange={(e) => handleProductChange(index, 'kdv_rate', e.target.value)}
+                  min="0"
+                  max="100"
+                  placeholder="0"
+                  style={{ ...inputStyle(`kdv_rate_${index}`), width: 55, padding: '10px 4px', textAlign: 'center' }}
+                  onFocus={() => setFocusedField(`kdv_rate_${index}`)}
+                  onBlur={() => setFocusedField(null)}
+                />
+                <span style={{ width: 70, textAlign: 'center', fontSize: 13, color: c.textSecondary }}>₺{kdvAmount.toFixed(2)}</span>
+                <span style={{ width: 70, textAlign: 'center', fontSize: 13, color: '#43e97b', fontWeight: 700 }}>₺{total.toFixed(2)}</span>
+                <button
+                  type="button"
+                  onClick={() => removeProduct(index)}
+                  disabled={formData.products.length === 1}
+                  style={{
+                    width: 32, height: 32, borderRadius: 6, border: 'none',
+                    background: formData.products.length === 1 ? 'transparent' : '#2d1f2f',
+                    color: '#f5576c', cursor: formData.products.length === 1 ? 'not-allowed' : 'pointer',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14,
+                    opacity: formData.products.length === 1 ? 0.3 : 1,
+                  }}
+                >🗑️</button>
               </div>
             )
           })}
 
+          {/* Totals */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 12, marginTop: 20, padding: '16px 0', borderTop: `1px solid ${c.border}` }}>
             <div style={{ background: c.bgTertiary, padding: 14, borderRadius: 10, textAlign: 'center' }}>
               <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0', fontWeight: 600 }}>Tutar</p>
@@ -120,12 +179,18 @@ export default function OrderForm({ onSubmit, theme }) {
           </div>
         </div>
 
+        {/* Notes */}
         <div style={{ marginTop: 20 }}>
           <label style={labelStyle}>Not (Opsiyonel)</label>
           <textarea name="notes" value={formData.notes} onChange={handleChange} onFocus={() => setFocusedField('notes')} onBlur={() => setFocusedField(null)} placeholder="Özel talep, açıklama..." rows={3} style={{ ...inputStyle('notes'), resize: 'vertical', minHeight: 70 }} />
         </div>
 
-        <button type="submit" disabled={isSubmitting} style={{ width: '100%', padding: '14px 24px', marginTop: 20, borderRadius: 10, border: 'none', background: buttonGradients.primary, color: 'white', fontSize: 15, fontWeight: 700, cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, transition: 'all 0.2s ease', opacity: isSubmitting ? 0.7 : 1 }}
+        {/* Submit */}
+        <button type="submit" disabled={isSubmitting} style={{
+          width: '100%', padding: '14px 24px', marginTop: 20, borderRadius: 10, border: 'none',
+          background: buttonGradients.primary, color: 'white', fontSize: 15, fontWeight: 700,
+          cursor: isSubmitting ? 'not-allowed' : 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, opacity: isSubmitting ? 0.7 : 1,
+        }}
           onMouseEnter={(e) => { if (!isSubmitting) { e.currentTarget.style.transform = 'scale(1.01)'; e.currentTarget.style.boxShadow = glowEffects.primary } }}
           onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none' }}>
           {isSubmitting ? (<><span style={{ width: 18, height: 18, border: '2px solid rgba(255,255,255,0.3)', borderTop: '2px solid white', borderRadius: '50%', animation: 'spin 0.8s linear infinite' }} />Kaydediliyor...</>) : (<>✓ Onayla</>)}
