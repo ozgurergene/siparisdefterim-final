@@ -2,7 +2,7 @@
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
-import { Loading } from '../components/Loading'
+import Loading from '../components/Loading'
 
 export default function RootPage() {
   const router = useRouter()
@@ -30,5 +30,5 @@ export default function RootPage() {
     checkSession()
   }, [router])
 
-  return <PageLoading />
+  return <Loading />
 }
