@@ -21,16 +21,13 @@ export default function CompletedPage() {
 
   const c = colors[theme]
 
-  // Aktif arama var mı?
   const hasActiveSearch = searchName || searchPhone || searchProduct
 
-  // Load theme
   useEffect(() => {
     const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
     setTheme(savedTheme)
   }, [])
 
-  // Check user and fetch completed orders
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -50,7 +47,6 @@ export default function CompletedPage() {
     checkUser()
   }, [router])
 
-  // Real-time filter
   useEffect(() => {
     let filtered = completedOrders
     
@@ -97,7 +93,6 @@ export default function CompletedPage() {
     router.push('/login')
   }
 
-  // Calculate stats
   const totalCompleted = completedOrders.length
   const totalRevenue = completedOrders.reduce((sum, order) => sum + parseFloat(order.price || 0), 0)
   
@@ -135,12 +130,21 @@ export default function CompletedPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ 
+      minHeight: '100vh', 
+      background: c.bg, 
+      fontFamily: 'Arial', 
+      color: c.text, 
+      margin: 0, 
+      padding: 0, 
+      display: 'flex', 
+      flexDirection: 'column',
+      overflowX: 'hidden'
+    }}>
       {/* Header */}
       <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
           
-          {/* Logo + Home Icon */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               onClick={() => router.push('/home')}
@@ -204,171 +208,171 @@ export default function CompletedPage() {
         </div>
       </div>
 
-      <div style={{ flex: 1, width: '100%', padding: '20px' }}>
-        {/* Stats Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '20px' }}>
-          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Toplam Tamamlanan</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{totalCompleted}</p>
+      <div style={{ flex: 1, width: '100%', padding: '20px', boxSizing: 'border-box' }}>
+        <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
+          {/* Stats Cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '20px' }}>
+            <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Toplam Tamamlanan</p>
+              <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{totalCompleted}</p>
+            </div>
+            <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Toplam Gelir</p>
+              <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>₺{totalRevenue.toFixed(2)}</p>
+            </div>
+            <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Bu Ay</p>
+              <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{thisMonth}</p>
+            </div>
+            <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+              <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Bu Hafta</p>
+              <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{thisWeek}</p>
+            </div>
           </div>
-          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Toplam Gelir</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>₺{totalRevenue.toFixed(2)}</p>
-          </div>
-          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Bu Ay</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{thisMonth}</p>
-          </div>
-          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>Bu Hafta</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{thisWeek}</p>
-          </div>
-        </div>
 
-        {/* Search Box - Collapsible */}
-        <div style={{ background: c.header, borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
-          {/* Header - Always visible */}
-          <div 
-            onClick={() => setIsSearchOpen(!isSearchOpen)}
-            style={{ 
-              padding: '12px 15px', 
-              display: 'flex', 
-              justifyContent: 'space-between', 
-              alignItems: 'center',
-              cursor: 'pointer',
-              background: isSearchOpen ? c.bgSecondary : c.header,
-              transition: 'background 0.2s'
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '14px', fontWeight: 'bold', color: c.text }}>🔍 Tamamlanan Siparişlerde Ara</span>
-              {hasActiveSearch && (
+          {/* Search Box */}
+          <div style={{ background: c.header, borderRadius: '8px', marginBottom: '20px', border: `1px solid ${c.border}`, overflow: 'hidden' }}>
+            <div 
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              style={{ 
+                padding: '12px 15px', 
+                display: 'flex', 
+                justifyContent: 'space-between', 
+                alignItems: 'center',
+                cursor: 'pointer',
+                background: isSearchOpen ? c.bgSecondary : c.header,
+                transition: 'background 0.2s'
+              }}
+            >
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '14px', fontWeight: 'bold', color: c.text }}>🔍 Tamamlanan Siparişlerde Ara</span>
+                {hasActiveSearch && (
+                  <span style={{ 
+                    background: '#007bff', 
+                    color: 'white', 
+                    fontSize: '11px', 
+                    padding: '2px 8px', 
+                    borderRadius: '10px',
+                    fontWeight: 'bold'
+                  }}>
+                    Aktif
+                  </span>
+                )}
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '13px', color: c.textSecondary }}>{filteredOrders.length} sonuç</span>
                 <span style={{ 
-                  background: '#007bff', 
-                  color: 'white', 
-                  fontSize: '11px', 
-                  padding: '2px 8px', 
-                  borderRadius: '10px',
-                  fontWeight: 'bold'
+                  fontSize: '12px', 
+                  color: c.textSecondary,
+                  transform: isSearchOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                  transition: 'transform 0.2s'
                 }}>
-                  Aktif
+                  ▼
                 </span>
-              )}
-            </div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '13px', color: c.textSecondary }}>{filteredOrders.length} sonuç</span>
-              <span style={{ 
-                fontSize: '12px', 
-                color: c.textSecondary,
-                transform: isSearchOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-                transition: 'transform 0.2s'
-              }}>
-                ▼
-              </span>
-            </div>
-          </div>
-
-          {/* Collapsible Content */}
-          {isSearchOpen && (
-            <div style={{ padding: '15px', borderTop: `1px solid ${c.border}` }}>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '10px' }}>
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
-                  <input
-                    type="text"
-                    placeholder="Adı ara..."
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
-                  <input
-                    type="text"
-                    placeholder="Telefon ara..."
-                    value={searchPhone}
-                    onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
-                    maxLength="10"
-                    style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-                  />
-                </div>
-                <div>
-                  <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
-                  <input
-                    type="text"
-                    placeholder="Ürün ara..."
-                    value={searchProduct}
-                    onChange={(e) => setSearchProduct(e.target.value)}
-                    style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
-                  />
-                </div>
-                <div>
-                  <button
-                    onClick={(e) => { 
-                      e.stopPropagation()
-                      setSearchName('')
-                      setSearchPhone('')
-                      setSearchProduct('')
-                    }}
-                    style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', marginTop: '23px' }}
-                  >
-                    Temizle
-                  </button>
-                </div>
               </div>
             </div>
-          )}
-        </div>
 
-        {/* Orders Table */}
-        <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
-          <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '800px' }}>
-            <thead>
-              <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
-                <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Fiyat</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '110px', color: c.text }}>Sipariş Tarihi</th>
-                <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '110px', color: c.text }}>Tamamlanma Tarihi</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredOrders.map((order, index) => (
-                <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
-                    <div>{order.customer_name}</div>
-                    {order.customer_city && order.customer_district && (
-                      <div style={{ fontSize: '11px', color: '#667eea', marginTop: '4px' }}>
-                        📍 {order.customer_city} / {order.customer_district}
-                      </div>
-                    )}
-                  </td>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
-                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                    {order.product.split(', ').map((prod, idx) => (
-                      <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0' }}>{prod}</div>
-                    ))}
-                    {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: '#1D9E75' }}>₺{order.price}</td>
-                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>
-                    📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
-                  </td>
-                  <td style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: '#1D9E75', fontWeight: 'bold' }}>
-                    ✅ {new Date(order.updated_at).toLocaleDateString('tr-TR')}
-                  </td>
+            {isSearchOpen && (
+              <div style={{ padding: '15px', borderTop: `1px solid ${c.border}` }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '10px' }}>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Müşteri Adı</label>
+                    <input
+                      type="text"
+                      placeholder="Adı ara..."
+                      value={searchName}
+                      onChange={(e) => setSearchName(e.target.value)}
+                      style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Telefon</label>
+                    <input
+                      type="text"
+                      placeholder="Telefon ara..."
+                      value={searchPhone}
+                      onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
+                      maxLength="10"
+                      style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Ürün</label>
+                    <input
+                      type="text"
+                      placeholder="Ürün ara..."
+                      value={searchProduct}
+                      onChange={(e) => setSearchProduct(e.target.value)}
+                      style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                    />
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'flex-end' }}>
+                    <button
+                      onClick={(e) => { 
+                        e.stopPropagation()
+                        setSearchName('')
+                        setSearchPhone('')
+                        setSearchProduct('')
+                      }}
+                      style={{ padding: '8px 15px', background: '#6c757d', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', width: '100%' }}
+                    >
+                      Temizle
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
+
+          {/* Orders Table */}
+          <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
+            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px', minWidth: '800px' }}>
+              <thead>
+                <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
+                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
+                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
+                  <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
+                  <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '80px', color: c.text }}>Fiyat</th>
+                  <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '110px', color: c.text }}>Sipariş Tarihi</th>
+                  <th style={{ padding: '12px', textAlign: 'center', fontWeight: 'bold', width: '110px', color: c.text }}>Tamamlanma Tarihi</th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-          
-          {filteredOrders.length === 0 && (
-            <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px' }}>
-              <p>📭 Tamamlanan sipariş bulunamadı.</p>
-            </div>
-          )}
+              </thead>
+              <tbody>
+                {filteredOrders.map((order, index) => (
+                  <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
+                    <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
+                      <div>{order.customer_name}</div>
+                      {order.customer_city && order.customer_district && (
+                        <div style={{ fontSize: '11px', color: '#667eea', marginTop: '4px' }}>
+                          📍 {order.customer_city} / {order.customer_district}
+                        </div>
+                      )}
+                    </td>
+                    <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '14px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
+                    <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                      {order.product.split(', ').map((prod, idx) => (
+                        <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '6px' : '0' }}>{prod}</div>
+                      ))}
+                      {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '6px' }}>Not: {order.note}</div>}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: '#1D9E75' }}>₺{order.price}</td>
+                    <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontSize: '12px', color: c.textSecondary }}>
+                      📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
+                    </td>
+                    <td style={{ padding: '12px', textAlign: 'center', fontSize: '12px', color: '#1D9E75', fontWeight: 'bold' }}>
+                      ✅ {new Date(order.updated_at).toLocaleDateString('tr-TR')}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            
+            {filteredOrders.length === 0 && (
+              <div style={{ textAlign: 'center', color: c.textSecondary, padding: '50px' }}>
+                <p>📭 Tamamlanan sipariş bulunamadı.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 

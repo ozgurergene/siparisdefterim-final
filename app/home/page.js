@@ -74,12 +74,17 @@ export default function HomePage() {
     })
   }
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    localStorage.setItem('siparisdefterim-theme', newTheme)
+  }
+
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.replace('/login')
   }
 
-  // Loading state - inline instead of PageLoading component
   if (loading) {
     return (
       <div style={{
@@ -135,17 +140,17 @@ export default function HomePage() {
       backgroundAttachment: 'fixed',
       display: 'flex',
       flexDirection: 'column',
+      overflowX: 'hidden',
     }}>
       <Header 
         user={user} 
-        orderCount={stats.total}
-        maxOrders={50}
+        ordersCreatedCount={stats.total}
         theme={theme} 
-        setTheme={setTheme} 
-        onLogout={handleLogout}
+        toggleTheme={toggleTheme} 
+        handleLogout={handleLogout}
       />
 
-      <main style={{ flex: 1, padding: '32px 24px' }}>
+      <main style={{ flex: 1, padding: '32px 24px', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           
           {/* Welcome Section */}
