@@ -318,7 +318,7 @@ export default function DashboardPage() {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', overflowX: 'hidden' }}>
         <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
             <div style={{ display: 'flex', gap: '15px' }}>
               <div style={{ width: 100, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
@@ -326,7 +326,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
+        <div style={{ padding: '20px' }}>
           <StatsCardsSkeleton theme={theme} />
           <SearchBoxSkeleton theme={theme} />
           <TableSkeleton rows={5} theme={theme} />
@@ -359,10 +359,8 @@ export default function DashboardPage() {
       <div style={{ 
         flex: 1, 
         width: '100%', 
-        padding: '20px', 
-        boxSizing: 'border-box',
-        maxWidth: '1400px',
-        margin: '0 auto'
+        padding: '20px 24px', 
+        boxSizing: 'border-box'
       }}>
         {/* Stats Cards */}
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '20px' }}>
