@@ -13,6 +13,22 @@ import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
+// Gradient Home Icon SVG Component
+function HomeIcon({ size = 22 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="homeGradientMobile" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#667eea" />
+          <stop offset="100%" stopColor="#764ba2" />
+        </linearGradient>
+      </defs>
+      <path d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="url(#homeGradientMobile)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+      <path d="M9 22V12H15V22" stroke="url(#homeGradientMobile)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+    </svg>
+  )
+}
+
 // Mobile Order Card Component
 function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
   const [touchStart, setTouchStart] = useState(null)
@@ -37,14 +53,10 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
     const isLeftSwipe = distance > minSwipeDistance
     const isRightSwipe = distance < -minSwipeDistance
     
-    if (isLeftSwipe) {
-      setSwiped(true)
-    } else if (isRightSwipe) {
-      setSwiped(false)
-    }
+    if (isLeftSwipe) setSwiped(true)
+    else if (isRightSwipe) setSwiped(false)
   }
 
-  // Close swipe when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (cardRef.current && !cardRef.current.contains(e.target)) {
@@ -56,7 +68,7 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
   }, [])
 
   return (
-    <div ref={cardRef} style={{ position: 'relative', overflow: 'hidden', marginBottom: '12px' }}>
+    <div ref={cardRef} style={{ position: 'relative', overflow: 'hidden', marginBottom: '12px', borderRadius: '16px' }}>
       {/* Swipe Actions Background */}
       <div style={{
         position: 'absolute',
@@ -106,19 +118,19 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         style={{
-          background: '#1a1a2e',
-          borderRadius: '12px',
-          padding: '16px',
+          background: 'rgba(26, 26, 46, 0.9)',
+          borderRadius: '16px',
+          padding: '16px 18px',
           borderLeft: `4px solid ${statusColor}`,
           position: 'relative',
           zIndex: 2,
           transform: swiped ? 'translateX(-140px)' : 'translateX(0)',
-          transition: 'transform 0.3s ease'
+          transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
           <div>
-            <p style={{ margin: 0, fontSize: '18px', fontWeight: 'bold', color: '#fff' }}>
+            <p style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#fff' }}>
               {order.customer_name.split(' ')[0]} {order.customer_name.split(' ')[1]?.[0]}.
             </p>
             <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>
@@ -130,19 +142,20 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
           </p>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', marginTop: '12px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
           <button
             onClick={() => onWhatsApp(order)}
             style={{
               flex: 1,
-              padding: '10px',
+              padding: '10px 16px',
               background: '#22c55e',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '10px',
               color: '#fff',
               fontSize: '14px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'transform 0.2s, opacity 0.2s'
             }}
           >
             WhatsApp
@@ -151,14 +164,15 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
             onClick={() => onEdit(order)}
             style={{
               flex: 1,
-              padding: '10px',
+              padding: '10px 16px',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               border: 'none',
-              borderRadius: '8px',
+              borderRadius: '10px',
               color: '#fff',
               fontSize: '14px',
               fontWeight: '600',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              transition: 'transform 0.2s, opacity 0.2s'
             }}
           >
             Düzenle
@@ -170,9 +184,7 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
 }
 
 // Mobile Add Order Modal
-function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, theme }) {
-  const c = colors[theme]
-  
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder }) {
   if (!isOpen) return null
 
   return (
@@ -182,17 +194,19 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0,0,0,0.8)',
+      background: 'rgba(0,0,0,0.85)',
       zIndex: 2000,
       display: 'flex',
-      flexDirection: 'column'
+      flexDirection: 'column',
+      animation: 'fadeIn 0.3s ease'
     }}>
       <div style={{
         background: '#0d0d1a',
         flex: 1,
         overflowY: 'auto',
         padding: '20px',
-        paddingTop: '60px'
+        paddingTop: '60px',
+        animation: 'slideUp 0.3s ease'
       }}>
         <button
           onClick={onClose}
@@ -200,50 +214,57 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             position: 'absolute',
             top: '20px',
             right: '20px',
-            background: 'none',
+            background: 'rgba(255,255,255,0.1)',
             border: 'none',
             color: '#fff',
-            fontSize: '28px',
-            cursor: 'pointer'
+            fontSize: '20px',
+            cursor: 'pointer',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
           }}
         >
           ✕
         </button>
 
-        <h2 style={{ color: '#fff', marginBottom: '20px' }}>Yeni Sipariş</h2>
+        <h2 style={{ color: '#fff', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '5px', fontSize: '14px' }}>Müşteri Adı</label>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Müşteri Adı</label>
           <input
             type="text"
             value={newOrder.customer_name}
             onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
             style={{
               width: '100%',
-              padding: '12px',
-              background: '#1a1a2e',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
               border: '1px solid #2a2a3e',
-              borderRadius: '8px',
+              borderRadius: '12px',
               color: '#fff',
               fontSize: '16px',
-              boxSizing: 'border-box'
+              boxSizing: 'border-box',
+              transition: 'border-color 0.2s'
             }}
             placeholder="Adı Soyadı"
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '5px', fontSize: '14px' }}>Telefon</label>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Telefon</label>
           <input
             type="tel"
             value={newOrder.customer_phone}
             onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
             style={{
               width: '100%',
-              padding: '12px',
-              background: '#1a1a2e',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
               border: '1px solid #2a2a3e',
-              borderRadius: '8px',
+              borderRadius: '12px',
               color: '#fff',
               fontSize: '16px',
               boxSizing: 'border-box'
@@ -253,8 +274,8 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '5px', fontSize: '14px' }}>Ürün</label>
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Ürün</label>
           <input
             type="text"
             value={newOrder.products[0]?.product || ''}
@@ -265,10 +286,10 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             }}
             style={{
               width: '100%',
-              padding: '12px',
-              background: '#1a1a2e',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
               border: '1px solid #2a2a3e',
-              borderRadius: '8px',
+              borderRadius: '12px',
               color: '#fff',
               fontSize: '16px',
               boxSizing: 'border-box'
@@ -277,9 +298,9 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '15px' }}>
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '5px', fontSize: '14px' }}>Adet</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adet</label>
             <input
               type="number"
               value={newOrder.products[0]?.quantity || 1}
@@ -290,19 +311,20 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               }}
               style={{
                 width: '100%',
-                padding: '12px',
-                background: '#1a1a2e',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
                 border: '1px solid #2a2a3e',
-                borderRadius: '8px',
+                borderRadius: '12px',
                 color: '#fff',
                 fontSize: '16px',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                textAlign: 'center'
               }}
               min="1"
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '5px', fontSize: '14px' }}>Birim Fiyat</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Birim Fiyat</label>
             <input
               type="number"
               value={newOrder.products[0]?.unit_price || ''}
@@ -313,31 +335,32 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               }}
               style={{
                 width: '100%',
-                padding: '12px',
-                background: '#1a1a2e',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
                 border: '1px solid #2a2a3e',
-                borderRadius: '8px',
+                borderRadius: '12px',
                 color: '#fff',
                 fontSize: '16px',
-                boxSizing: 'border-box'
+                boxSizing: 'border-box',
+                textAlign: 'center'
               }}
               placeholder="₺"
             />
           </div>
         </div>
 
-        <div style={{ marginBottom: '15px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '5px', fontSize: '14px' }}>Not (Opsiyonel)</label>
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Not (Opsiyonel)</label>
           <input
             type="text"
             value={newOrder.note}
             onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
             style={{
               width: '100%',
-              padding: '12px',
-              background: '#1a1a2e',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
               border: '1px solid #2a2a3e',
-              borderRadius: '8px',
+              borderRadius: '12px',
               color: '#fff',
               fontSize: '16px',
               boxSizing: 'border-box'
@@ -353,12 +376,14 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             padding: '16px',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             border: 'none',
-            borderRadius: '12px',
+            borderRadius: '14px',
             color: '#fff',
             fontSize: '16px',
             fontWeight: 'bold',
             cursor: 'pointer',
-            marginTop: '10px'
+            marginTop: '10px',
+            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
+            transition: 'transform 0.2s, box-shadow 0.2s'
           }}
         >
           ✓ Sipariş Ekle
@@ -368,7 +393,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
-// Bottom Tab Bar Component
+// Bottom Tab Bar Component - Referans tasarıma göre
 function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
@@ -384,13 +409,16 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       bottom: 0,
       left: 0,
       right: 0,
-      background: 'linear-gradient(180deg, rgba(13,13,26,0.95) 0%, #0d0d1a 100%)',
-      padding: '10px 20px 25px 20px',
+      background: 'rgba(13, 13, 26, 0.98)',
+      backdropFilter: 'blur(20px)',
+      WebkitBackdropFilter: 'blur(20px)',
+      padding: '8px 16px 28px 16px',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'flex-end',
       zIndex: 1000,
-      borderTop: '1px solid #2a2a3e'
+      borderTop: '1px solid rgba(102, 126, 234, 0.2)',
+      boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.3)'
     }}>
       {tabs.map((tab) => (
         tab.isMain ? (
@@ -398,19 +426,21 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
             key={tab.id}
             onClick={onAddClick}
             style={{
-              width: '60px',
-              height: '60px',
+              width: '64px',
+              height: '64px',
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              border: 'none',
+              border: '4px solid #0d0d1a',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '32px',
+              fontSize: '36px',
               color: '#fff',
               cursor: 'pointer',
-              marginTop: '-30px',
-              boxShadow: '0 4px 20px rgba(102, 126, 234, 0.5)'
+              marginTop: '-36px',
+              boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
+              transition: 'transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s',
+              fontWeight: '300'
             }}
           >
             +
@@ -427,12 +457,19 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
               alignItems: 'center',
               gap: '4px',
               cursor: 'pointer',
-              opacity: activeTab === tab.id ? 1 : 0.5,
-              transition: 'opacity 0.2s'
+              opacity: activeTab === tab.id ? 1 : 0.4,
+              transition: 'opacity 0.3s ease, transform 0.2s ease',
+              transform: activeTab === tab.id ? 'scale(1.05)' : 'scale(1)',
+              padding: '8px 12px'
             }}
           >
-            <span style={{ fontSize: '24px' }}>{tab.icon}</span>
-            <span style={{ fontSize: '11px', color: activeTab === tab.id ? '#22c55e' : '#94a3b8' }}>
+            <span style={{ fontSize: '22px' }}>{tab.icon}</span>
+            <span style={{ 
+              fontSize: '11px', 
+              color: activeTab === tab.id ? '#22c55e' : '#64748b',
+              fontWeight: activeTab === tab.id ? '600' : '400',
+              transition: 'color 0.3s ease'
+            }}>
               {tab.label}
             </span>
           </button>
@@ -455,13 +492,11 @@ export default function DashboardPage() {
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [activeTab, setActiveTab] = useState('orders')
   
-  // Search states
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   
-  // New order state
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
@@ -472,29 +507,23 @@ export default function DashboardPage() {
     note: ''
   })
   
-  // Edit state
   const [editingId, setEditingId] = useState(null)
   const [editingData, setEditingData] = useState(null)
 
   const c = colors[theme]
 
-  // Check if mobile
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768)
-    }
+    const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
     window.addEventListener('resize', checkMobile)
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
-  // Load theme
   useEffect(() => {
     const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
     setTheme(savedTheme)
   }, [])
 
-  // Check user
   useEffect(() => {
     const checkUser = async () => {
       try {
@@ -514,52 +543,25 @@ export default function DashboardPage() {
     checkUser()
   }, [router])
 
-  // Filter orders
   useEffect(() => {
     let filtered = orders
-    
-    if (searchName.trim()) {
-      filtered = filtered.filter(order => 
-        order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
-      )
-    }
-    if (searchPhone.trim()) {
-      filtered = filtered.filter(order => 
-        order.customer_phone.startsWith(searchPhone)
-      )
-    }
-    if (searchProduct.trim()) {
-      filtered = filtered.filter(order => {
-        const products = order.product.split(', ')
-        return products.some(prod => 
-          prod.toLowerCase().startsWith(searchProduct.toLowerCase())
-        )
-      })
-    }
-    if (statusFilter !== 'all') {
-      filtered = filtered.filter(order => order.status === statusFilter)
-    }
+    if (searchName.trim()) filtered = filtered.filter(order => order.customer_name.toLowerCase().startsWith(searchName.toLowerCase()))
+    if (searchPhone.trim()) filtered = filtered.filter(order => order.customer_phone.startsWith(searchPhone))
+    if (searchProduct.trim()) filtered = filtered.filter(order => {
+      const products = order.product.split(', ')
+      return products.some(prod => prod.toLowerCase().startsWith(searchProduct.toLowerCase()))
+    })
+    if (statusFilter !== 'all') filtered = filtered.filter(order => order.status === statusFilter)
     setFilteredOrders(filtered)
   }, [searchName, searchPhone, searchProduct, statusFilter, orders])
 
   const fetchUserData = async (userId) => {
     try {
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .single()
-      
+      const { data: userData, error: userError } = await supabase.from('users').select('*').eq('id', userId).single()
       if (userError && userError.code === 'PGRST116') {
         await supabase.from('users').insert([{ id: userId, orders_created_count: 0 }])
       }
-
-      const { data: ordersData } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('user_id', userId)
-        .order('created_at', { ascending: false })
-
+      const { data: ordersData } = await supabase.from('orders').select('*').eq('user_id', userId).order('created_at', { ascending: false })
       const allOrders = ordersData || []
       setOrders(allOrders.filter(o => o.status !== 'completed'))
       setOrdersCreatedCount(allOrders.length)
@@ -591,20 +593,13 @@ export default function DashboardPage() {
       alert('Lütfen müşteri adı ve telefon numarası girin.')
       return
     }
-
     const hasValidProduct = newOrder.products.some(p => p.product && p.unit_price)
     if (!hasValidProduct) {
       alert('Lütfen en az bir ürün ve fiyat girin.')
       return
     }
-
-    const productString = newOrder.products
-      .filter(p => p.product)
-      .map(p => `${p.product} x${p.quantity}`)
-      .join(', ')
-
+    const productString = newOrder.products.filter(p => p.product).map(p => `${p.product} x${p.quantity}`).join(', ')
     const totalPrice = calculateGrandTotal(newOrder.products)
-
     const orderData = {
       user_id: user.id,
       customer_name: newOrder.customer_name,
@@ -617,20 +612,13 @@ export default function DashboardPage() {
       status: 'payment_pending',
       note: newOrder.note
     }
-
     const { data, error } = await supabase.from('orders').insert([orderData]).select()
-
     if (error) {
       console.error('Order error:', error)
       alert('Sipariş oluşturulamadı.')
       return
     }
-
-    await supabase
-      .from('users')
-      .update({ orders_created_count: ordersCreatedCount + 1 })
-      .eq('id', user.id)
-
+    await supabase.from('users').update({ orders_created_count: ordersCreatedCount + 1 }).eq('id', user.id)
     setOrders([data[0], ...orders])
     setOrdersCreatedCount(ordersCreatedCount + 1)
     setNewOrder({
@@ -646,52 +634,27 @@ export default function DashboardPage() {
 
   const deleteOrder = async (orderId) => {
     if (!confirm('Siparişi silmek istediğinize emin misiniz?')) return
-
     const { error } = await supabase.from('orders').delete().eq('id', orderId)
-    if (error) {
-      console.error('Delete error:', error)
-      alert('Sipariş silinemedi.')
-      return
-    }
-
+    if (error) { alert('Sipariş silinemedi.'); return }
     setOrders(orders.filter(o => o.id !== orderId))
     setOrdersCreatedCount(ordersCreatedCount - 1)
-
-    await supabase
-      .from('users')
-      .update({ orders_created_count: ordersCreatedCount - 1 })
-      .eq('id', user.id)
+    await supabase.from('users').update({ orders_created_count: ordersCreatedCount - 1 }).eq('id', user.id)
   }
 
   const updateOrderStatus = async (orderId, newStatus) => {
-    const { error } = await supabase
-      .from('orders')
-      .update({ status: newStatus })
-      .eq('id', orderId)
-
-    if (error) {
-      console.error('Status update error:', error)
-      alert('Durum güncellenemedi.')
-      return
-    }
-
-    if (newStatus === 'completed') {
-      setOrders(orders.filter(o => o.id !== orderId))
-    } else {
-      setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
-    }
+    const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId)
+    if (error) { alert('Durum güncellenemedi.'); return }
+    if (newStatus === 'completed') setOrders(orders.filter(o => o.id !== orderId))
+    else setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
   }
 
   const startEditing = (order) => {
     const productParts = order.product.split(', ')
     const products = productParts.map(part => {
       const match = part.match(/(.+) x(\d+)/)
-      if (match) {
-        return { product: match[1], quantity: parseInt(match[2]), unit_price: '', kdv_rate: '' }
-      }
+      if (match) return { product: match[1], quantity: parseInt(match[2]), unit_price: '', kdv_rate: '' }
       return { product: part, quantity: 1, unit_price: '', kdv_rate: '' }
     })
-
     setEditingId(order.id)
     setEditingData({
       customer_name: order.customer_name,
@@ -705,13 +668,8 @@ export default function DashboardPage() {
   }
 
   const saveEdit = async () => {
-    const productString = editingData.products
-      .filter(p => p.product)
-      .map(p => `${p.product} x${p.quantity}`)
-      .join(', ')
-
+    const productString = editingData.products.filter(p => p.product).map(p => `${p.product} x${p.quantity}`).join(', ')
     const totalPrice = calculateGrandTotal(editingData.products)
-
     const updateData = {
       customer_name: editingData.customer_name,
       customer_phone: editingData.customer_phone,
@@ -722,27 +680,14 @@ export default function DashboardPage() {
       price: totalPrice,
       note: editingData.note
     }
-
-    const { error } = await supabase
-      .from('orders')
-      .update(updateData)
-      .eq('id', editingId)
-
-    if (error) {
-      console.error('Update error:', error)
-      alert('Sipariş güncellenemedi.')
-      return
-    }
-
+    const { error } = await supabase.from('orders').update(updateData).eq('id', editingId)
+    if (error) { alert('Sipariş güncellenemedi.'); return }
     setOrders(orders.map(o => o.id === editingId ? { ...o, ...updateData } : o))
     setEditingId(null)
     setEditingData(null)
   }
 
-  const cancelEdit = () => {
-    setEditingId(null)
-    setEditingData(null)
-  }
+  const cancelEdit = () => { setEditingId(null); setEditingData(null) }
 
   const handleWhatsApp = (order) => {
     const phone = order.customer_phone.startsWith('0') ? order.customer_phone.slice(1) : order.customer_phone
@@ -752,13 +697,7 @@ export default function DashboardPage() {
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)
-    if (tabId === 'completed') {
-      router.push('/completed')
-    } else if (tabId === 'customers') {
-      // TODO: Müşteri sayfası
-    } else if (tabId === 'reports') {
-      // TODO: Rapor sayfası
-    }
+    if (tabId === 'completed') router.push('/completed')
   }
 
   const getStatusColor = (status) => {
@@ -771,7 +710,6 @@ export default function DashboardPage() {
     }
   }
 
-  // Stats
   const activeOrders = orders.filter(o => o.status !== 'completed').length
   const pendingPayments = orders.filter(o => o.status === 'payment_pending').length
   const shippedOrders = orders.filter(o => o.status === 'shipped').length
@@ -789,7 +727,6 @@ export default function DashboardPage() {
             <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
             <div style={{ display: 'flex', gap: '15px' }}>
               <div style={{ width: 100, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
-              <div style={{ width: 120, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
             </div>
           </div>
         </div>
@@ -802,29 +739,50 @@ export default function DashboardPage() {
     )
   }
 
-  // MOBILE VIEW
+  // ========== MOBILE VIEW ==========
   if (isMobile) {
     return (
       <div style={{
         minHeight: '100vh',
-        background: '#0d0d1a',
-        fontFamily: 'Arial',
+        background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)',
+        fontFamily: 'Arial, sans-serif',
         color: '#fff',
         paddingBottom: '100px'
       }}>
         {/* Mobile Header */}
         <div style={{
-          padding: '20px',
+          padding: '24px 20px 16px 20px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <h1 style={{ margin: 0, fontSize: '28px', fontWeight: 'bold' }}>Siparişler</h1>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Home Button */}
+            <button
+              onClick={() => router.push('/home')}
+              style={{
+                padding: '10px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid rgba(102, 126, 234, 0.3)',
+                borderRadius: '12px',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+              }}
+            >
+              <HomeIcon size={22} />
+            </button>
+            <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>Siparişler</h1>
+          </div>
+          
+          {/* Avatar */}
           <div
             onClick={handleLogout}
             style={{
-              width: '45px',
-              height: '45px',
+              width: '46px',
+              height: '46px',
               borderRadius: '50%',
               background: getAvatarGradient(user.email),
               display: 'flex',
@@ -832,14 +790,16 @@ export default function DashboardPage() {
               justifyContent: 'center',
               fontSize: '16px',
               fontWeight: 'bold',
-              cursor: 'pointer'
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
+              transition: 'transform 0.2s ease'
             }}
           >
             {getInitials(user.email)}
           </div>
         </div>
 
-        {/* Pull to Refresh Indicator */}
+        {/* Pull to Refresh */}
         {isRefreshing && (
           <div style={{
             display: 'flex',
@@ -856,16 +816,24 @@ export default function DashboardPage() {
               borderRadius: '50%',
               animation: 'spin 1s linear infinite'
             }} />
-            <p style={{ marginTop: '10px' }}>Yenileniyor...</p>
+            <p style={{ marginTop: '12px', fontSize: '14px' }}>Yenileniyor...</p>
           </div>
         )}
 
         {/* Orders List */}
         <div style={{ padding: '0 20px' }}>
           {filteredOrders.length === 0 ? (
-            <div style={{ textAlign: 'center', color: '#94a3b8', padding: '40px 20px' }}>
-              <p style={{ fontSize: '48px', marginBottom: '10px' }}>📭</p>
-              <p>Henüz sipariş yok</p>
+            <div style={{ 
+              textAlign: 'center', 
+              color: '#64748b', 
+              padding: '60px 20px',
+              background: 'rgba(26, 26, 46, 0.4)',
+              borderRadius: '20px',
+              marginTop: '20px'
+            }}>
+              <p style={{ fontSize: '56px', marginBottom: '16px' }}>📭</p>
+              <p style={{ fontSize: '16px' }}>Henüz sipariş yok</p>
+              <p style={{ fontSize: '14px', marginTop: '8px', color: '#4a5568' }}>+ butonuna basarak yeni sipariş ekle</p>
             </div>
           ) : (
             filteredOrders.map(order => (
@@ -895,7 +863,6 @@ export default function DashboardPage() {
           newOrder={newOrder}
           setNewOrder={setNewOrder}
           handleAddOrder={handleAddOrder}
-          theme={theme}
         />
 
         {/* Edit Modal */}
@@ -912,12 +879,20 @@ export default function DashboardPage() {
           @keyframes spin {
             to { transform: rotate(360deg); }
           }
+          @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
         `}</style>
       </div>
     )
   }
 
-  // DESKTOP VIEW (unchanged)
+  // ========== DESKTOP VIEW (unchanged) ==========
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -931,21 +906,9 @@ export default function DashboardPage() {
       overflowX: 'hidden',
       boxSizing: 'border-box'
     }}>
-      <Header 
-        user={user} 
-        ordersCreatedCount={ordersCreatedCount} 
-        theme={theme} 
-        toggleTheme={toggleTheme} 
-        handleLogout={handleLogout} 
-      />
+      <Header user={user} ordersCreatedCount={ordersCreatedCount} theme={theme} toggleTheme={toggleTheme} handleLogout={handleLogout} />
 
-      <div style={{ 
-        flex: 1, 
-        width: '100%', 
-        padding: '20px 24px', 
-        boxSizing: 'border-box'
-      }}>
-        {/* Stats Cards */}
+      <div style={{ flex: 1, width: '100%', padding: '20px 24px', boxSizing: 'border-box' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '20px' }}>
           <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
             <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📦 Aktif Siparişler</p>
@@ -965,50 +928,12 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Order Form */}
-        <OrderForm 
-          newOrder={newOrder}
-          setNewOrder={setNewOrder}
-          ordersCreatedCount={ordersCreatedCount}
-          handleAddOrder={handleAddOrder}
-          theme={theme}
-        />
-
-        {/* Search Box */}
-        <SearchBox
-          searchName={searchName}
-          setSearchName={setSearchName}
-          searchPhone={searchPhone}
-          setSearchPhone={setSearchPhone}
-          searchProduct={searchProduct}
-          setSearchProduct={setSearchProduct}
-          filteredCount={filteredOrders.length}
-          theme={theme}
-        />
-
-        {/* Order Table */}
-        <OrderTable
-          filteredOrders={filteredOrders}
-          user={user}
-          theme={theme}
-          startEditing={startEditing}
-          deleteOrder={deleteOrder}
-          updateOrderStatus={updateOrderStatus}
-          statusFilter={statusFilter}
-          setStatusFilter={setStatusFilter}
-        />
+        <OrderForm newOrder={newOrder} setNewOrder={setNewOrder} ordersCreatedCount={ordersCreatedCount} handleAddOrder={handleAddOrder} theme={theme} />
+        <SearchBox searchName={searchName} setSearchName={setSearchName} searchPhone={searchPhone} setSearchPhone={setSearchPhone} searchProduct={searchProduct} setSearchProduct={setSearchProduct} filteredCount={filteredOrders.length} theme={theme} />
+        <OrderTable filteredOrders={filteredOrders} user={user} theme={theme} startEditing={startEditing} deleteOrder={deleteOrder} updateOrderStatus={updateOrderStatus} statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
       </div>
 
-      {/* Edit Modal */}
-      <EditModal
-        editingId={editingId}
-        editingData={editingData}
-        setEditingData={setEditingData}
-        saveEdit={saveEdit}
-        cancelEdit={cancelEdit}
-        theme={theme}
-      />
-
+      <EditModal editingId={editingId} editingData={editingData} setEditingData={setEditingData} saveEdit={saveEdit} cancelEdit={cancelEdit} theme={theme} />
       <Footer theme={theme} />
     </div>
   )
