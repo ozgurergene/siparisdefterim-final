@@ -1,8 +1,8 @@
 'use client'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '../../lib/supabase'
-import { colors } from '../../lib/theme'
+import { supabase } from '../lib/supabase'
+import { colors } from '../lib/theme'
 
 const buttonGradients = {
   primary: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
