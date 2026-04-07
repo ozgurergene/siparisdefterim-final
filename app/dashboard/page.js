@@ -316,9 +316,9 @@ export default function DashboardPage() {
 
   if (loading || !user) {
     return (
-      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial' }}>
+      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', overflowX: 'hidden' }}>
         <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', maxWidth: '1400px', margin: '0 auto' }}>
             <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
             <div style={{ display: 'flex', gap: '15px' }}>
               <div style={{ width: 100, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
@@ -326,7 +326,7 @@ export default function DashboardPage() {
             </div>
           </div>
         </div>
-        <div style={{ padding: '20px' }}>
+        <div style={{ padding: '20px', maxWidth: '1400px', margin: '0 auto' }}>
           <StatsCardsSkeleton theme={theme} />
           <SearchBoxSkeleton theme={theme} />
           <TableSkeleton rows={5} theme={theme} />
@@ -336,7 +336,18 @@ export default function DashboardPage() {
   }
 
   return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
+    <div style={{ 
+      minHeight: '100vh', 
+      background: c.bg, 
+      fontFamily: 'Arial', 
+      color: c.text, 
+      margin: 0, 
+      padding: 0, 
+      display: 'flex', 
+      flexDirection: 'column',
+      overflowX: 'hidden',
+      boxSizing: 'border-box'
+    }}>
       <Header 
         user={user} 
         ordersCreatedCount={ordersCreatedCount} 
@@ -345,9 +356,16 @@ export default function DashboardPage() {
         handleLogout={handleLogout} 
       />
 
-      <div style={{ flex: 1, width: '100%', padding: '20px' }}>
+      <div style={{ 
+        flex: 1, 
+        width: '100%', 
+        padding: '20px', 
+        boxSizing: 'border-box',
+        maxWidth: '1400px',
+        margin: '0 auto'
+      }}>
         {/* Stats Cards */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '20px' }}>
           <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
             <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📦 Aktif Siparişler</p>
             <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{activeOrders}</p>
