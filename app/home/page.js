@@ -11,6 +11,7 @@ export default function HomePage() {
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [theme, setTheme] = useState('dark')
+  const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -38,37 +39,39 @@ export default function HomePage() {
   }
 
   const fetchStats = async (userId) => {
-    const { data: activeOrders } = await supabase
+    // Fetch ALL orders (for ordersCreatedCount)
+    const { data: allOrders } = await supabase
       .from('orders')
       .select('*')
       .eq('user_id', userId)
-      .neq('status', 'completed')
 
-    const { data: completedOrders } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('user_id', userId)
-      .eq('status', 'completed')
+    const orders = allOrders || []
+    
+    // ordersCreatedCount = tüm siparişler (aktif + tamamlanan)
+    setOrdersCreatedCount(orders.length)
 
-    const orders = activeOrders || []
-    const completed = completedOrders || []
+    // Active orders (not completed)
+    const activeOrders = orders.filter(o => o.status !== 'completed')
+    const completedOrders = orders.filter(o => o.status === 'completed')
     
-    const pending = orders.filter(o => o.status === 'payment_pending' || o.status === 'paid').length
-    const shipped = orders.filter(o => o.status === 'preparing' || o.status === 'shipped').length
+    const pending = activeOrders.filter(o => o.status === 'payment_pending' || o.status === 'paid').length
+    const shipped = activeOrders.filter(o => o.status === 'preparing' || o.status === 'shipped').length
     
+    // Today's revenue
     const today = new Date().toISOString().split('T')[0]
-    const todayCompleted = completed.filter(o => o.created_at?.startsWith(today))
-    const todayRevenue = todayCompleted.reduce((sum, o) => sum + (o.total_amount || 0), 0)
+    const todayCompleted = completedOrders.filter(o => o.created_at?.startsWith(today))
+    const todayRevenue = todayCompleted.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
     
+    // Monthly revenue
     const thisMonth = new Date().toISOString().slice(0, 7)
-    const monthlyCompleted = completed.filter(o => o.created_at?.startsWith(thisMonth))
-    const monthlyRevenue = monthlyCompleted.reduce((sum, o) => sum + (o.total_amount || 0), 0)
+    const monthlyCompleted = completedOrders.filter(o => o.created_at?.startsWith(thisMonth))
+    const monthlyRevenue = monthlyCompleted.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
 
     setStats({
-      total: orders.length,
+      total: activeOrders.length,
       pending,
       shipped,
-      completed: completed.length,
+      completed: completedOrders.length,
       todayRevenue,
       monthlyRevenue
     })
@@ -144,7 +147,7 @@ export default function HomePage() {
     }}>
       <Header 
         user={user} 
-        ordersCreatedCount={stats.total}
+        ordersCreatedCount={ordersCreatedCount}
         theme={theme} 
         toggleTheme={toggleTheme} 
         handleLogout={handleLogout}
