@@ -92,6 +92,11 @@ export default function LoginPage() {
 
   const primaryGradient = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
 
+  const linkStyle = {
+    color: '#667eea',
+    textDecoration: 'none',
+  }
+
   return (
     <div style={{
       minHeight: '100vh',
@@ -172,15 +177,17 @@ export default function LoginPage() {
             />
           </div>
 
-          {/* Terms for signup - TEK SATIR */}
+          {/* Terms for signup - TEK CHECKBOX, TIKLANABILIR LİNKLER */}
           {!isLogin && (
             <label style={{ display: 'flex', alignItems: 'flex-start', gap: 10, marginBottom: 20, cursor: 'pointer' }}>
               <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)}
                 style={{ width: 18, height: 18, marginTop: 2, accentColor: '#667eea' }} />
-              <span style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.5 }}>
-                <a href="/terms-of-use" target="_blank" style={{ color: '#667eea' }}>Kullanım Koşulları</a>,{' '}
-                <a href="/privacy-policy" target="_blank" style={{ color: '#667eea' }}>Gizlilik Politikası</a> ve{' '}
-                <a href="/gdpr-disclosure" target="_blank" style={{ color: '#667eea' }}>KVKK</a>'yı kabul ediyorum.
+              <span style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
+                <a href="/gdpr-disclosure" target="_blank" style={linkStyle}>KVKK Aydınlatma</a>,{' '}
+                <a href="/terms-of-use" target="_blank" style={linkStyle}>Kullanım Koşulları</a>,{' '}
+                <a href="/privacy-policy" target="_blank" style={linkStyle}>Gizlilik Politikası</a>,{' '}
+                <a href="/consent" target="_blank" style={linkStyle}>Açık Rıza</a> ve{' '}
+                <a href="/disclaimer" target="_blank" style={linkStyle}>Sorumluluk Reddi</a>'ni okudum, kabul ediyorum.
               </span>
             </label>
           )}
