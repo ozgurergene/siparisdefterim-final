@@ -1,351 +1,416 @@
 'use client'
+
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import { colors, metricGradients, glowEffects, keyframesCSS } from '../../lib/theme'
-import { calculateOrderTotals } from '../../lib/calculations'
+import { colors } from '../../lib/theme'
+import { calculateGrandTotal } from '../../lib/calculations'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import OrderForm from '../../components/OrderForm'
 import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
-import { DashboardSkeleton } from '../../components/Loading'
+import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
 export default function DashboardPage() {
   const router = useRouter()
   const [user, setUser] = useState(null)
+  const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([])
   const [filteredOrders, setFilteredOrders] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [theme, setTheme] = useState('dark')
-  const [editingOrder, setEditingOrder] = useState(null)
-  const [searchTerm, setSearchTerm] = useState('')
+  const [theme, setTheme] = useState('light')
+  const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
+  
+  // Search states
+  const [searchName, setSearchName] = useState('')
+  const [searchPhone, setSearchPhone] = useState('')
+  const [searchProduct, setSearchProduct] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
   
+  // New order state with İl/İlçe
+  const [newOrder, setNewOrder] = useState({
+    customer_name: '',
+    customer_phone: '',
+    customer_address: '',
+    customer_city: '',
+    customer_district: '',
+    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+    note: ''
+  })
+  
+  // Edit state
+  const [editingId, setEditingId] = useState(null)
+  const [editingData, setEditingData] = useState(null)
+
   const c = colors[theme]
 
+  // Load theme
   useEffect(() => {
-    checkUser()
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    setTheme(savedTheme)
   }, [])
 
+  // Check user
   useEffect(() => {
-    filterOrders()
-  }, [orders, searchTerm, statusFilter])
-
-  const checkUser = async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (!session) {
-      router.replace('/login')
-      return
+    const checkUser = async () => {
+      try {
+        const { data } = await supabase.auth.getSession()
+        if (!data?.session?.user) {
+          router.push('/login')
+          return
+        }
+        setUser(data.session.user)
+        await fetchUserData(data.session.user.id)
+      } catch (error) {
+        console.error('Auth error:', error)
+        router.push('/login')
+      }
+      setLoading(false)
     }
-    setUser(session.user)
-    await fetchOrders(session.user.id)
-    setLoading(false)
-  }
+    checkUser()
+  }, [router])
 
-  const fetchOrders = async (userId) => {
-    const { data, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('user_id', userId)
-      .neq('status', 'completed')
-      .order('created_at', { ascending: false })
-
-    if (!error && data) {
-      setOrders(data)
-    }
-  }
-
-  const filterOrders = () => {
-    let result = [...orders]
+  // Filter orders
+  useEffect(() => {
+    let filtered = orders
     
-    // Status filter
-    if (statusFilter !== 'all') {
-      result = result.filter(o => o.status === statusFilter)
-    }
-    
-    // Search filter
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      result = result.filter(o => 
-        o.customer_name?.toLowerCase().includes(term) ||
-        o.phone?.includes(term) ||
-        o.products?.some(p => p.name?.toLowerCase().includes(term))
+    if (searchName.trim()) {
+      filtered = filtered.filter(order => 
+        order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
       )
     }
-    
-    setFilteredOrders(result)
-  }
+    if (searchPhone.trim()) {
+      filtered = filtered.filter(order => 
+        order.customer_phone.startsWith(searchPhone)
+      )
+    }
+    if (searchProduct.trim()) {
+      filtered = filtered.filter(order => {
+        const products = order.product.split(', ')
+        return products.some(prod => 
+          prod.toLowerCase().startsWith(searchProduct.toLowerCase())
+        )
+      })
+    }
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === statusFilter)
+    }
+    setFilteredOrders(filtered)
+  }, [searchName, searchPhone, searchProduct, statusFilter, orders])
 
-  const getStatusCounts = () => {
-    return {
-      payment_pending: orders.filter(o => o.status === 'payment_pending').length,
-      paid: orders.filter(o => o.status === 'paid').length,
-      preparing: orders.filter(o => o.status === 'preparing').length,
-      shipped: orders.filter(o => o.status === 'shipped').length,
+  const fetchUserData = async (userId) => {
+    try {
+      // Check if user exists in users table
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      
+      if (userError && userError.code === 'PGRST116') {
+        await supabase.from('users').insert([{ id: userId, orders_created_count: 0 }])
+      }
+
+      // Fetch orders and use actual count
+      const { data: ordersData } = await supabase
+        .from('orders')
+        .select('*')
+        .eq('user_id', userId)
+        .order('created_at', { ascending: false })
+
+      const allOrders = ordersData || []
+      setOrders(allOrders.filter(o => o.status !== 'completed'))
+      setOrdersCreatedCount(allOrders.length)
+    } catch (error) {
+      console.error('fetchUserData error:', error)
     }
   }
 
-  const handleSubmit = async (formData) => {
-    // Calculate product totals
-    const products = formData.products.map(p => {
-      const quantity = parseInt(p.quantity) || 0
-      const unitPrice = parseFloat(p.unit_price) || 0
-      const kdvRate = parseFloat(p.kdv_rate) || 0
-      const subtotal = quantity * unitPrice
-      const kdvAmount = subtotal * (kdvRate / 100)
-      const total = subtotal + kdvAmount
-      
-      return {
-        ...p,
-        quantity,
-        unit_price: unitPrice,
-        kdv_rate: kdvRate,
-        subtotal,
-        kdv_amount: kdvAmount,
-        total
-      }
-    })
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    localStorage.setItem('siparisdefterim-theme', newTheme)
+  }
 
-    const totals = calculateOrderTotals(products)
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
+    router.push('/login')
+  }
+
+  // Add new order
+  const handleAddOrder = async () => {
+    if (!newOrder.customer_name || !newOrder.customer_phone) {
+      alert('Lütfen müşteri adı ve telefon numarası girin.')
+      return
+    }
+
+    const hasValidProduct = newOrder.products.some(p => p.product && p.unit_price)
+    if (!hasValidProduct) {
+      alert('Lütfen en az bir ürün ve fiyat girin.')
+      return
+    }
+
+    const productString = newOrder.products
+      .filter(p => p.product)
+      .map(p => `${p.product} x${p.quantity}`)
+      .join(', ')
+
+    const totalPrice = calculateGrandTotal(newOrder.products)
 
     const orderData = {
       user_id: user.id,
-      customer_name: formData.customer_name,
-      phone: formData.phone,
-      address: formData.address,
-      notes: formData.notes,
-      products,
-      total_amount: totals.total,
-      status: 'payment_pending'
+      customer_name: newOrder.customer_name,
+      customer_phone: newOrder.customer_phone,
+      customer_address: newOrder.customer_address,
+      customer_city: newOrder.customer_city,
+      customer_district: newOrder.customer_district,
+      product: productString,
+      price: totalPrice,
+      status: 'payment_pending',
+      note: newOrder.note
     }
 
-    const { error } = await supabase.from('orders').insert([orderData])
-    
-    if (!error) {
-      await fetchOrders(user.id)
+    const { data, error } = await supabase.from('orders').insert([orderData]).select()
+
+    if (error) {
+      console.error('Order error:', error)
+      alert('Sipariş oluşturulamadı.')
+      return
     }
+
+    // Update orders_created_count
+    await supabase
+      .from('users')
+      .update({ orders_created_count: ordersCreatedCount + 1 })
+      .eq('id', user.id)
+
+    setOrders([data[0], ...orders])
+    setOrdersCreatedCount(ordersCreatedCount + 1)
+    setNewOrder({
+      customer_name: '',
+      customer_phone: '',
+      customer_address: '',
+      customer_city: '',
+      customer_district: '',
+      products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+      note: ''
+    })
   }
 
-  const handleStatusChange = async (orderId, newStatus) => {
+  // Delete order
+  const deleteOrder = async (orderId) => {
+    if (!confirm('Siparişi silmek istediğinize emin misiniz?')) return
+
+    const { error } = await supabase.from('orders').delete().eq('id', orderId)
+    if (error) {
+      console.error('Delete error:', error)
+      alert('Sipariş silinemedi.')
+      return
+    }
+
+    setOrders(orders.filter(o => o.id !== orderId))
+    setOrdersCreatedCount(ordersCreatedCount - 1)
+
+    await supabase
+      .from('users')
+      .update({ orders_created_count: ordersCreatedCount - 1 })
+      .eq('id', user.id)
+  }
+
+  // Update order status
+  const updateOrderStatus = async (orderId, newStatus) => {
     const { error } = await supabase
       .from('orders')
       .update({ status: newStatus })
       .eq('id', orderId)
 
-    if (!error) {
-      if (newStatus === 'completed') {
-        setOrders(orders.filter(o => o.id !== orderId))
-      } else {
-        setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
-      }
+    if (error) {
+      console.error('Status update error:', error)
+      alert('Durum güncellenemedi.')
+      return
     }
-  }
 
-  const handleDelete = async (orderId) => {
-    const { error } = await supabase
-      .from('orders')
-      .delete()
-      .eq('id', orderId)
-
-    if (!error) {
+    if (newStatus === 'completed') {
       setOrders(orders.filter(o => o.id !== orderId))
+    } else {
+      setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
     }
   }
 
-  const handleEdit = (order) => {
-    setEditingOrder(order)
-  }
-
-  const handleSaveEdit = async (orderId, formData) => {
-    const products = formData.products.map(p => {
-      const quantity = parseInt(p.quantity) || 0
-      const unitPrice = parseFloat(p.unit_price) || 0
-      const kdvRate = parseFloat(p.kdv_rate) || 0
-      const subtotal = quantity * unitPrice
-      const kdvAmount = subtotal * (kdvRate / 100)
-      const total = subtotal + kdvAmount
-      
-      return {
-        ...p,
-        quantity,
-        unit_price: unitPrice,
-        kdv_rate: kdvRate,
-        subtotal,
-        kdv_amount: kdvAmount,
-        total
+  // Start editing
+  const startEditing = (order) => {
+    // Parse existing product string to products array
+    const productParts = order.product.split(', ')
+    const products = productParts.map(part => {
+      const match = part.match(/(.+) x(\d+)/)
+      if (match) {
+        return { product: match[1], quantity: parseInt(match[2]), unit_price: '', kdv_rate: '' }
       }
+      return { product: part, quantity: 1, unit_price: '', kdv_rate: '' }
     })
 
-    const totals = calculateOrderTotals(products)
+    setEditingId(order.id)
+    setEditingData({
+      customer_name: order.customer_name,
+      customer_phone: order.customer_phone,
+      customer_address: order.customer_address || '',
+      customer_city: order.customer_city || '',
+      customer_district: order.customer_district || '',
+      products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+      note: order.note || ''
+    })
+  }
+
+  // Save edit
+  const saveEdit = async () => {
+    const productString = editingData.products
+      .filter(p => p.product)
+      .map(p => `${p.product} x${p.quantity}`)
+      .join(', ')
+
+    const totalPrice = calculateGrandTotal(editingData.products)
+
+    const updateData = {
+      customer_name: editingData.customer_name,
+      customer_phone: editingData.customer_phone,
+      customer_address: editingData.customer_address,
+      customer_city: editingData.customer_city,
+      customer_district: editingData.customer_district,
+      product: productString,
+      price: totalPrice,
+      note: editingData.note
+    }
 
     const { error } = await supabase
       .from('orders')
-      .update({
-        customer_name: formData.customer_name,
-        phone: formData.phone,
-        address: formData.address,
-        notes: formData.notes,
-        products,
-        total_amount: totals.total
-      })
-      .eq('id', orderId)
+      .update(updateData)
+      .eq('id', editingId)
 
-    if (!error) {
-      await fetchOrders(user.id)
-      setEditingOrder(null)
+    if (error) {
+      console.error('Update error:', error)
+      alert('Sipariş güncellenemedi.')
+      return
     }
+
+    setOrders(orders.map(o => o.id === editingId ? { ...o, ...updateData } : o))
+    setEditingId(null)
+    setEditingData(null)
   }
 
-  const handleLogout = async () => {
-    await supabase.auth.signOut()
-    router.replace('/login')
+  // Cancel edit
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditingData(null)
   }
 
-  if (loading) {
+  // Calculate stats
+  const activeOrders = orders.filter(o => o.status !== 'completed').length
+  const pendingPayments = orders.filter(o => o.status === 'payment_pending').length
+  const shippedOrders = orders.filter(o => o.status === 'shipped').length
+  const todayOrders = orders.filter(o => {
+    const orderDate = new Date(o.created_at)
+    const today = new Date()
+    return orderDate.toDateString() === today.toDateString()
+  }).length
+
+  if (loading || !user) {
     return (
-      <div style={{ 
-        minHeight: '100vh', 
-        background: c.bgGradient,
-        padding: 24,
-      }}>
-        <DashboardSkeleton />
+      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial' }}>
+        <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
+            <div style={{ display: 'flex', gap: '15px' }}>
+              <div style={{ width: 100, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
+              <div style={{ width: 120, height: 36, background: c.bgSecondary, borderRadius: 6 }} />
+            </div>
+          </div>
+        </div>
+        <div style={{ padding: '20px' }}>
+          <StatsCardsSkeleton theme={theme} />
+          <SearchBoxSkeleton theme={theme} />
+          <TableSkeleton rows={5} theme={theme} />
+        </div>
       </div>
     )
   }
 
-  // Stats for metric cards
-  const stats = {
-    total: orders.length,
-    pending: orders.filter(o => o.status === 'payment_pending').length,
-    paid: orders.filter(o => o.status === 'paid').length,
-    shipped: orders.filter(o => o.status === 'shipped' || o.status === 'preparing').length,
-  }
-
-  const metricCards = [
-    { label: 'Toplam Sipariş', value: stats.total, icon: '📦', gradient: metricGradients.active },
-    { label: 'Ödeme Bekleyen', value: stats.pending, icon: '💰', gradient: metricGradients.pending },
-    { label: 'Ödeme Alındı', value: stats.paid, icon: '✅', gradient: metricGradients.today },
-    { label: 'Kargo Sürecinde', value: stats.shipped, icon: '🚚', gradient: metricGradients.shipped },
-  ]
-
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      background: c.bgGradient,
-      backgroundAttachment: 'fixed',
-      display: 'flex',
-      flexDirection: 'column',
-    }}>
+    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
       <Header 
         user={user} 
-        orderCount={orders.length}
-        maxOrders={50}
+        ordersCreatedCount={ordersCreatedCount} 
         theme={theme} 
-        setTheme={setTheme} 
-        onLogout={handleLogout}
+        toggleTheme={toggleTheme} 
+        handleLogout={handleLogout} 
       />
 
-      <main style={{ flex: 1, padding: '24px' }}>
-        <div style={{ maxWidth: 1400, margin: '0 auto' }}>
-          
-          {/* Metric Cards */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(4, 1fr)', 
-            gap: 16,
-            marginBottom: 24,
-          }}>
-            {metricCards.map((card, index) => (
-              <div
-                key={card.label}
-                style={{
-                  background: c.bgCard,
-                  backdropFilter: 'blur(20px)',
-                  borderRadius: 16,
-                  padding: 20,
-                  border: `1px solid ${c.border}`,
-                  position: 'relative',
-                  overflow: 'hidden',
-                  animation: `fadeIn 0.3s ease-out ${index * 0.05}s both`,
-                }}
-              >
-                <div style={{
-                  position: 'absolute',
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  height: 3,
-                  background: card.gradient,
-                }} />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <div>
-                    <p style={{ fontSize: 12, color: c.textMuted, margin: '0 0 4px 0' }}>{card.label}</p>
-                    <p style={{ 
-                      fontSize: 28, 
-                      fontWeight: 700, 
-                      margin: 0,
-                      background: card.gradient,
-                      WebkitBackgroundClip: 'text',
-                      WebkitTextFillColor: 'transparent',
-                    }}>
-                      {card.value}
-                    </p>
-                  </div>
-                  <span style={{ fontSize: 24 }}>{card.icon}</span>
-                </div>
-              </div>
-            ))}
+      <div style={{ flex: 1, width: '100%', padding: '20px' }}>
+        {/* Stats Cards */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: '15px', marginBottom: '20px' }}>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📦 Aktif Siparişler</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: c.text }}>{activeOrders}</p>
           </div>
-
-          {/* Main Content Grid */}
-          <div style={{ display: 'grid', gridTemplateColumns: '400px 1fr', gap: 24 }}>
-            
-            {/* Order Form */}
-            <div>
-              <OrderForm onSubmit={handleSubmit} theme={theme} />
-            </div>
-
-            {/* Orders List */}
-            <div>
-              <SearchBox
-                onSearch={setSearchTerm}
-                onStatusFilter={setStatusFilter}
-                activeStatus={statusFilter}
-                statusCounts={getStatusCounts()}
-                resultCount={filteredOrders.length}
-                theme={theme}
-              />
-              
-              <OrderTable
-                orders={filteredOrders}
-                onStatusChange={handleStatusChange}
-                onDelete={handleDelete}
-                onEdit={handleEdit}
-                theme={theme}
-              />
-            </div>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>💰 Ödeme Bekleyen</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#f39c12' }}>{pendingPayments}</p>
           </div>
-
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>🚚 Kargoda</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#9b59b6' }}>{shippedOrders}</p>
+          </div>
+          <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📅 Bugün Eklenen</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>{todayOrders}</p>
+          </div>
         </div>
-      </main>
 
-      <Footer theme={theme} />
-
-      {/* Edit Modal */}
-      {editingOrder && (
-        <EditModal
-          order={editingOrder}
-          onSave={handleSaveEdit}
-          onClose={() => setEditingOrder(null)}
+        {/* Order Form */}
+        <OrderForm 
+          newOrder={newOrder}
+          setNewOrder={setNewOrder}
+          ordersCreatedCount={ordersCreatedCount}
+          handleAddOrder={handleAddOrder}
           theme={theme}
         />
-      )}
 
-      <style jsx global>{`
-        ${keyframesCSS}
-      `}</style>
+        {/* Search Box */}
+        <SearchBox
+          searchName={searchName}
+          setSearchName={setSearchName}
+          searchPhone={searchPhone}
+          setSearchPhone={setSearchPhone}
+          searchProduct={searchProduct}
+          setSearchProduct={setSearchProduct}
+          filteredCount={filteredOrders.length}
+          theme={theme}
+        />
+
+        {/* Order Table */}
+        <OrderTable
+          filteredOrders={filteredOrders}
+          user={user}
+          theme={theme}
+          startEditing={startEditing}
+          deleteOrder={deleteOrder}
+          updateOrderStatus={updateOrderStatus}
+          statusFilter={statusFilter}
+          setStatusFilter={setStatusFilter}
+        />
+      </div>
+
+      {/* Edit Modal */}
+      <EditModal
+        editingId={editingId}
+        editingData={editingData}
+        setEditingData={setEditingData}
+        saveEdit={saveEdit}
+        cancelEdit={cancelEdit}
+        theme={theme}
+      />
+
+      <Footer theme={theme} />
     </div>
   )
 }

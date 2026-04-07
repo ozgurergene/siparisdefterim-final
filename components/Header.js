@@ -1,166 +1,166 @@
 'use client'
-import { useRouter, usePathname } from 'next/navigation'
-import { colors, getInitials, getAvatarGradient, glowEffects } from '../lib/theme'
 
-export default function Header({ user, orderCount = 0, maxOrders = 50, theme, setTheme, onLogout }) {
-  const router = useRouter()
-  const pathname = usePathname()
+import { useRouter } from 'next/navigation'
+import { colors } from '../lib/theme'
+
+// Gradient Home Icon SVG Component
+function HomeIcon({ size = 24 }) {
+  return (
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <defs>
+        <linearGradient id="homeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#667eea" />
+          <stop offset="100%" stopColor="#764ba2" />
+        </linearGradient>
+      </defs>
+      <path 
+        d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" 
+        stroke="url(#homeGradient)" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+      <path 
+        d="M9 22V12H15V22" 
+        stroke="url(#homeGradient)" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export default function Header({ user, ordersCreatedCount, theme, toggleTheme, handleLogout }) {
   const c = colors[theme]
-  
-  const progressPercent = Math.min((orderCount / maxOrders) * 100, 100)
-  const progressColor = progressPercent > 80 ? '#f5576c' : progressPercent > 60 ? '#f093fb' : '#667eea'
-  
-  const userInitials = user?.email ? user.email.substring(0, 2).toUpperCase() : 'U'
-  const userName = user?.email?.split('@')[0] || 'Kullanıcı'
+  const router = useRouter()
 
   return (
-    <header
-      style={{
-        background: c.header,
-        borderBottom: `1px solid ${c.border}`,
-        padding: '12px 24px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        boxShadow: c.shadow,
-      }}
-    >
-      {/* Left: Logo & Nav */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
-        {/* Home Button */}
-        <button
-          onClick={() => router.push('/home')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            cursor: 'pointer',
-            padding: 8,
-            borderRadius: 10,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.1)'}
-          onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
-          title="Ana Sayfa"
-        >
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#667eea" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-            <polyline points="9 22 9 12 15 12 15 22" />
-          </svg>
-        </button>
-
-        {/* Brand */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 22 }}>📱</span>
-          <h1 style={{ fontSize: 18, fontWeight: 700, color: c.text, margin: 0, letterSpacing: '-0.02em' }}>
-            SiparişDefterim
+    <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        
+        {/* Logo + Home Icon */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <button
+            onClick={() => router.push('/home')}
+            style={{
+              padding: '8px',
+              background: c.bgSecondary,
+              border: `1px solid ${c.border}`,
+              borderRadius: '8px',
+              cursor: 'pointer',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            title="Ana Sayfa"
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            <HomeIcon size={22} />
+          </button>
+          <h1 
+            onClick={() => router.push('/home')}
+            style={{ 
+              margin: 0, 
+              fontSize: '24px', 
+              color: c.text,
+              cursor: 'pointer',
+              transition: 'opacity 0.2s'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
+            onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+          >
+            📱 SiparişDefterim
           </h1>
         </div>
-
-        {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', gap: 8, marginLeft: 20 }}>
+        
+        <div style={{ display: 'flex', gap: '10px' }}>
           <button
-            onClick={() => router.push('/dashboard')}
-            style={{
-              padding: '10px 18px',
-              borderRadius: 8,
-              border: 'none',
-              cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.2s ease',
-              background: pathname === '/dashboard' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : c.bgCard,
-              color: pathname === '/dashboard' ? 'white' : c.text,
-              boxShadow: pathname === '/dashboard' ? '0 4px 12px rgba(102, 126, 234, 0.3)' : 'none',
-            }}
+            style={{ padding: '8px 16px', background: '#007bff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: 'white' }}
           >
-            <span>📦</span>
-            Siparişler
+            📋 Siparişler
           </button>
-
           <button
             onClick={() => router.push('/completed')}
+            style={{ padding: '8px 16px', background: c.bgSecondary, border: `2px solid #1D9E75`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: '#1D9E75' }}
+          >
+            ✓ Tamamlananlar
+          </button>
+        </div>
+
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
+          <div style={{ textAlign: 'right' }}>
+            <p style={{ margin: '0 0 5px 0', fontSize: '16px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
+            <div style={{ width: '150px', height: '8px', background: c.bgSecondary, borderRadius: '4px', overflow: 'hidden' }}>
+              <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : '#007bff', transition: 'width 0.3s' }} />
+            </div>
+          </div>
+          <span style={{ color: c.textSecondary, fontSize: '16px', minWidth: '120px' }}>{user.email}</span>
+          
+          {/* Theme Toggle Button with Yellow/Orange glow */}
+          <button
+            onClick={toggleTheme}
             style={{
-              padding: '10px 18px',
-              borderRadius: 8,
-              border: 'none',
+              padding: '8px 12px',
+              background: c.bgSecondary,
+              border: `1px solid ${c.border}`,
+              borderRadius: '6px',
               cursor: 'pointer',
-              fontSize: 14,
-              fontWeight: 500,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 8,
-              transition: 'all 0.2s ease',
-              background: pathname === '/completed' ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' : c.bgCard,
-              color: pathname === '/completed' ? 'white' : c.text,
-              boxShadow: pathname === '/completed' ? '0 4px 12px rgba(67, 233, 123, 0.3)' : 'none',
+              fontSize: '16px',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : '0 4px 15px rgba(255, 193, 7, 0.5)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
             }}
           >
-            <span>✅</span>
-            Tamamlananlar
+            {theme === 'light' ? '🌙' : '☀️'}
           </button>
-        </nav>
-      </div>
-
-      {/* Right: Progress, Theme, User, Logout */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-        {/* Order Progress */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <span style={{ fontSize: 13, fontWeight: 500, color: c.textSecondary }}>{orderCount}/{maxOrders}</span>
-          <div style={{ width: 80, height: 6, background: c.border, borderRadius: 3, overflow: 'hidden' }}>
-            <div style={{ width: `${progressPercent}%`, height: '100%', background: `linear-gradient(90deg, #667eea, ${progressColor})`, borderRadius: 3, transition: 'width 0.5s ease' }} />
-          </div>
+          
+          {/* Logout Button with Red glow */}
+          <button
+            onClick={handleLogout}
+            style={{
+              padding: '8px 15px',
+              background: '#ff6b6b',
+              color: 'white',
+              border: 'none',
+              borderRadius: '6px',
+              cursor: 'pointer',
+              fontWeight: 'bold',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'scale(1.05)'
+              e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.5)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'scale(1)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            Çıkış
+          </button>
         </div>
-
-        {/* Theme Toggle */}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          style={{
-            width: 40, height: 40, borderRadius: 8, border: `1px solid ${c.border}`, background: c.bgCard,
-            cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, transition: 'all 0.2s ease',
-          }}
-          title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
-        >
-          {theme === 'dark' ? '☀️' : '🌙'}
-        </button>
-
-        {/* User Avatar & Info */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ fontSize: 11, color: c.textMuted, margin: 0, fontWeight: 500 }}>Hoş geldin,</p>
-            <p style={{ fontSize: 13, color: c.text, margin: 0, fontWeight: 600 }}>{userName}</p>
-          </div>
-          <div style={{
-            width: 40, height: 40, borderRadius: '50%', background: getAvatarGradient(user?.email),
-            display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, color: 'white',
-            boxShadow: '0 2px 8px rgba(102, 126, 234, 0.3)',
-          }}>
-            {userInitials}
-          </div>
-        </div>
-
-        {/* Logout Button */}
-        <button
-          onClick={onLogout}
-          style={{
-            padding: '10px 18px', borderRadius: 8, border: 'none',
-            background: 'linear-gradient(135deg, #f5576c 0%, #f093fb 100%)', color: 'white',
-            fontSize: 14, fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, transition: 'all 0.2s ease',
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.transform = 'scale(1.02)'; e.currentTarget.style.boxShadow = glowEffects.danger }}
-          onMouseLeave={(e) => { e.currentTarget.style.transform = 'scale(1)'; e.currentTarget.style.boxShadow = 'none' }}
-        >
-          Çıkış
-        </button>
       </div>
-    </header>
+    </div>
   )
 }
