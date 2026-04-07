@@ -1,5 +1,4 @@
 'use client'
-
 import { useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../lib/supabase'
@@ -29,17 +28,16 @@ export default function RootPage() {
   }, [router])
 
   return (
-    <div style={{ 
-      minHeight: '100vh', 
-      display: 'flex', 
-      alignItems: 'center', 
-      justifyContent: 'center',
+    <div style={{
+      minHeight: '100vh',
       background: 'linear-gradient(135deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-      fontFamily: 'Arial'
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
     }}>
-      <div style={{ textAlign: 'center', color: 'white' }}>
-        <div style={{ fontSize: '48px', marginBottom: '20px' }}>📱</div>
-        <p style={{ color: '#94a3b8' }}>Yükleniyor...</p>
+      <div style={{ textAlign: 'center' }}>
+        <div style={{ fontSize: 48, marginBottom: 20 }}>📱</div>
+        <p style={{ color: '#94a3b8', fontSize: 14 }}>Yükleniyor...</p>
       </div>
     </div>
   )

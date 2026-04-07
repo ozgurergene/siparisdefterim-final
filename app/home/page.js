@@ -1,215 +1,447 @@
 'use client'
-
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
-import { colors } from '../../lib/theme'
+import { colors, metricGradients, glowEffects, buttonGradients, keyframesCSS } from '../../lib/theme'
+import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 
 export default function HomePage() {
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [theme, setTheme] = useState('light')
-  const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
-
+  const [theme, setTheme] = useState('dark')
+  const [stats, setStats] = useState({
+    total: 0,
+    pending: 0,
+    shipped: 0,
+    completed: 0,
+    todayRevenue: 0,
+    monthlyRevenue: 0
+  })
+  
   const c = colors[theme]
 
-  // Load theme
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
-    setTheme(savedTheme)
+    checkUser()
   }, [])
 
-  // Check user
-  useEffect(() => {
-    const checkUser = async () => {
-      try {
-        const { data } = await supabase.auth.getSession()
-        if (!data?.session?.user) {
-          router.push('/login')
-          return
-        }
-        setUser(data.session.user)
-        
-        // Get order count
-        const { data: ordersData } = await supabase
-          .from('orders')
-          .select('id')
-          .eq('user_id', data.session.user.id)
-        
-        setOrdersCreatedCount(ordersData?.length || 0)
-      } catch (error) {
-        console.error('Auth error:', error)
-        router.push('/login')
-      }
-      setLoading(false)
+  const checkUser = async () => {
+    const { data: { session } } = await supabase.auth.getSession()
+    if (!session) {
+      router.replace('/login')
+      return
     }
-    checkUser()
-  }, [router])
+    setUser(session.user)
+    await fetchStats(session.user.id)
+    setLoading(false)
+  }
 
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light'
-    setTheme(newTheme)
-    localStorage.setItem('siparisdefterim-theme', newTheme)
+  const fetchStats = async (userId) => {
+    const { data: activeOrders } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', userId)
+      .neq('status', 'completed')
+
+    const { data: completedOrders } = await supabase
+      .from('orders')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('status', 'completed')
+
+    const orders = activeOrders || []
+    const completed = completedOrders || []
+    
+    const pending = orders.filter(o => o.status === 'payment_pending' || o.status === 'paid').length
+    const shipped = orders.filter(o => o.status === 'preparing' || o.status === 'shipped').length
+    
+    const today = new Date().toISOString().split('T')[0]
+    const todayCompleted = completed.filter(o => o.created_at?.startsWith(today))
+    const todayRevenue = todayCompleted.reduce((sum, o) => sum + (o.total_amount || 0), 0)
+    
+    const thisMonth = new Date().toISOString().slice(0, 7)
+    const monthlyCompleted = completed.filter(o => o.created_at?.startsWith(thisMonth))
+    const monthlyRevenue = monthlyCompleted.reduce((sum, o) => sum + (o.total_amount || 0), 0)
+
+    setStats({
+      total: orders.length,
+      pending,
+      shipped,
+      completed: completed.length,
+      todayRevenue,
+      monthlyRevenue
+    })
   }
 
   const handleLogout = async () => {
     await supabase.auth.signOut()
-    router.push('/login')
+    router.replace('/login')
   }
 
+  // Loading state - inline instead of PageLoading component
   if (loading) {
     return (
-      <div style={{ minHeight: '100vh', background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Arial' }}>
+      <div style={{
+        minHeight: '100vh',
+        background: 'linear-gradient(135deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
         <div style={{ textAlign: 'center' }}>
-          <div style={{ fontSize: '48px', marginBottom: '20px' }}>📱</div>
-          <p style={{ color: c.textSecondary }}>Yükleniyor...</p>
+          <div style={{ fontSize: 48, marginBottom: 20 }}>📱</div>
+          <p style={{ color: '#94a3b8', fontSize: 14 }}>Yükleniyor...</p>
         </div>
       </div>
     )
   }
 
-  return (
-    <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', color: c.text, margin: 0, padding: 0, display: 'flex', flexDirection: 'column' }}>
-      {/* Header */}
-      <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          <h1 style={{ margin: 0, fontSize: '24px', color: c.text }}>📱 SiparişDefterim</h1>
-          
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <div style={{ textAlign: 'right' }}>
-              <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
-              <div style={{ width: '120px', height: '6px', background: c.bgSecondary, borderRadius: '4px', overflow: 'hidden' }}>
-                <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : '#007bff', transition: 'width 0.3s' }} />
-              </div>
-            </div>
-            <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user?.email}</span>
-            <button
-              onClick={toggleTheme}
-              style={{ padding: '8px 12px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '6px', cursor: 'pointer', fontSize: '16px' }}
-            >
-              {theme === 'light' ? '🌙' : '☀️'}
-            </button>
-            <button
-              onClick={handleLogout}
-              style={{ padding: '8px 15px', background: '#ff6b6b', color: 'white', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
-            >
-              Çıkış
-            </button>
-          </div>
-        </div>
-      </div>
+  const metricCards = [
+    { 
+      label: 'Aktif Siparişler', 
+      value: stats.total, 
+      icon: '📦', 
+      gradient: metricGradients.active,
+      glow: glowEffects.primary 
+    },
+    { 
+      label: 'Ödeme Bekleyen', 
+      value: stats.pending, 
+      icon: '💰', 
+      gradient: metricGradients.pending,
+      glow: glowEffects.danger 
+    },
+    { 
+      label: 'Kargo Sürecinde', 
+      value: stats.shipped, 
+      icon: '🚚', 
+      gradient: metricGradients.shipped,
+      glow: glowEffects.info 
+    },
+    { 
+      label: 'Tamamlanan', 
+      value: stats.completed, 
+      icon: '✅', 
+      gradient: metricGradients.completed,
+      glow: glowEffects.primary 
+    },
+  ]
 
-      {/* Main Content */}
-      <div style={{ flex: 1, padding: '40px 20px' }}>
-        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-          {/* Welcome Message */}
-          <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-            <h2 style={{ fontSize: '28px', margin: '0 0 10px 0', color: c.text }}>Hoş Geldiniz! 👋</h2>
-            <p style={{ fontSize: '16px', color: c.textSecondary, margin: 0 }}>
-              Siparişlerinizi kolayca yönetin, müşterilerinizle iletişimde kalın.
+  return (
+    <div style={{ 
+      minHeight: '100vh', 
+      background: c.bgGradient,
+      backgroundAttachment: 'fixed',
+      display: 'flex',
+      flexDirection: 'column',
+    }}>
+      <Header 
+        user={user} 
+        orderCount={stats.total}
+        maxOrders={50}
+        theme={theme} 
+        setTheme={setTheme} 
+        onLogout={handleLogout}
+      />
+
+      <main style={{ flex: 1, padding: '32px 24px' }}>
+        <div style={{ maxWidth: 1200, margin: '0 auto' }}>
+          
+          {/* Welcome Section */}
+          <div style={{ 
+            textAlign: 'center', 
+            marginBottom: 40,
+            animation: 'fadeIn 0.5s ease-out',
+          }}>
+            <h1 style={{ 
+              fontSize: 32, 
+              fontWeight: 700, 
+              color: c.text,
+              marginBottom: 8,
+            }}>
+              Hoş Geldin! 👋
+            </h1>
+            <p style={{ color: c.textSecondary, fontSize: 16 }}>
+              İşte güncel sipariş durumun
             </p>
           </div>
 
-          {/* Action Cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', gap: '20px' }}>
-            {/* Siparişler Card */}
-            <div 
-              onClick={() => router.push('/dashboard')}
-              style={{ 
-                background: c.header, 
-                padding: '30px', 
-                borderRadius: '12px', 
+          {/* Metric Cards */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: 'repeat(4, 1fr)', 
+            gap: 20,
+            marginBottom: 32,
+          }}>
+            {metricCards.map((card, index) => (
+              <div
+                key={card.label}
+                style={{
+                  background: c.bgCard,
+                  backdropFilter: 'blur(20px)',
+                  borderRadius: 20,
+                  padding: 24,
+                  border: `1px solid ${c.border}`,
+                  position: 'relative',
+                  overflow: 'hidden',
+                  cursor: 'pointer',
+                  transition: 'all 0.3s ease',
+                  animation: `slideUp 0.5s ease-out ${index * 0.1}s both`,
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'translateY(-5px)'
+                  e.currentTarget.style.boxShadow = card.glow
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = 'none'
+                }}
+                onClick={() => router.push('/dashboard')}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 4,
+                  background: card.gradient,
+                }} />
+                
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <p style={{ 
+                      fontSize: 13, 
+                      color: c.textMuted, 
+                      margin: '0 0 8px 0',
+                      fontWeight: 500,
+                    }}>
+                      {card.label}
+                    </p>
+                    <p style={{ 
+                      fontSize: 36, 
+                      fontWeight: 700, 
+                      margin: 0,
+                      background: card.gradient,
+                      WebkitBackgroundClip: 'text',
+                      WebkitTextFillColor: 'transparent',
+                    }}>
+                      {card.value}
+                    </p>
+                  </div>
+                  <span style={{ fontSize: 32 }}>{card.icon}</span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Revenue Cards */}
+          <div style={{ 
+            display: 'grid', 
+            gridTemplateColumns: '1fr 1fr', 
+            gap: 20,
+            marginBottom: 32,
+          }}>
+            <div
+              style={{
+                background: c.bgCard,
+                backdropFilter: 'blur(20px)',
+                borderRadius: 20,
+                padding: 28,
                 border: `1px solid ${c.border}`,
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)'
-                e.currentTarget.style.boxShadow = '0 8px 25px rgba(0, 123, 255, 0.2)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
+                animation: 'slideUp 0.5s ease-out 0.4s both',
               }}
             >
-              <div style={{ fontSize: '48px', marginBottom: '15px' }}>📋</div>
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', color: c.text }}>Siparişler</h3>
-              <p style={{ margin: 0, fontSize: '14px', color: c.textSecondary }}>
-                Yeni sipariş oluştur, mevcut siparişleri yönet ve durumlarını takip et.
-              </p>
-              <div style={{ marginTop: '15px', padding: '8px 16px', background: '#007bff', color: 'white', borderRadius: '6px', display: 'inline-block', fontWeight: 'bold', fontSize: '14px' }}>
-                Siparişlere Git →
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  background: 'rgba(67, 233, 123, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 24,
+                }}>
+                  💵
+                </div>
+                <div>
+                  <p style={{ fontSize: 13, color: c.textMuted, margin: 0 }}>Bugünün Geliri</p>
+                  <p style={{ 
+                    fontSize: 28, 
+                    fontWeight: 700, 
+                    margin: 0,
+                    color: '#43e97b',
+                  }}>
+                    ₺{stats.todayRevenue.toFixed(0)}
+                  </p>
+                </div>
               </div>
             </div>
 
-            {/* Tamamlananlar Card */}
-            <div 
-              onClick={() => router.push('/completed')}
-              style={{ 
-                background: c.header, 
-                padding: '30px', 
-                borderRadius: '12px', 
+            <div
+              style={{
+                background: c.bgCard,
+                backdropFilter: 'blur(20px)',
+                borderRadius: 20,
+                padding: 28,
                 border: `1px solid ${c.border}`,
-                cursor: 'pointer',
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'translateY(-4px)'
-                e.currentTarget.style.boxShadow = '0 8px 25px rgba(29, 158, 117, 0.2)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'translateY(0)'
-                e.currentTarget.style.boxShadow = 'none'
+                animation: 'slideUp 0.5s ease-out 0.5s both',
               }}
             >
-              <div style={{ fontSize: '48px', marginBottom: '15px' }}>✅</div>
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '20px', color: c.text }}>Tamamlananlar</h3>
-              <p style={{ margin: 0, fontSize: '14px', color: c.textSecondary }}>
-                Teslim edilen siparişlerin geçmişini görüntüle ve gelir raporlarını incele.
-              </p>
-              <div style={{ marginTop: '15px', padding: '8px 16px', background: '#1D9E75', color: 'white', borderRadius: '6px', display: 'inline-block', fontWeight: 'bold', fontSize: '14px' }}>
-                Tamamlananlara Git →
+              <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
+                <div style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 14,
+                  background: 'rgba(102, 126, 234, 0.15)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: 24,
+                }}>
+                  📊
+                </div>
+                <div>
+                  <p style={{ fontSize: 13, color: c.textMuted, margin: 0 }}>Bu Ayki Gelir</p>
+                  <p style={{ 
+                    fontSize: 28, 
+                    fontWeight: 700, 
+                    margin: 0,
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    WebkitBackgroundClip: 'text',
+                    WebkitTextFillColor: 'transparent',
+                  }}>
+                    ₺{stats.monthlyRevenue.toFixed(0)}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Pro Upgrade Banner */}
-          {ordersCreatedCount >= 40 && (
-            <div style={{ 
-              marginTop: '30px', 
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', 
-              padding: '25px', 
-              borderRadius: '12px',
-              color: 'white',
-              textAlign: 'center'
+          {/* Quick Actions */}
+          <div style={{
+            background: c.bgCard,
+            backdropFilter: 'blur(20px)',
+            borderRadius: 20,
+            padding: 28,
+            border: `1px solid ${c.border}`,
+            animation: 'slideUp 0.5s ease-out 0.6s both',
+          }}>
+            <h2 style={{ 
+              fontSize: 18, 
+              fontWeight: 600, 
+              color: c.text, 
+              marginBottom: 20,
+              display: 'flex',
+              alignItems: 'center',
+              gap: 10,
             }}>
-              <h3 style={{ margin: '0 0 10px 0', fontSize: '18px' }}>🚀 Pro'ya Yükselt!</h3>
-              <p style={{ margin: '0 0 15px 0', fontSize: '14px', opacity: 0.9 }}>
-                50 sipariş limitine yaklaşıyorsunuz. Pro ile sınırsız sipariş oluşturun!
-              </p>
+              <span>⚡</span>
+              Hızlı İşlemler
+            </h2>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
               <button
-                onClick={() => router.push('/payment')}
-                style={{ 
-                  padding: '12px 30px', 
-                  background: 'white', 
-                  color: '#667eea', 
-                  border: 'none', 
-                  borderRadius: '8px', 
-                  cursor: 'pointer', 
-                  fontWeight: 'bold',
-                  fontSize: '14px'
+                onClick={() => router.push('/dashboard')}
+                style={{
+                  padding: '20px',
+                  borderRadius: 16,
+                  border: 'none',
+                  background: buttonGradients.primary,
+                  color: 'white',
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 10,
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.transform = 'scale(1.03)'
+                  e.currentTarget.style.boxShadow = glowEffects.primary
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.transform = 'scale(1)'
+                  e.currentTarget.style.boxShadow = 'none'
                 }}
               >
-                Pro'ya Geç
+                <span style={{ fontSize: 28 }}>➕</span>
+                Yeni Sipariş Ekle
+              </button>
+
+              <button
+                onClick={() => router.push('/dashboard')}
+                style={{
+                  padding: '20px',
+                  borderRadius: 16,
+                  border: `1px solid ${c.border}`,
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  color: c.text,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 10,
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
+                  e.currentTarget.style.borderColor = '#667eea'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'
+                  e.currentTarget.style.borderColor = c.border
+                }}
+              >
+                <span style={{ fontSize: 28 }}>📦</span>
+                Siparişleri Görüntüle
+              </button>
+
+              <button
+                onClick={() => router.push('/completed')}
+                style={{
+                  padding: '20px',
+                  borderRadius: 16,
+                  border: `1px solid ${c.border}`,
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  color: c.text,
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  gap: 10,
+                  transition: 'all 0.3s ease',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.08)'
+                  e.currentTarget.style.borderColor = '#43e97b'
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = 'rgba(255, 255, 255, 0.03)'
+                  e.currentTarget.style.borderColor = c.border
+                }}
+              >
+                <span style={{ fontSize: 28 }}>✅</span>
+                Tamamlananları Gör
               </button>
             </div>
-          )}
+          </div>
+
         </div>
-      </div>
+      </main>
 
       <Footer theme={theme} />
+
+      <style jsx global>{`
+        ${keyframesCSS}
+      `}</style>
     </div>
   )
 }
