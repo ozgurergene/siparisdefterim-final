@@ -14,7 +14,7 @@ import EditModal from '../../components/EditModal'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
 // Gradient Home Icon SVG Component
-function HomeIcon({ size = 22 }) {
+function HomeIcon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -29,7 +29,170 @@ function HomeIcon({ size = 22 }) {
   )
 }
 
-// Mobile Order Card Component
+// WhatsApp Icon Component - 30px
+function WhatsAppIcon() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="#fff">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+    </svg>
+  )
+}
+
+// Edit Icon Component - 30px
+function EditIcon() {
+  return (
+    <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+      <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+    </svg>
+  )
+}
+
+// Profile Popup Component
+function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
+  if (!isOpen) return null
+
+  return (
+    <>
+      <div 
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.3)',
+          zIndex: 998
+        }}
+      />
+      <div style={{
+        position: 'absolute',
+        top: '60px',
+        right: '16px',
+        width: '220px',
+        background: '#1a1a2e',
+        borderRadius: '14px',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+        border: '1px solid rgba(102, 126, 234, 0.2)',
+        zIndex: 999,
+        overflow: 'hidden',
+        animation: 'fadeIn 0.2s ease'
+      }}>
+        {/* Profile Header */}
+        <div style={{
+          padding: '16px',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: getAvatarGradient(user.email),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: '15px',
+              fontWeight: '600'
+            }}>
+              {getInitials(user.email)}
+            </div>
+            <div>
+              <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>
+                {user.email.split('@')[0]}
+              </p>
+              <p style={{ color: '#64748b', fontSize: '11px', margin: '2px 0 0 0' }}>
+                {user.email}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Order Quota */}
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
+            <span style={{ color: '#fff', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
+          </div>
+          <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+            <div style={{
+              width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #667eea, #764ba2)',
+              borderRadius: '2px'
+            }} />
+          </div>
+          <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
+        </div>
+
+        {/* Menu Items */}
+        <div style={{ padding: '8px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 12px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            background: 'rgba(255,255,255,0.03)'
+          }}>
+            <span style={{ fontSize: '16px' }}>🌙</span>
+            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Tema: Koyu</span>
+            <div style={{
+              marginLeft: 'auto',
+              width: '32px',
+              height: '18px',
+              background: '#667eea',
+              borderRadius: '9px',
+              position: 'relative'
+            }}>
+              <div style={{
+                position: 'absolute',
+                right: '2px',
+                top: '2px',
+                width: '14px',
+                height: '14px',
+                background: '#fff',
+                borderRadius: '50%'
+              }} />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <span style={{ fontSize: '16px' }}>✏️</span>
+            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Profili Düzenle</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <span style={{ fontSize: '16px' }}>⭐</span>
+            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Pro'ya Yükselt</span>
+            <span style={{
+              marginLeft: 'auto',
+              background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+              color: '#fff',
+              fontSize: '8px',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: '600'
+            }}>YENİ</span>
+          </div>
+
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '6px 0' }} />
+
+          <div onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <span style={{ fontSize: '16px' }}>🚪</span>
+            <span style={{ color: '#ef4444', fontSize: '13px', fontWeight: '500' }}>Çıkış Yap</span>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// Mobile Order Card Component with Swipe
 function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
@@ -50,11 +213,8 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return
     const distance = touchStart - touchEnd
-    const isLeftSwipe = distance > minSwipeDistance
-    const isRightSwipe = distance < -minSwipeDistance
-    
-    if (isLeftSwipe) setSwiped(true)
-    else if (isRightSwipe) setSwiped(false)
+    if (distance > minSwipeDistance) setSwiped(true)
+    else if (distance < -minSwipeDistance) setSwiped(false)
   }
 
   useEffect(() => {
@@ -67,49 +227,60 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
     return () => document.removeEventListener('touchstart', handleClickOutside)
   }, [])
 
+  const getStatusText = (status) => {
+    switch (status) {
+      case 'payment_pending': return 'Ödeme Bekleniyor'
+      case 'paid': return 'Ödeme Alındı'
+      case 'preparing': return 'Hazırlanıyor'
+      case 'shipped': return 'Kargoda'
+      default: return status
+    }
+  }
+
+  const getStatusBgColor = (status) => {
+    switch (status) {
+      case 'payment_pending': return 'rgba(59, 130, 246, 0.15)'
+      case 'paid': return 'rgba(34, 197, 94, 0.15)'
+      case 'preparing': return 'rgba(245, 158, 11, 0.15)'
+      case 'shipped': return 'rgba(139, 92, 246, 0.15)'
+      default: return 'rgba(107, 114, 128, 0.15)'
+    }
+  }
+
+  const getStatusTextColor = (status) => {
+    switch (status) {
+      case 'payment_pending': return '#60a5fa'
+      case 'paid': return '#4ade80'
+      case 'preparing': return '#fbbf24'
+      case 'shipped': return '#a78bfa'
+      default: return '#9ca3af'
+    }
+  }
+
   return (
-    <div ref={cardRef} style={{ position: 'relative', overflow: 'hidden', marginBottom: '12px', borderRadius: '16px' }}>
-      {/* Swipe Actions Background */}
+    <div ref={cardRef} style={{ position: 'relative', overflow: 'hidden', marginBottom: '8px', borderRadius: '12px' }}>
+      {/* Swipe Delete Button */}
       <div style={{
         position: 'absolute',
         right: 0,
         top: 0,
         bottom: 0,
+        width: '70px',
+        background: '#ef4444',
         display: 'flex',
-        zIndex: 1
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderRadius: '0 12px 12px 0'
       }}>
-        <button
-          onClick={() => { onEdit(order); setSwiped(false) }}
-          style={{
-            width: '70px',
-            height: '100%',
-            background: '#3b82f6',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            cursor: 'pointer'
-          }}
-        >
-          ✏️
-        </button>
-        <button
+        <div 
           onClick={() => { onDelete(order.id); setSwiped(false) }}
-          style={{
-            width: '70px',
-            height: '100%',
-            background: '#ef4444',
-            border: 'none',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            cursor: 'pointer'
-          }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', cursor: 'pointer' }}
         >
-          🗑️
-        </button>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2">
+            <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          <span style={{ color: '#fff', fontSize: '10px', fontWeight: '600' }}>Sil</span>
+        </div>
       </div>
 
       {/* Card Content */}
@@ -118,65 +289,81 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         style={{
-          background: 'rgba(26, 26, 46, 0.9)',
-          borderRadius: '16px',
-          padding: '16px 18px',
-          borderLeft: `4px solid ${statusColor}`,
+          background: 'rgba(26, 26, 46, 0.85)',
+          borderRadius: '12px',
+          padding: '12px 14px',
+          borderLeft: `3px solid ${statusColor}`,
           position: 'relative',
           zIndex: 2,
-          transform: swiped ? 'translateX(-140px)' : 'translateX(0)',
+          transform: swiped ? 'translateX(-70px)' : 'translateX(0)',
           transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}
       >
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-          <div>
-            <p style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#fff' }}>
-              {order.customer_name.split(' ')[0]} {order.customer_name.split(' ')[1]?.[0]}.
-            </p>
-            <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>
-              {order.product}
-            </p>
+        {/* Row 1: Name + Status + Price */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <span style={{ color: '#fff', fontSize: '14px', fontWeight: '600' }}>{order.customer_name}</span>
+            <span style={{
+              background: getStatusBgColor(order.status),
+              color: getStatusTextColor(order.status),
+              fontSize: '8px',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: '500'
+            }}>
+              {getStatusText(order.status)}
+            </span>
           </div>
-          <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#22c55e' }}>
-            ₺{order.price}
-          </p>
+          <span style={{ color: '#22c55e', fontSize: '16px', fontWeight: '700' }}>₺{order.price}</span>
         </div>
 
-        <div style={{ display: 'flex', gap: '10px', marginTop: '14px' }}>
-          <button
-            onClick={() => onWhatsApp(order)}
-            style={{
-              flex: 1,
-              padding: '10px 16px',
-              background: '#22c55e',
-              border: 'none',
-              borderRadius: '10px',
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'transform 0.2s, opacity 0.2s'
-            }}
-          >
-            WhatsApp
-          </button>
-          <button
-            onClick={() => onEdit(order)}
-            style={{
-              flex: 1,
-              padding: '10px 16px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              border: 'none',
-              borderRadius: '10px',
-              color: '#fff',
-              fontSize: '14px',
-              fontWeight: '600',
-              cursor: 'pointer',
-              transition: 'transform 0.2s, opacity 0.2s'
-            }}
-          >
-            Düzenle
-          </button>
+        {/* Row 2: Product + Location */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+          <span style={{ color: '#cbd5e1', fontSize: '12px' }}>{order.product}</span>
+          {order.customer_city && order.customer_district && (
+            <span style={{ color: '#6b7280', fontSize: '11px' }}>📍 {order.customer_city}/{order.customer_district}</span>
+          )}
+        </div>
+
+        {/* Row 3: Phone + Buttons */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <span style={{ color: '#64748b', fontSize: '11px' }}>📱 {order.customer_phone}</span>
+          <div style={{ display: 'flex', gap: '8px' }}>
+            {/* WhatsApp Button - 35x35 */}
+            <button
+              onClick={() => onWhatsApp(order)}
+              style={{
+                width: '35px',
+                height: '35px',
+                background: '#22c55e',
+                border: 'none',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <WhatsAppIcon />
+            </button>
+            {/* Edit Button - 35x35 */}
+            <button
+              onClick={() => onEdit(order)}
+              style={{
+                width: '35px',
+                height: '35px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: 'none',
+                borderRadius: '8px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer'
+              }}
+            >
+              <EditIcon />
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -246,8 +433,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               borderRadius: '12px',
               color: '#fff',
               fontSize: '16px',
-              boxSizing: 'border-box',
-              transition: 'border-color 0.2s'
+              boxSizing: 'border-box'
             }}
             placeholder="Adı Soyadı"
           />
@@ -382,8 +568,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             fontWeight: 'bold',
             cursor: 'pointer',
             marginTop: '10px',
-            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)',
-            transition: 'transform 0.2s, box-shadow 0.2s'
+            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)'
           }}
         >
           ✓ Sipariş Ekle
@@ -393,11 +578,11 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
-// Bottom Tab Bar Component - Referans tasarıma göre
+// Bottom Tab Bar Component
 function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
-    { id: 'completed', icon: '✅', label: 'Tamam' },
+    { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
     { id: 'customers', icon: '👥', label: 'Müşteri' },
     { id: 'reports', icon: '📊', label: 'Rapor' }
@@ -412,7 +597,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       background: 'rgba(13, 13, 26, 0.98)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      padding: '8px 16px 28px 16px',
+      padding: '6px 12px 20px 12px',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'flex-end',
@@ -426,20 +611,19 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
             key={tab.id}
             onClick={onAddClick}
             style={{
-              width: '64px',
-              height: '64px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              border: '4px solid #0d0d1a',
+              border: '3px solid #0d0d1a',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '36px',
+              fontSize: '28px',
               color: '#fff',
               cursor: 'pointer',
-              marginTop: '-36px',
+              marginTop: '-28px',
               boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
-              transition: 'transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s',
               fontWeight: '300'
             }}
           >
@@ -455,20 +639,17 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '4px',
+              gap: '2px',
               cursor: 'pointer',
               opacity: activeTab === tab.id ? 1 : 0.4,
-              transition: 'opacity 0.3s ease, transform 0.2s ease',
-              transform: activeTab === tab.id ? 'scale(1.05)' : 'scale(1)',
-              padding: '8px 12px'
+              padding: '6px 10px'
             }}
           >
-            <span style={{ fontSize: '22px' }}>{tab.icon}</span>
+            <span style={{ fontSize: '18px' }}>{tab.icon}</span>
             <span style={{ 
-              fontSize: '11px', 
+              fontSize: '9px', 
               color: activeTab === tab.id ? '#22c55e' : '#64748b',
-              fontWeight: activeTab === tab.id ? '600' : '400',
-              transition: 'color 0.3s ease'
+              fontWeight: activeTab === tab.id ? '600' : '400'
             }}>
               {tab.label}
             </span>
@@ -489,7 +670,7 @@ export default function DashboardPage() {
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [activeTab, setActiveTab] = useState('orders')
   
   const [searchName, setSearchName] = useState('')
@@ -568,13 +749,6 @@ export default function DashboardPage() {
     } catch (error) {
       console.error('fetchUserData error:', error)
     }
-  }
-
-  const handleRefresh = async () => {
-    if (!user) return
-    setIsRefreshing(true)
-    await fetchUserData(user.id)
-    setTimeout(() => setIsRefreshing(false), 1000)
   }
 
   const toggleTheme = () => {
@@ -663,7 +837,8 @@ export default function DashboardPage() {
       customer_city: order.customer_city || '',
       customer_district: order.customer_district || '',
       products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
-      note: order.note || ''
+      note: order.note || '',
+      status: order.status
     })
   }
 
@@ -678,11 +853,16 @@ export default function DashboardPage() {
       customer_district: editingData.customer_district,
       product: productString,
       price: totalPrice,
-      note: editingData.note
+      note: editingData.note,
+      status: editingData.status
     }
     const { error } = await supabase.from('orders').update(updateData).eq('id', editingId)
     if (error) { alert('Sipariş güncellenemedi.'); return }
-    setOrders(orders.map(o => o.id === editingId ? { ...o, ...updateData } : o))
+    if (editingData.status === 'completed') {
+      setOrders(orders.filter(o => o.id !== editingId))
+    } else {
+      setOrders(orders.map(o => o.id === editingId ? { ...o, ...updateData } : o))
+    }
     setEditingId(null)
     setEditingData(null)
   }
@@ -713,11 +893,7 @@ export default function DashboardPage() {
   const activeOrders = orders.filter(o => o.status !== 'completed').length
   const pendingPayments = orders.filter(o => o.status === 'payment_pending').length
   const shippedOrders = orders.filter(o => o.status === 'shipped').length
-  const todayOrders = orders.filter(o => {
-    const orderDate = new Date(o.created_at)
-    const today = new Date()
-    return orderDate.toDateString() === today.toDateString()
-  }).length
+  const completedCount = ordersCreatedCount - activeOrders
 
   if (loading || !user) {
     return (
@@ -747,81 +923,139 @@ export default function DashboardPage() {
         background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)',
         fontFamily: 'Arial, sans-serif',
         color: '#fff',
-        paddingBottom: '100px'
+        paddingBottom: '100px',
+        position: 'relative'
       }}>
         {/* Mobile Header */}
         <div style={{
-          padding: '24px 20px 16px 20px',
+          padding: '16px 16px 10px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Home Button */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               onClick={() => router.push('/home')}
               style={{
-                padding: '10px',
+                padding: '8px',
                 background: 'rgba(26, 26, 46, 0.8)',
                 border: '1px solid rgba(102, 126, 234, 0.3)',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                justifyContent: 'center'
               }}
             >
-              <HomeIcon size={22} />
+              <HomeIcon size={18} />
             </button>
-            <h1 style={{ margin: 0, fontSize: '26px', fontWeight: 'bold', letterSpacing: '-0.5px' }}>Siparişler</h1>
+            <span style={{ color: '#fff', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
+            <span style={{
+              background: 'rgba(102, 126, 234, 0.2)',
+              color: '#a5b4fc',
+              fontSize: '11px',
+              padding: '3px 8px',
+              borderRadius: '10px',
+              fontWeight: '500'
+            }}>{filteredOrders.length}</span>
           </div>
           
           {/* Avatar */}
           <div
-            onClick={handleLogout}
+            onClick={() => setShowProfilePopup(!showProfilePopup)}
             style={{
-              width: '46px',
-              height: '46px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               background: getAvatarGradient(user.email),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '16px',
+              fontSize: '13px',
               fontWeight: 'bold',
               cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)',
-              transition: 'transform 0.2s ease'
+              boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
             }}
           >
             {getInitials(user.email)}
           </div>
         </div>
 
-        {/* Pull to Refresh */}
-        {isRefreshing && (
-          <div style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            padding: '20px',
-            color: '#94a3b8'
-          }}>
-            <div style={{
-              width: '40px',
-              height: '40px',
-              border: '3px solid #667eea',
-              borderTopColor: 'transparent',
-              borderRadius: '50%',
-              animation: 'spin 1s linear infinite'
-            }} />
-            <p style={{ marginTop: '12px', fontSize: '14px' }}>Yenileniyor...</p>
+        {/* Profile Popup */}
+        <ProfilePopup
+          user={user}
+          isOpen={showProfilePopup}
+          onClose={() => setShowProfilePopup(false)}
+          onLogout={handleLogout}
+          ordersCreatedCount={ordersCreatedCount}
+        />
+
+        {/* Stats Row - 4 cards */}
+        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
+          <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{activeOrders}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Aktif</span>
           </div>
-        )}
+          <div style={{ flex: 1, background: 'rgba(251, 191, 36, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bekleyen</span>
+          </div>
+          <div style={{ flex: 1, background: 'rgba(139, 92, 246, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargo</span>
+          </div>
+          <div style={{ flex: 1, background: 'rgba(102, 126, 234, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{completedCount}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bitti</span>
+          </div>
+        </div>
+
+        {/* Search Row */}
+        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
+          <div style={{
+            flex: 1,
+            background: 'rgba(26, 26, 46, 0.7)',
+            borderRadius: '10px',
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            border: '1px solid rgba(255,255,255,0.06)'
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Ara..."
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: '#fff',
+                fontSize: '13px',
+                outline: 'none'
+              }}
+            />
+          </div>
+          <div style={{
+            background: 'rgba(26, 26, 46, 0.7)',
+            borderRadius: '10px',
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            border: '1px solid rgba(255,255,255,0.06)'
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+            </svg>
+          </div>
+        </div>
 
         {/* Orders List */}
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px' }}>
           {filteredOrders.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
@@ -872,13 +1106,11 @@ export default function DashboardPage() {
           setEditingData={setEditingData}
           saveEdit={saveEdit}
           cancelEdit={cancelEdit}
+          deleteOrder={deleteOrder}
           theme={theme}
         />
 
         <style jsx global>{`
-          @keyframes spin {
-            to { transform: rotate(360deg); }
-          }
           @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
@@ -924,7 +1156,11 @@ export default function DashboardPage() {
           </div>
           <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
             <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📅 Bugün Eklenen</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>{todayOrders}</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>{orders.filter(o => {
+              const orderDate = new Date(o.created_at)
+              const today = new Date()
+              return orderDate.toDateString() === today.toDateString()
+            }).length}</p>
           </div>
         </div>
 
@@ -933,7 +1169,7 @@ export default function DashboardPage() {
         <OrderTable filteredOrders={filteredOrders} user={user} theme={theme} startEditing={startEditing} deleteOrder={deleteOrder} updateOrderStatus={updateOrderStatus} statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
       </div>
 
-      <EditModal editingId={editingId} editingData={editingData} setEditingData={setEditingData} saveEdit={saveEdit} cancelEdit={cancelEdit} theme={theme} />
+      <EditModal editingId={editingId} editingData={editingData} setEditingData={setEditingData} saveEdit={saveEdit} cancelEdit={cancelEdit} deleteOrder={deleteOrder} theme={theme} />
       <Footer theme={theme} />
     </div>
   )

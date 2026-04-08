@@ -7,7 +7,7 @@ import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 
 // Gradient Home Icon SVG Component
-function HomeIcon({ size = 22 }) {
+function HomeIcon({ size = 18 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
       <defs>
@@ -22,11 +22,152 @@ function HomeIcon({ size = 22 }) {
   )
 }
 
-// Bottom Tab Bar Component for Mobile
+// Profile Popup Component
+function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
+  if (!isOpen) return null
+
+  return (
+    <>
+      <div 
+        onClick={onClose}
+        style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: 'rgba(0,0,0,0.3)',
+          zIndex: 998
+        }}
+      />
+      <div style={{
+        position: 'absolute',
+        top: '60px',
+        right: '16px',
+        width: '220px',
+        background: '#1a1a2e',
+        borderRadius: '14px',
+        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
+        border: '1px solid rgba(102, 126, 234, 0.2)',
+        zIndex: 999,
+        overflow: 'hidden',
+        animation: 'fadeIn 0.2s ease'
+      }}>
+        <div style={{
+          padding: '16px',
+          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+          borderBottom: '1px solid rgba(255,255,255,0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <div style={{
+              width: '44px',
+              height: '44px',
+              borderRadius: '50%',
+              background: getAvatarGradient(user.email),
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: '#fff',
+              fontSize: '15px',
+              fontWeight: '600'
+            }}>
+              {getInitials(user.email)}
+            </div>
+            <div>
+              <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>
+                {user.email.split('@')[0]}
+              </p>
+              <p style={{ color: '#64748b', fontSize: '11px', margin: '2px 0 0 0' }}>
+                {user.email}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+            <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
+            <span style={{ color: '#fff', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
+          </div>
+          <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+            <div style={{
+              width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
+              height: '100%',
+              background: 'linear-gradient(90deg, #667eea, #764ba2)',
+              borderRadius: '2px'
+            }} />
+          </div>
+          <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
+        </div>
+
+        <div style={{ padding: '8px' }}>
+          <div style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px',
+            padding: '10px 12px',
+            borderRadius: '8px',
+            cursor: 'pointer',
+            background: 'rgba(255,255,255,0.03)'
+          }}>
+            <span style={{ fontSize: '16px' }}>🌙</span>
+            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Tema: Koyu</span>
+            <div style={{
+              marginLeft: 'auto',
+              width: '32px',
+              height: '18px',
+              background: '#667eea',
+              borderRadius: '9px',
+              position: 'relative'
+            }}>
+              <div style={{
+                position: 'absolute',
+                right: '2px',
+                top: '2px',
+                width: '14px',
+                height: '14px',
+                background: '#fff',
+                borderRadius: '50%'
+              }} />
+            </div>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <span style={{ fontSize: '16px' }}>✏️</span>
+            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Profili Düzenle</span>
+          </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <span style={{ fontSize: '16px' }}>⭐</span>
+            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Pro'ya Yükselt</span>
+            <span style={{
+              marginLeft: 'auto',
+              background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+              color: '#fff',
+              fontSize: '8px',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: '600'
+            }}>YENİ</span>
+          </div>
+
+          <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '6px 0' }} />
+
+          <div onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <span style={{ fontSize: '16px' }}>🚪</span>
+            <span style={{ color: '#ef4444', fontSize: '13px', fontWeight: '500' }}>Çıkış Yap</span>
+          </div>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// Bottom Tab Bar Component
 function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
-    { id: 'completed', icon: '✅', label: 'Tamam' },
+    { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
     { id: 'customers', icon: '👥', label: 'Müşteri' },
     { id: 'reports', icon: '📊', label: 'Rapor' }
@@ -41,7 +182,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       background: 'rgba(13, 13, 26, 0.98)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      padding: '8px 16px 28px 16px',
+      padding: '6px 12px 20px 12px',
       display: 'flex',
       justifyContent: 'space-around',
       alignItems: 'flex-end',
@@ -55,20 +196,19 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
             key={tab.id}
             onClick={onAddClick}
             style={{
-              width: '64px',
-              height: '64px',
+              width: '56px',
+              height: '56px',
               borderRadius: '50%',
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              border: '4px solid #0d0d1a',
+              border: '3px solid #0d0d1a',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '36px',
+              fontSize: '28px',
               color: '#fff',
               cursor: 'pointer',
-              marginTop: '-36px',
+              marginTop: '-28px',
               boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
-              transition: 'transform 0.2s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.2s',
               fontWeight: '300'
             }}
           >
@@ -84,20 +224,17 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
-              gap: '4px',
+              gap: '2px',
               cursor: 'pointer',
               opacity: activeTab === tab.id ? 1 : 0.4,
-              transition: 'opacity 0.3s ease, transform 0.2s ease',
-              transform: activeTab === tab.id ? 'scale(1.05)' : 'scale(1)',
-              padding: '8px 12px'
+              padding: '6px 10px'
             }}
           >
-            <span style={{ fontSize: '22px' }}>{tab.icon}</span>
+            <span style={{ fontSize: '18px' }}>{tab.icon}</span>
             <span style={{ 
-              fontSize: '11px', 
+              fontSize: '9px', 
               color: activeTab === tab.id ? '#22c55e' : '#64748b',
-              fontWeight: activeTab === tab.id ? '600' : '400',
-              transition: 'color 0.3s ease'
+              fontWeight: activeTab === tab.id ? '600' : '400'
             }}>
               {tab.label}
             </span>
@@ -115,6 +252,7 @@ export default function HomePage() {
   const [theme, setTheme] = useState('dark')
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
+  const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -126,7 +264,6 @@ export default function HomePage() {
   
   const c = colors[theme]
 
-  // Check if mobile
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
@@ -230,53 +367,62 @@ export default function HomePage() {
         background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)',
         fontFamily: 'Arial, sans-serif',
         color: '#fff',
-        paddingBottom: '100px'
+        paddingBottom: '100px',
+        position: 'relative'
       }}>
         {/* Mobile Header */}
         <div style={{
-          padding: '24px 20px 16px 20px',
+          padding: '16px 16px 10px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
-              onClick={() => router.push('/home')}
               style={{
-                padding: '10px',
+                padding: '8px',
                 background: 'rgba(26, 26, 46, 0.8)',
                 border: '1px solid rgba(102, 126, 234, 0.3)',
-                borderRadius: '12px',
+                borderRadius: '10px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center'
               }}
             >
-              <HomeIcon size={22} />
+              <HomeIcon size={18} />
             </button>
-            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Ana Sayfa</h1>
+            <span style={{ color: '#fff', fontSize: '18px', fontWeight: '600' }}>Ana Sayfa</span>
           </div>
           
           <div
-            onClick={handleLogout}
+            onClick={() => setShowProfilePopup(!showProfilePopup)}
             style={{
-              width: '46px',
-              height: '46px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               background: getAvatarGradient(user.email),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '16px',
+              fontSize: '13px',
               fontWeight: 'bold',
               cursor: 'pointer',
-              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.3)'
+              boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
             }}
           >
             {getInitials(user.email)}
           </div>
         </div>
+
+        {/* Profile Popup */}
+        <ProfilePopup
+          user={user}
+          isOpen={showProfilePopup}
+          onClose={() => setShowProfilePopup(false)}
+          onLogout={handleLogout}
+          ordersCreatedCount={ordersCreatedCount}
+        />
 
         {/* Welcome Section */}
         <div style={{ textAlign: 'center', padding: '20px 20px 30px 20px' }}>
@@ -296,7 +442,7 @@ export default function HomePage() {
           gap: '12px',
           marginBottom: '20px'
         }}>
-          {metricCards.map((card, index) => (
+          {metricCards.map((card) => (
             <div
               key={card.label}
               onClick={() => router.push('/dashboard')}
@@ -306,17 +452,10 @@ export default function HomePage() {
                 padding: '16px',
                 borderTop: `3px solid transparent`,
                 borderImage: `${card.gradient} 1`,
-                cursor: 'pointer',
-                transition: 'transform 0.2s ease'
+                cursor: 'pointer'
               }}
             >
-              <p style={{ 
-                fontSize: '12px', 
-                color: '#94a3b8', 
-                margin: '0 0 8px 0'
-              }}>
-                {card.label}
-              </p>
+              <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 8px 0' }}>{card.label}</p>
               <p style={{ 
                 fontSize: '32px', 
                 fontWeight: 'bold', 
@@ -410,14 +549,7 @@ export default function HomePage() {
             borderRadius: '20px',
             padding: '20px'
           }}>
-            <h3 style={{ 
-              fontSize: '16px', 
-              fontWeight: '600', 
-              margin: '0 0 16px 0',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px'
-            }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
               <span>⚡</span> Hızlı İşlemler
             </h3>
             
@@ -500,10 +632,6 @@ export default function HomePage() {
             from { opacity: 0; }
             to { opacity: 1; }
           }
-          @keyframes slideUp {
-            from { transform: translateY(20px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-          }
         `}</style>
       </div>
     )
@@ -531,17 +659,8 @@ export default function HomePage() {
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           
           {/* Welcome Section */}
-          <div style={{ 
-            textAlign: 'center', 
-            marginBottom: 40,
-            animation: 'fadeIn 0.5s ease-out',
-          }}>
-            <h1 style={{ 
-              fontSize: 32, 
-              fontWeight: 700, 
-              color: c.text,
-              marginBottom: 8,
-            }}>
+          <div style={{ textAlign: 'center', marginBottom: 40, animation: 'fadeIn 0.5s ease-out' }}>
+            <h1 style={{ fontSize: 32, fontWeight: 700, color: c.text, marginBottom: 8 }}>
               Hoş Geldin! 👋
             </h1>
             <p style={{ color: c.textSecondary, fontSize: 16 }}>
@@ -550,12 +669,7 @@ export default function HomePage() {
           </div>
 
           {/* Metric Cards */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: 'repeat(4, 1fr)', 
-            gap: 20,
-            marginBottom: 32,
-          }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, marginBottom: 32 }}>
             {metricCards.map((card, index) => (
               <div
                 key={card.label}
@@ -592,12 +706,7 @@ export default function HomePage() {
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                   <div>
-                    <p style={{ 
-                      fontSize: 13, 
-                      color: c.textMuted, 
-                      margin: '0 0 8px 0',
-                      fontWeight: 500,
-                    }}>
+                    <p style={{ fontSize: 13, color: c.textMuted, margin: '0 0 8px 0', fontWeight: 500 }}>
                       {card.label}
                     </p>
                     <p style={{ 
@@ -618,22 +727,15 @@ export default function HomePage() {
           </div>
 
           {/* Revenue Cards */}
-          <div style={{ 
-            display: 'grid', 
-            gridTemplateColumns: '1fr 1fr', 
-            gap: 20,
-            marginBottom: 32,
-          }}>
-            <div
-              style={{
-                background: c.bgCard,
-                backdropFilter: 'blur(20px)',
-                borderRadius: 20,
-                padding: 28,
-                border: `1px solid ${c.border}`,
-                animation: 'slideUp 0.5s ease-out 0.4s both',
-              }}
-            >
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32 }}>
+            <div style={{
+              background: c.bgCard,
+              backdropFilter: 'blur(20px)',
+              borderRadius: 20,
+              padding: 28,
+              border: `1px solid ${c.border}`,
+              animation: 'slideUp 0.5s ease-out 0.4s both',
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 <div style={{
                   width: 48,
@@ -649,28 +751,21 @@ export default function HomePage() {
                 </div>
                 <div>
                   <p style={{ fontSize: 13, color: c.textMuted, margin: 0 }}>Bugünün Geliri</p>
-                  <p style={{ 
-                    fontSize: 28, 
-                    fontWeight: 700, 
-                    margin: 0,
-                    color: '#43e97b',
-                  }}>
+                  <p style={{ fontSize: 28, fontWeight: 700, margin: 0, color: '#43e97b' }}>
                     ₺{stats.todayRevenue.toFixed(0)}
                   </p>
                 </div>
               </div>
             </div>
 
-            <div
-              style={{
-                background: c.bgCard,
-                backdropFilter: 'blur(20px)',
-                borderRadius: 20,
-                padding: 28,
-                border: `1px solid ${c.border}`,
-                animation: 'slideUp 0.5s ease-out 0.5s both',
-              }}
-            >
+            <div style={{
+              background: c.bgCard,
+              backdropFilter: 'blur(20px)',
+              borderRadius: 20,
+              padding: 28,
+              border: `1px solid ${c.border}`,
+              animation: 'slideUp 0.5s ease-out 0.5s both',
+            }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 16 }}>
                 <div style={{
                   width: 48,
@@ -710,15 +805,7 @@ export default function HomePage() {
             border: `1px solid ${c.border}`,
             animation: 'slideUp 0.5s ease-out 0.6s both',
           }}>
-            <h2 style={{ 
-              fontSize: 18, 
-              fontWeight: 600, 
-              color: c.text, 
-              marginBottom: 20,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 10,
-            }}>
+            <h2 style={{ fontSize: 18, fontWeight: 600, color: c.text, marginBottom: 20, display: 'flex', alignItems: 'center', gap: 10 }}>
               <span>⚡</span>
               Hızlı İşlemler
             </h2>
