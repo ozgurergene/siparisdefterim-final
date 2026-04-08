@@ -685,6 +685,419 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
+// Mobile Edit Modal with Status Dropdown
+function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancelEdit, deleteOrder, editingId, turkeyData }) {
+  if (!isOpen || !editingData) return null
+
+  const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
+  const districts = editingData.customer_city && turkeyData ? turkeyData[editingData.customer_city] || [] : []
+
+  const statusOptions = [
+    { value: 'payment_pending', label: 'Ödeme Bekleniyor', color: '#3b82f6', icon: '💳' },
+    { value: 'paid', label: 'Ödeme Alındı', color: '#22c55e', icon: '✅' },
+    { value: 'preparing', label: 'Paketlendi', color: '#f59e0b', icon: '📦' },
+    { value: 'shipped', label: 'Kargoda', color: '#8b5cf6', icon: '🚚' },
+    { value: 'completed', label: 'Teslim Edildi', color: '#10b981', icon: '🎉' }
+  ]
+
+  const currentStatus = statusOptions.find(s => s.value === editingData.status) || statusOptions[0]
+
+  // Calculate totals
+  const calculateTotals = () => {
+    const product = editingData.products[0] || {}
+    const quantity = parseInt(product.quantity) || 1
+    const unitPrice = parseFloat(product.unit_price) || 0
+    const kdvRate = parseFloat(product.kdv_rate) || 0
+    const tutar = quantity * unitPrice
+    const kdv = tutar * (kdvRate / 100)
+    const toplam = tutar + kdv
+    return { tutar, kdv, toplam }
+  }
+
+  const { tutar, kdv, toplam } = calculateTotals()
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.9)',
+      zIndex: 2000,
+      display: 'flex',
+      flexDirection: 'column',
+      animation: 'fadeIn 0.3s ease'
+    }}>
+      <div style={{
+        background: '#0d0d1a',
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        paddingTop: '20px',
+        animation: 'slideUp 0.3s ease'
+      }}>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ color: '#fff', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            ✏️ Siparişi Düzenle
+          </h2>
+          <button
+            onClick={cancelEdit}
+            style={{
+              background: 'rgba(255,255,255,0.1)',
+              border: 'none',
+              color: '#fff',
+              fontSize: '18px',
+              cursor: 'pointer',
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* Müşteri Adı Soyadı ve Telefon */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
+            <input
+              type="text"
+              value={editingData.customer_name}
+              onChange={(e) => setEditingData({ ...editingData, customer_name: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
+            <input
+              type="tel"
+              value={editingData.customer_phone}
+              onChange={(e) => setEditingData({ ...editingData, customer_phone: e.target.value.replace(/\D/g, '') })}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+              maxLength="10"
+            />
+          </div>
+        </div>
+
+        {/* Adres */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
+          <input
+            type="text"
+            value={editingData.customer_address}
+            onChange={(e) => setEditingData({ ...editingData, customer_address: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: 'rgba(26, 26, 46, 0.8)',
+              border: '1px solid #2a2a3e',
+              borderRadius: '10px',
+              color: '#fff',
+              fontSize: '14px',
+              boxSizing: 'border-box'
+            }}
+          />
+        </div>
+
+        {/* İl ve İlçe */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
+            <select
+              value={editingData.customer_city}
+              onChange={(e) => setEditingData({ ...editingData, customer_city: e.target.value, customer_district: '' })}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                appearance: 'none'
+              }}
+            >
+              <option value="">İl Seçin</option>
+              {cities.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
+            <select
+              value={editingData.customer_district}
+              onChange={(e) => setEditingData({ ...editingData, customer_district: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                appearance: 'none'
+              }}
+              disabled={!editingData.customer_city}
+            >
+              <option value="">İlçe Seçin</option>
+              {districts.map(district => (
+                <option key={district} value={district}>{district}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Ürün Bilgileri */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ flex: 2 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
+            <input
+              type="text"
+              value={editingData.products[0]?.product || ''}
+              onChange={(e) => {
+                const updatedProducts = [...editingData.products]
+                updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
+                setEditingData({ ...editingData, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adet</label>
+            <input
+              type="number"
+              value={editingData.products[0]?.quantity || 1}
+              onChange={(e) => {
+                const updatedProducts = [...editingData.products]
+                updatedProducts[0] = { ...updatedProducts[0], quantity: parseInt(e.target.value) || 1 }
+                setEditingData({ ...editingData, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              min="1"
+            />
+          </div>
+        </div>
+
+        {/* Birim Fiyat ve KDV */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
+            <input
+              type="number"
+              value={editingData.products[0]?.unit_price || ''}
+              onChange={(e) => {
+                const updatedProducts = [...editingData.products]
+                updatedProducts[0] = { ...updatedProducts[0], unit_price: e.target.value }
+                setEditingData({ ...editingData, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              placeholder="₺"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
+            <input
+              type="number"
+              value={editingData.products[0]?.kdv_rate || ''}
+              onChange={(e) => {
+                const updatedProducts = [...editingData.products]
+                updatedProducts[0] = { ...updatedProducts[0], kdv_rate: e.target.value }
+                setEditingData({ ...editingData, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '12px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '10px',
+                color: '#fff',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              placeholder="0"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#22c55e', marginBottom: '4px', fontSize: '12px' }}>Toplam</label>
+            <div style={{
+              width: '100%',
+              padding: '12px',
+              background: 'rgba(34, 197, 94, 0.15)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '10px',
+              color: '#22c55e',
+              fontSize: '14px',
+              fontWeight: '600',
+              boxSizing: 'border-box',
+              textAlign: 'center'
+            }}>
+              ₺{toplam.toFixed(2)}
+            </div>
+          </div>
+        </div>
+
+        {/* Tutar Özeti */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ flex: 1, background: 'rgba(26, 26, 46, 0.6)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
+            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
+            <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
+          </div>
+          <div style={{ flex: 1, background: 'rgba(26, 26, 46, 0.6)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
+            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
+            <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
+          </div>
+          <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
+            <p style={{ color: '#22c55e', fontSize: '10px', margin: '0 0 4px 0' }}>Toplam</p>
+            <p style={{ color: '#22c55e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{toplam.toFixed(2)}</p>
+          </div>
+        </div>
+
+        {/* Sipariş Durumu */}
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Sipariş Durumu</label>
+          <select
+            value={editingData.status}
+            onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '12px 16px',
+              background: `rgba(${currentStatus.value === 'paid' ? '34, 197, 94' : currentStatus.value === 'payment_pending' ? '59, 130, 246' : currentStatus.value === 'preparing' ? '245, 158, 11' : currentStatus.value === 'shipped' ? '139, 92, 246' : '16, 185, 129'}, 0.2)`,
+              border: `1px solid ${currentStatus.color}`,
+              borderRadius: '10px',
+              color: currentStatus.color,
+              fontSize: '14px',
+              fontWeight: '600',
+              boxSizing: 'border-box',
+              appearance: 'none',
+              cursor: 'pointer'
+            }}
+          >
+            {statusOptions.map(option => (
+              <option key={option.value} value={option.value}>{option.icon} {option.label}</option>
+            ))}
+          </select>
+        </div>
+
+        {/* Not */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
+          <textarea
+            value={editingData.note}
+            onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '12px',
+              background: 'rgba(26, 26, 46, 0.8)',
+              border: '1px solid #2a2a3e',
+              borderRadius: '10px',
+              color: '#fff',
+              fontSize: '14px',
+              boxSizing: 'border-box',
+              minHeight: '60px',
+              resize: 'none'
+            }}
+            placeholder="Özel notlar..."
+          />
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button
+            onClick={() => { deleteOrder(editingId); cancelEdit() }}
+            style={{
+              flex: 1,
+              padding: '14px',
+              background: 'rgba(239, 68, 68, 0.2)',
+              border: '1px solid #ef4444',
+              borderRadius: '12px',
+              color: '#ef4444',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer'
+            }}
+          >
+            🗑️ Sil
+          </button>
+          <button
+            onClick={saveEdit}
+            style={{
+              flex: 2,
+              padding: '14px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '12px',
+              color: '#fff',
+              fontSize: '14px',
+              fontWeight: '600',
+              cursor: 'pointer',
+              boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
+            }}
+          >
+            ✓ Kaydet
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Bottom Tab Bar Component
 function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
   const tabs = [
@@ -1236,15 +1649,16 @@ export default function DashboardPage() {
           turkeyData={turkeyData}
         />
 
-        {/* Edit Modal */}
-        <EditModal
-          editingId={editingId}
+        {/* Mobile Edit Modal */}
+        <MobileEditModal
+          isOpen={editingId !== null}
           editingData={editingData}
           setEditingData={setEditingData}
           saveEdit={saveEdit}
           cancelEdit={cancelEdit}
           deleteOrder={deleteOrder}
-          theme={theme}
+          editingId={editingId}
+          turkeyData={turkeyData}
         />
 
         <style jsx global>{`
