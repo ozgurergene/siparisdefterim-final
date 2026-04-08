@@ -521,7 +521,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 }
 
 // Bottom Tab Bar Component - Same as Dashboard
-function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
+function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
@@ -536,7 +536,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       bottom: 0,
       left: 0,
       right: 0,
-      background: 'rgba(13, 13, 26, 0.98)',
+      background: isDark ? 'rgba(13, 13, 26, 0.98)' : 'rgba(255, 255, 255, 0.98)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       padding: '8px 0 24px 0',
@@ -544,8 +544,8 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       justifyContent: 'center',
       alignItems: 'flex-end',
       zIndex: 1000,
-      borderTop: '1px solid rgba(102, 126, 234, 0.2)',
-      boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.3)'
+      borderTop: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+      boxShadow: isDark ? '0 -4px 30px rgba(0, 0, 0, 0.3)' : '0 -4px 20px rgba(0, 0, 0, 0.1)'
     }}>
       <div style={{
         display: 'flex',
@@ -572,7 +572,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
                   height: '56px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: '3px solid #0d0d1a',
+                  border: `3px solid ${isDark ? '#0d0d1a' : '#ffffff'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -624,18 +624,19 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
 }
 
 // Mobile Completed Order Card
-function MobileCompletedCard({ order }) {
+function MobileCompletedCard({ order, isDark = true }) {
   return (
     <div style={{
-      background: 'rgba(26, 26, 46, 0.9)',
+      background: isDark ? 'rgba(26, 26, 46, 0.9)' : 'rgba(255, 255, 255, 0.95)',
       borderRadius: '16px',
       padding: '16px 18px',
       borderLeft: '4px solid #22c55e',
-      marginBottom: '12px'
+      marginBottom: '12px',
+      boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
     }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
         <div>
-          <p style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: '#fff' }}>
+          <p style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: isDark ? '#fff' : '#1a1a2e' }}>
             {order.customer_name.split(' ')[0]} {order.customer_name.split(' ')[1]?.[0]}.
           </p>
           <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>
@@ -647,7 +648,7 @@ function MobileCompletedCard({ order }) {
         </p>
       </div>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', paddingTop: '12px', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
         <span style={{ fontSize: '12px', color: '#64748b' }}>
           📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
         </span>
@@ -859,12 +860,16 @@ export default function CompletedPage() {
 
   // ========== MOBILE VIEW ==========
   if (isMobile) {
+    const isDark = theme === 'dark'
+    
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)',
+        background: isDark 
+          ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
+          : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: 'Arial, sans-serif',
-        color: '#fff',
+        color: isDark ? '#fff' : '#1a1a2e',
         paddingBottom: '100px'
       }}>
         {/* Mobile Header */}
@@ -879,19 +884,20 @@ export default function CompletedPage() {
               onClick={() => router.push('/home')}
               style={{
                 padding: '10px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid rgba(102, 126, 234, 0.3)',
+                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
                 borderRadius: '12px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease'
+                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
               }}
             >
               <HomeIcon size={22} />
             </button>
-            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold' }}>Tamamlananlar</h1>
+            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: isDark ? '#fff' : '#1a1a2e' }}>Tamamlananlar</h1>
           </div>
           
           <div
@@ -933,37 +939,41 @@ export default function CompletedPage() {
           gap: '12px'
         }}>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.8)',
+            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '16px',
             padding: '16px',
-            borderTop: '3px solid #22c55e'
+            borderTop: '3px solid #22c55e',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Toplam</p>
             <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, color: '#22c55e' }}>{totalCompleted}</p>
           </div>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.8)',
+            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '16px',
             padding: '16px',
-            borderTop: '3px solid #22c55e'
+            borderTop: '3px solid #22c55e',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Toplam Gelir</p>
             <p style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, color: '#22c55e' }}>₺{totalRevenue.toFixed(0)}</p>
           </div>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.8)',
+            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '16px',
             padding: '16px',
-            borderTop: '3px solid #667eea'
+            borderTop: '3px solid #667eea',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Bu Ay</p>
             <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, color: '#667eea' }}>{thisMonth}</p>
           </div>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.8)',
+            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '16px',
             padding: '16px',
-            borderTop: '3px solid #667eea'
+            borderTop: '3px solid #667eea',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Bu Hafta</p>
             <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, color: '#667eea' }}>{thisWeek}</p>
@@ -977,16 +987,17 @@ export default function CompletedPage() {
             style={{
               width: '100%',
               padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid rgba(102, 126, 234, 0.3)',
+              background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+              border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
               borderRadius: '12px',
-              color: '#fff',
+              color: isDark ? '#fff' : '#1a1a2e',
               fontSize: '14px',
               fontWeight: '500',
               cursor: 'pointer',
               display: 'flex',
               justifyContent: 'space-between',
-              alignItems: 'center'
+              alignItems: 'center',
+              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
             }}
           >
             <span>🔍 Ara ({filteredOrders.length} sonuç)</span>
@@ -1000,11 +1011,12 @@ export default function CompletedPage() {
             <div style={{
               marginTop: '12px',
               padding: '16px',
-              background: 'rgba(26, 26, 46, 0.8)',
+              background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
               borderRadius: '12px',
               display: 'flex',
               flexDirection: 'column',
-              gap: '12px'
+              gap: '12px',
+              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
             }}>
               <input
                 type="text"
@@ -1014,10 +1026,10 @@ export default function CompletedPage() {
                 style={{
                   width: '100%',
                   padding: '12px 14px',
-                  background: 'rgba(13, 13, 26, 0.8)',
-                  border: '1px solid #2a2a3e',
+                  background: isDark ? 'rgba(13, 13, 26, 0.8)' : 'rgba(248, 250, 252, 1)',
+                  border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
                   borderRadius: '10px',
-                  color: '#fff',
+                  color: isDark ? '#fff' : '#1a1a2e',
                   fontSize: '14px',
                   boxSizing: 'border-box'
                 }}
@@ -1030,10 +1042,10 @@ export default function CompletedPage() {
                 style={{
                   width: '100%',
                   padding: '12px 14px',
-                  background: 'rgba(13, 13, 26, 0.8)',
-                  border: '1px solid #2a2a3e',
+                  background: isDark ? 'rgba(13, 13, 26, 0.8)' : 'rgba(248, 250, 252, 1)',
+                  border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
                   borderRadius: '10px',
-                  color: '#fff',
+                  color: isDark ? '#fff' : '#1a1a2e',
                   fontSize: '14px',
                   boxSizing: 'border-box'
                 }}
@@ -1064,15 +1076,16 @@ export default function CompletedPage() {
               textAlign: 'center', 
               color: '#64748b', 
               padding: '60px 20px',
-              background: 'rgba(26, 26, 46, 0.4)',
-              borderRadius: '20px'
+              background: isDark ? 'rgba(26, 26, 46, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+              borderRadius: '20px',
+              boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
             }}>
               <p style={{ fontSize: '56px', marginBottom: '16px' }}>📭</p>
-              <p style={{ fontSize: '16px' }}>Tamamlanan sipariş yok</p>
+              <p style={{ fontSize: '16px', color: isDark ? '#64748b' : '#4a5568' }}>Tamamlanan sipariş yok</p>
             </div>
           ) : (
             filteredOrders.map(order => (
-              <MobileCompletedCard key={order.id} order={order} />
+              <MobileCompletedCard key={order.id} order={order} isDark={isDark} />
             ))
           )}
         </div>
@@ -1082,6 +1095,7 @@ export default function CompletedPage() {
           activeTab="completed"
           onTabChange={handleTabChange}
           onAddClick={() => setShowAddModal(true)}
+          isDark={isDark}
         />
 
         {/* Add Order Modal */}

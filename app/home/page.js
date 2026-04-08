@@ -520,7 +520,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 }
 
 // Bottom Tab Bar Component
-function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
+function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
@@ -535,7 +535,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       bottom: 0,
       left: 0,
       right: 0,
-      background: 'rgba(13, 13, 26, 0.98)',
+      background: isDark ? 'rgba(13, 13, 26, 0.98)' : 'rgba(255, 255, 255, 0.98)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       padding: '8px 0 24px 0',
@@ -543,8 +543,8 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       justifyContent: 'center',
       alignItems: 'flex-end',
       zIndex: 1000,
-      borderTop: '1px solid rgba(102, 126, 234, 0.2)',
-      boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.3)'
+      borderTop: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+      boxShadow: isDark ? '0 -4px 30px rgba(0, 0, 0, 0.3)' : '0 -4px 20px rgba(0, 0, 0, 0.1)'
     }}>
       <div style={{
         display: 'flex',
@@ -571,7 +571,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
                   height: '56px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: '3px solid #0d0d1a',
+                  border: `3px solid ${isDark ? '#0d0d1a' : '#ffffff'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -800,12 +800,16 @@ export default function HomePage() {
 
   // ========== MOBILE VIEW ==========
   if (isMobile) {
+    const isDark = theme === 'dark'
+    
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)',
+        background: isDark 
+          ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
+          : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: 'Arial, sans-serif',
-        color: '#fff',
+        color: isDark ? '#fff' : '#1a1a2e',
         paddingBottom: '100px',
         position: 'relative'
       }}>
@@ -820,18 +824,19 @@ export default function HomePage() {
             <button
               style={{
                 padding: '8px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid rgba(102, 126, 234, 0.3)',
+                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
                 borderRadius: '10px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
               }}
             >
               <HomeIcon size={18} />
             </button>
-            <span style={{ color: '#fff', fontSize: '18px', fontWeight: '600' }}>Ana Sayfa</span>
+            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Ana Sayfa</span>
           </div>
           
           <div
@@ -867,7 +872,7 @@ export default function HomePage() {
 
         {/* Welcome Section */}
         <div style={{ textAlign: 'center', padding: '20px 20px 30px 20px' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 'bold', margin: '0 0 8px 0' }}>
+          <h2 style={{ fontSize: '28px', fontWeight: 'bold', margin: '0 0 8px 0', color: isDark ? '#fff' : '#1a1a2e' }}>
             Hoş Geldin! 👋
           </h2>
           <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>
@@ -888,12 +893,13 @@ export default function HomePage() {
               key={card.label}
               onClick={() => router.push('/dashboard')}
               style={{
-                background: 'rgba(26, 26, 46, 0.8)',
+                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
                 borderRadius: '16px',
                 padding: '16px',
                 borderTop: `3px solid transparent`,
                 borderImage: `${card.gradient} 1`,
-                cursor: 'pointer'
+                cursor: 'pointer',
+                boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
               }}
             >
               <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 8px 0' }}>{card.label}</p>
@@ -920,12 +926,13 @@ export default function HomePage() {
           marginBottom: '24px'
         }}>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.8)',
+            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '16px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px'
+            gap: '12px',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <div style={{
               width: '44px',
@@ -948,12 +955,13 @@ export default function HomePage() {
           </div>
 
           <div style={{
-            background: 'rgba(26, 26, 46, 0.8)',
+            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '16px',
             padding: '16px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px'
+            gap: '12px',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <div style={{
               width: '44px',
@@ -986,17 +994,18 @@ export default function HomePage() {
         {/* Quick Actions */}
         <div style={{ padding: '0 20px' }}>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.6)',
+            background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '20px',
-            padding: '20px'
+            padding: '20px',
+            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px', color: isDark ? '#fff' : '#1a1a2e' }}>
               <span>⚡</span> Hızlı İşlemler
             </h3>
             
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
               <button
-                onClick={() => router.push('/dashboard')}
+                onClick={() => setShowAddModal(true)}
                 style={{
                   padding: '16px 8px',
                   borderRadius: '14px',
@@ -1021,9 +1030,9 @@ export default function HomePage() {
                 style={{
                   padding: '16px 8px',
                   borderRadius: '14px',
-                  border: '1px solid rgba(102, 126, 234, 0.3)',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  color: '#fff',
+                  border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.4)'}`,
+                  background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(102, 126, 234, 0.08)',
+                  color: isDark ? '#fff' : '#1a1a2e',
                   fontSize: '12px',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -1042,9 +1051,9 @@ export default function HomePage() {
                 style={{
                   padding: '16px 8px',
                   borderRadius: '14px',
-                  border: '1px solid rgba(102, 126, 234, 0.3)',
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  color: '#fff',
+                  border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.4)'}`,
+                  background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(102, 126, 234, 0.08)',
+                  color: isDark ? '#fff' : '#1a1a2e',
                   fontSize: '12px',
                   fontWeight: '600',
                   cursor: 'pointer',
@@ -1066,6 +1075,7 @@ export default function HomePage() {
           activeTab="home"
           onTabChange={handleTabChange}
           onAddClick={() => setShowAddModal(true)}
+          isDark={isDark}
         />
 
         {/* Add Order Modal */}

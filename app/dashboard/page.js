@@ -234,7 +234,7 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, the
 }
 
 // Mobile Order Card Component with Swipe
-function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
+function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isDark = true }) {
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
   const [swiped, setSwiped] = useState(false)
@@ -330,20 +330,21 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
         style={{
-          background: 'rgba(26, 26, 46, 0.85)',
+          background: isDark ? 'rgba(26, 26, 46, 0.85)' : 'rgba(255, 255, 255, 0.95)',
           borderRadius: '12px',
           padding: '12px 14px',
           borderLeft: `3px solid ${statusColor}`,
           position: 'relative',
           zIndex: 2,
           transform: swiped ? 'translateX(-70px)' : 'translateX(0)',
-          transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
+          transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
+          boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.08)'
         }}
       >
         {/* Row 1: Name + Status + Price */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: '#fff', fontSize: '14px', fontWeight: '600' }}>{order.customer_name}</span>
+            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600' }}>{order.customer_name}</span>
             <span style={{
               background: getStatusBgColor(order.status),
               color: getStatusTextColor(order.status),
@@ -360,14 +361,14 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
 
         {/* Row 2: Product + Location */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <span style={{ color: '#cbd5e1', fontSize: '12px' }}>{order.product}</span>
+          <span style={{ color: isDark ? '#cbd5e1' : '#4a5568', fontSize: '12px' }}>{order.product}</span>
           {order.customer_city && order.customer_district && (
             <span style={{ color: '#6b7280', fontSize: '11px' }}>📍 {order.customer_city}/{order.customer_district}</span>
           )}
         </div>
 
         {/* Row 3: Phone + Buttons */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
           <span style={{ color: '#64748b', fontSize: '11px' }}>📱 {order.customer_phone}</span>
           <div style={{ display: 'flex', gap: '8px' }}>
             {/* WhatsApp Button - 35x35 */}
@@ -1139,7 +1140,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 }
 
 // Bottom Tab Bar Component
-function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
+function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
@@ -1154,7 +1155,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       bottom: 0,
       left: 0,
       right: 0,
-      background: 'rgba(13, 13, 26, 0.98)',
+      background: isDark ? 'rgba(13, 13, 26, 0.98)' : 'rgba(255, 255, 255, 0.98)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       padding: '8px 0 24px 0',
@@ -1162,8 +1163,8 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       justifyContent: 'center',
       alignItems: 'flex-end',
       zIndex: 1000,
-      borderTop: '1px solid rgba(102, 126, 234, 0.2)',
-      boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.3)'
+      borderTop: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0, 0, 0, 0.1)'}`,
+      boxShadow: isDark ? '0 -4px 30px rgba(0, 0, 0, 0.3)' : '0 -4px 20px rgba(0, 0, 0, 0.1)'
     }}>
       <div style={{
         display: 'flex',
@@ -1190,7 +1191,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
                   height: '56px',
                   borderRadius: '50%',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  border: '3px solid #0d0d1a',
+                  border: `3px solid ${isDark ? '#0d0d1a' : '#ffffff'}`,
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
@@ -1511,12 +1512,16 @@ export default function DashboardPage() {
 
   // ========== MOBILE VIEW ==========
   if (isMobile) {
+    const isDark = theme === 'dark'
+    
     return (
       <div style={{
         minHeight: '100vh',
-        background: 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)',
+        background: isDark 
+          ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
+          : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: 'Arial, sans-serif',
-        color: '#fff',
+        color: isDark ? '#fff' : '#1a1a2e',
         paddingBottom: '100px',
         position: 'relative'
       }}>
@@ -1532,21 +1537,22 @@ export default function DashboardPage() {
               onClick={() => router.push('/home')}
               style={{
                 padding: '8px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid rgba(102, 126, 234, 0.3)',
+                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
                 borderRadius: '10px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
               }}
             >
               <HomeIcon size={18} />
             </button>
-            <span style={{ color: '#fff', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
+            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
             <span style={{
-              background: 'rgba(102, 126, 234, 0.2)',
-              color: '#a5b4fc',
+              background: isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(102, 126, 234, 0.15)',
+              color: '#667eea',
               fontSize: '11px',
               padding: '3px 8px',
               borderRadius: '10px',
@@ -1588,19 +1594,19 @@ export default function DashboardPage() {
 
         {/* Stats Row - 4 cards */}
         <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
-          <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
             <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{activeOrders}</p>
             <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Aktif</span>
           </div>
-          <div style={{ flex: 1, background: 'rgba(251, 191, 36, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(251, 191, 36, 0.12)' : 'rgba(251, 191, 36, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
             <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
             <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bekleyen</span>
           </div>
-          <div style={{ flex: 1, background: 'rgba(139, 92, 246, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
             <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
             <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargo</span>
           </div>
-          <div style={{ flex: 1, background: 'rgba(102, 126, 234, 0.12)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
             <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{completedCount}</p>
             <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bitti</span>
           </div>
@@ -1610,13 +1616,14 @@ export default function DashboardPage() {
         <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
           <div style={{
             flex: 1,
-            background: 'rgba(26, 26, 46, 0.7)',
+            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '10px',
             padding: '10px 12px',
             display: 'flex',
             alignItems: 'center',
             gap: '8px',
-            border: '1px solid rgba(255,255,255,0.06)'
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
               <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
@@ -1630,19 +1637,20 @@ export default function DashboardPage() {
                 flex: 1,
                 background: 'transparent',
                 border: 'none',
-                color: '#fff',
+                color: isDark ? '#fff' : '#1a1a2e',
                 fontSize: '13px',
                 outline: 'none'
               }}
             />
           </div>
           <div style={{
-            background: 'rgba(26, 26, 46, 0.7)',
+            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
             borderRadius: '10px',
             padding: '10px 12px',
             display: 'flex',
             alignItems: 'center',
-            border: '1px solid rgba(255,255,255,0.06)'
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
           }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
               <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
@@ -1657,12 +1665,13 @@ export default function DashboardPage() {
               textAlign: 'center', 
               color: '#64748b', 
               padding: '60px 20px',
-              background: 'rgba(26, 26, 46, 0.4)',
+              background: isDark ? 'rgba(26, 26, 46, 0.4)' : 'rgba(255, 255, 255, 0.8)',
               borderRadius: '20px',
-              marginTop: '20px'
+              marginTop: '20px',
+              boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
             }}>
               <p style={{ fontSize: '56px', marginBottom: '16px' }}>📭</p>
-              <p style={{ fontSize: '16px' }}>Henüz sipariş yok</p>
+              <p style={{ fontSize: '16px', color: isDark ? '#64748b' : '#4a5568' }}>Henüz sipariş yok</p>
               <p style={{ fontSize: '14px', marginTop: '8px', color: '#4a5568' }}>+ butonuna basarak yeni sipariş ekle</p>
             </div>
           ) : (
@@ -1674,6 +1683,7 @@ export default function DashboardPage() {
                 onDelete={deleteOrder}
                 onWhatsApp={handleWhatsApp}
                 statusColor={getStatusColor(order.status)}
+                isDark={isDark}
               />
             ))
           )}
@@ -1684,6 +1694,7 @@ export default function DashboardPage() {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onAddClick={() => setShowAddModal(true)}
+          isDark={isDark}
         />
 
         {/* Add Order Modal */}
