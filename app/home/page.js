@@ -182,65 +182,76 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       background: 'rgba(13, 13, 26, 0.98)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
-      padding: '6px 12px 20px 12px',
+      padding: '8px 0 24px 0',
       display: 'flex',
-      justifyContent: 'space-around',
+      justifyContent: 'center',
       alignItems: 'flex-end',
       zIndex: 1000,
       borderTop: '1px solid rgba(102, 126, 234, 0.2)',
       boxShadow: '0 -4px 30px rgba(0, 0, 0, 0.3)'
     }}>
-      {tabs.map((tab) => (
-        tab.isMain ? (
-          <button
-            key={tab.id}
-            onClick={onAddClick}
-            style={{
-              width: '56px',
-              height: '56px',
-              borderRadius: '50%',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              border: '3px solid #0d0d1a',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '28px',
-              color: '#fff',
-              cursor: 'pointer',
-              marginTop: '-28px',
-              boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
-              fontWeight: '300'
-            }}
-          >
-            +
-          </button>
-        ) : (
-          <button
-            key={tab.id}
-            onClick={() => onTabChange(tab.id)}
-            style={{
-              background: 'none',
-              border: 'none',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '2px',
-              cursor: 'pointer',
-              opacity: activeTab === tab.id ? 1 : 0.4,
-              padding: '6px 10px'
-            }}
-          >
-            <span style={{ fontSize: '18px' }}>{tab.icon}</span>
-            <span style={{ 
-              fontSize: '9px', 
-              color: activeTab === tab.id ? '#22c55e' : '#64748b',
-              fontWeight: activeTab === tab.id ? '600' : '400'
-            }}>
-              {tab.label}
-            </span>
-          </button>
-        )
-      ))}
+      <div style={{
+        display: 'flex',
+        alignItems: 'flex-end',
+        justifyContent: 'space-between',
+        width: '100%',
+        maxWidth: '400px',
+        padding: '0 20px'
+      }}>
+        {tabs.map((tab) => (
+          tab.isMain ? (
+            <button
+              key={tab.id}
+              onClick={onAddClick}
+              style={{
+                width: '56px',
+                height: '56px',
+                borderRadius: '50%',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                border: '3px solid #0d0d1a',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '28px',
+                color: '#fff',
+                cursor: 'pointer',
+                marginTop: '-28px',
+                boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
+                fontWeight: '300',
+                flexShrink: 0
+              }}
+            >
+              +
+            </button>
+          ) : (
+            <button
+              key={tab.id}
+              onClick={() => onTabChange(tab.id)}
+              style={{
+                background: 'none',
+                border: 'none',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '3px',
+                cursor: 'pointer',
+                opacity: activeTab === tab.id ? 1 : 0.5,
+                padding: '4px 8px',
+                minWidth: '50px'
+              }}
+            >
+              <span style={{ fontSize: '20px' }}>{tab.icon}</span>
+              <span style={{ 
+                fontSize: '10px', 
+                color: activeTab === tab.id ? '#22c55e' : '#64748b',
+                fontWeight: activeTab === tab.id ? '600' : '400'
+              }}>
+                {tab.label}
+              </span>
+            </button>
+          )
+        ))}
+      </div>
     </div>
   )
 }
