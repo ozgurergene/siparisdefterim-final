@@ -79,8 +79,10 @@ function SuccessToast({ show, message }) {
 }
 
 // Profile Popup Component
-function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
+function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, theme, toggleTheme }) {
   if (!isOpen) return null
+
+  const isDark = theme === 'dark'
 
   return (
     <>
@@ -101,10 +103,10 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
         top: '60px',
         right: '16px',
         width: '220px',
-        background: '#1a1a2e',
+        background: isDark ? '#1a1a2e' : '#ffffff',
         borderRadius: '14px',
         boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-        border: '1px solid rgba(102, 126, 234, 0.2)',
+        border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0,0,0,0.1)'}`,
         zIndex: 999,
         overflow: 'hidden',
         animation: 'fadeIn 0.2s ease'
@@ -112,8 +114,10 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
         {/* Profile Header */}
         <div style={{
           padding: '16px',
-          background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-          borderBottom: '1px solid rgba(255,255,255,0.05)'
+          background: isDark 
+            ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)'
+            : 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
+          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
             <div style={{
@@ -131,7 +135,7 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
               {getInitials(user.email)}
             </div>
             <div>
-              <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>
+              <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>
                 {user.email.split('@')[0]}
               </p>
               <p style={{ color: '#64748b', fontSize: '11px', margin: '2px 0 0 0' }}>
@@ -142,12 +146,12 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
         </div>
 
         {/* Order Quota */}
-        <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+        <div style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
             <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
-            <span style={{ color: '#fff', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
+            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
           </div>
-          <div style={{ height: '4px', background: 'rgba(255,255,255,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+          <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
             <div style={{
               width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
               height: '100%',
@@ -160,45 +164,52 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
 
         {/* Menu Items */}
         <div style={{ padding: '8px' }}>
-          <div style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            padding: '10px 12px',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            background: 'rgba(255,255,255,0.03)'
-          }}>
-            <span style={{ fontSize: '16px' }}>🌙</span>
-            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Tema: Koyu</span>
+          {/* Theme Toggle */}
+          <div 
+            onClick={toggleTheme}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              padding: '10px 12px',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'
+            }}
+          >
+            <span style={{ fontSize: '16px' }}>{isDark ? '🌙' : '☀️'}</span>
+            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Tema: {isDark ? 'Koyu' : 'Açık'}</span>
             <div style={{
               marginLeft: 'auto',
-              width: '32px',
-              height: '18px',
-              background: '#667eea',
-              borderRadius: '9px',
-              position: 'relative'
+              width: '36px',
+              height: '20px',
+              background: isDark ? '#667eea' : '#cbd5e1',
+              borderRadius: '10px',
+              position: 'relative',
+              transition: 'background 0.2s ease'
             }}>
               <div style={{
                 position: 'absolute',
-                right: '2px',
+                left: isDark ? '18px' : '2px',
                 top: '2px',
-                width: '14px',
-                height: '14px',
+                width: '16px',
+                height: '16px',
                 background: '#fff',
-                borderRadius: '50%'
+                borderRadius: '50%',
+                transition: 'left 0.2s ease',
+                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
               }} />
             </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
             <span style={{ fontSize: '16px' }}>✏️</span>
-            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Profili Düzenle</span>
+            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Profili Düzenle</span>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
             <span style={{ fontSize: '16px' }}>⭐</span>
-            <span style={{ color: '#e2e8f0', fontSize: '13px' }}>Pro'ya Yükselt</span>
+            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
             <span style={{
               marginLeft: 'auto',
               background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
@@ -210,7 +221,7 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
             }}>YENİ</span>
           </div>
 
-          <div style={{ height: '1px', background: 'rgba(255,255,255,0.05)', margin: '6px 0' }} />
+          <div style={{ height: '1px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', margin: '6px 0' }} />
 
           <div onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
             <span style={{ fontSize: '16px' }}>🚪</span>
@@ -1571,6 +1582,8 @@ export default function DashboardPage() {
           onClose={() => setShowProfilePopup(false)}
           onLogout={handleLogout}
           ordersCreatedCount={ordersCreatedCount}
+          theme={theme}
+          toggleTheme={toggleTheme}
         />
 
         {/* Stats Row - 4 cards */}
