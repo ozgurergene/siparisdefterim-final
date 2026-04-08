@@ -608,36 +608,43 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
       <div style={{
         display: 'flex',
         alignItems: 'flex-end',
-        justifyContent: 'space-between',
+        justifyContent: 'space-around',
         width: '100%',
-        maxWidth: '400px',
-        padding: '0 20px'
+        maxWidth: '400px'
       }}>
         {tabs.map((tab) => (
           tab.isMain ? (
-            <button
+            <div
               key={tab.id}
-              onClick={onAddClick}
               style={{
-                width: '56px',
-                height: '56px',
-                borderRadius: '50%',
-                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                border: '3px solid #0d0d1a',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '28px',
-                color: '#fff',
-                cursor: 'pointer',
-                marginTop: '-28px',
-                boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
-                fontWeight: '300',
-                flexShrink: 0
+                width: '60px'
               }}
             >
-              +
-            </button>
+              <button
+                onClick={onAddClick}
+                style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  border: '3px solid #0d0d1a',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontSize: '28px',
+                  color: '#fff',
+                  cursor: 'pointer',
+                  marginTop: '-28px',
+                  boxShadow: '0 6px 25px rgba(102, 126, 234, 0.5)',
+                  fontWeight: '300'
+                }}
+              >
+                +
+              </button>
+            </div>
           ) : (
             <button
               key={tab.id}
@@ -648,18 +655,21 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'center',
+                justifyContent: 'center',
                 gap: '3px',
                 cursor: 'pointer',
                 opacity: activeTab === tab.id ? 1 : 0.5,
-                padding: '4px 8px',
-                minWidth: '50px'
+                padding: '4px 0',
+                width: '60px'
               }}
             >
               <span style={{ fontSize: '20px' }}>{tab.icon}</span>
               <span style={{ 
                 fontSize: '10px', 
                 color: activeTab === tab.id ? '#22c55e' : '#64748b',
-                fontWeight: activeTab === tab.id ? '600' : '400'
+                fontWeight: activeTab === tab.id ? '600' : '400',
+                textAlign: 'center',
+                whiteSpace: 'nowrap'
               }}>
                 {tab.label}
               </span>
