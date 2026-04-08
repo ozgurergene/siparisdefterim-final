@@ -49,6 +49,35 @@ function EditIcon() {
   )
 }
 
+// Success Toast Component
+function SuccessToast({ show, message }) {
+  if (!show) return null
+  
+  return (
+    <div style={{
+      position: 'fixed',
+      top: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+      color: '#fff',
+      padding: '14px 24px',
+      borderRadius: '12px',
+      boxShadow: '0 8px 30px rgba(34, 197, 94, 0.4)',
+      zIndex: 3000,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontSize: '14px',
+      fontWeight: '600',
+      animation: 'slideDown 0.3s ease'
+    }}>
+      <span style={{ fontSize: '18px' }}>✅</span>
+      {message}
+    </div>
+  )
+}
+
 // Profile Popup Component
 function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
   if (!isOpen) return null
@@ -1212,6 +1241,7 @@ export default function DashboardPage() {
   const [isMobile, setIsMobile] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [activeTab, setActiveTab] = useState('orders')
   
   const [searchName, setSearchName] = useState('')
@@ -1345,6 +1375,10 @@ export default function DashboardPage() {
       products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
       note: ''
     })
+    
+    // Show success toast
+    setShowSuccessToast(true)
+    setTimeout(() => setShowSuccessToast(false), 3000)
   }
 
   const deleteOrder = async (orderId) => {
@@ -1661,6 +1695,9 @@ export default function DashboardPage() {
           turkeyData={turkeyData}
         />
 
+        {/* Success Toast */}
+        <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
+
         <style jsx global>{`
           @keyframes fadeIn {
             from { opacity: 0; }
@@ -1669,6 +1706,10 @@ export default function DashboardPage() {
           @keyframes slideUp {
             from { transform: translateY(30px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
+          }
+          @keyframes slideDown {
+            from { transform: translate(-50%, -20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
           }
         `}</style>
       </div>

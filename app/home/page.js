@@ -3,6 +3,8 @@ import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, metricGradients, glowEffects, buttonGradients, keyframesCSS, getAvatarGradient, getInitials } from '../../lib/theme'
+import { calculateGrandTotal } from '../../lib/calculations'
+import turkeyData from '../../lib/turkeyData'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 
@@ -163,6 +165,349 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount }) {
   )
 }
 
+// Success Toast Component
+function SuccessToast({ show, message }) {
+  if (!show) return null
+  
+  return (
+    <div style={{
+      position: 'fixed',
+      top: '20px',
+      left: '50%',
+      transform: 'translateX(-50%)',
+      background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+      color: '#fff',
+      padding: '14px 24px',
+      borderRadius: '12px',
+      boxShadow: '0 8px 30px rgba(34, 197, 94, 0.4)',
+      zIndex: 3000,
+      display: 'flex',
+      alignItems: 'center',
+      gap: '10px',
+      fontSize: '14px',
+      fontWeight: '600',
+      animation: 'slideDown 0.3s ease'
+    }}>
+      <span style={{ fontSize: '18px' }}>✅</span>
+      {message}
+    </div>
+  )
+}
+
+// Mobile Add Order Modal
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData }) {
+  if (!isOpen) return null
+
+  const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
+  const districts = newOrder.customer_city && turkeyData ? turkeyData[newOrder.customer_city] || [] : []
+
+  return (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      background: 'rgba(0,0,0,0.85)',
+      zIndex: 2000,
+      display: 'flex',
+      flexDirection: 'column',
+      animation: 'fadeIn 0.3s ease'
+    }}>
+      <div style={{
+        background: '#0d0d1a',
+        flex: 1,
+        overflowY: 'auto',
+        padding: '20px',
+        paddingTop: '60px',
+        animation: 'slideUp 0.3s ease'
+      }}>
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute',
+            top: '20px',
+            right: '20px',
+            background: 'rgba(255,255,255,0.1)',
+            border: 'none',
+            color: '#fff',
+            fontSize: '20px',
+            cursor: 'pointer',
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          ✕
+        </button>
+
+        <h2 style={{ color: '#fff', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
+
+        {/* Müşteri Adı Soyadı ve Telefon */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Müşteri Adı Soyadı</label>
+            <input
+              type="text"
+              value={newOrder.customer_name}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Adı Soyadı"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Telefon</label>
+            <input
+              type="tel"
+              value={newOrder.customer_phone}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="5XX XXX XX XX"
+              maxLength="10"
+            />
+          </div>
+        </div>
+
+        {/* Adres */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adres</label>
+          <input
+            type="text"
+            value={newOrder.customer_address}
+            onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
+              border: '1px solid #2a2a3e',
+              borderRadius: '12px',
+              color: '#fff',
+              fontSize: '16px',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Mahalle, sokak, bina no..."
+          />
+        </div>
+
+        {/* İl ve İlçe */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>İl</label>
+            <select
+              value={newOrder.customer_city}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                appearance: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">İl Seçin</option>
+              {cities.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>İlçe</label>
+            <select
+              value={newOrder.customer_district}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                appearance: 'none',
+                cursor: 'pointer'
+              }}
+              disabled={!newOrder.customer_city}
+            >
+              <option value="">İlçe Seçin</option>
+              {districts.map(district => (
+                <option key={district} value={district}>{district}</option>
+              ))}
+            </select>
+          </div>
+        </div>
+
+        {/* Ürün */}
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Ürün</label>
+          <input
+            type="text"
+            value={newOrder.products[0]?.product || ''}
+            onChange={(e) => {
+              const updatedProducts = [...newOrder.products]
+              updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
+              setNewOrder({ ...newOrder, products: updatedProducts })
+            }}
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
+              border: '1px solid #2a2a3e',
+              borderRadius: '12px',
+              color: '#fff',
+              fontSize: '16px',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Ürün adı"
+          />
+        </div>
+
+        {/* Adet, Birim Fiyat, KDV */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adet</label>
+            <input
+              type="number"
+              value={newOrder.products[0]?.quantity || 1}
+              onChange={(e) => {
+                const updatedProducts = [...newOrder.products]
+                updatedProducts[0] = { ...updatedProducts[0], quantity: parseInt(e.target.value) || 1 }
+                setNewOrder({ ...newOrder, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              min="1"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Birim Fiyat</label>
+            <input
+              type="number"
+              value={newOrder.products[0]?.unit_price || ''}
+              onChange={(e) => {
+                const updatedProducts = [...newOrder.products]
+                updatedProducts[0] = { ...updatedProducts[0], unit_price: e.target.value }
+                setNewOrder({ ...newOrder, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              placeholder="₺"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>KDV %</label>
+            <input
+              type="number"
+              value={newOrder.products[0]?.kdv_rate || ''}
+              onChange={(e) => {
+                const updatedProducts = [...newOrder.products]
+                updatedProducts[0] = { ...updatedProducts[0], kdv_rate: e.target.value }
+                setNewOrder({ ...newOrder, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              placeholder="0"
+            />
+          </div>
+        </div>
+
+        {/* Not */}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Not (Opsiyonel)</label>
+          <input
+            type="text"
+            value={newOrder.note}
+            onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
+            style={{
+              width: '100%',
+              padding: '14px 16px',
+              background: 'rgba(26, 26, 46, 0.8)',
+              border: '1px solid #2a2a3e',
+              borderRadius: '12px',
+              color: '#fff',
+              fontSize: '16px',
+              boxSizing: 'border-box'
+            }}
+            placeholder="Özel talep, açıklama..."
+          />
+        </div>
+
+        <button
+          onClick={() => { handleAddOrder(); onClose() }}
+          style={{
+            width: '100%',
+            padding: '16px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            border: 'none',
+            borderRadius: '14px',
+            color: '#fff',
+            fontSize: '16px',
+            fontWeight: 'bold',
+            cursor: 'pointer',
+            marginTop: '10px',
+            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)'
+          }}
+        >
+          ✓ Sipariş Ekle
+        </button>
+      </div>
+    </div>
+  )
+}
+
 // Bottom Tab Bar Component
 function BottomTabBar({ activeTab, onTabChange, onAddClick }) {
   const tabs = [
@@ -274,6 +619,8 @@ export default function HomePage() {
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [isMobile, setIsMobile] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
+  const [showAddModal, setShowAddModal] = useState(false)
+  const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -281,6 +628,15 @@ export default function HomePage() {
     completed: 0,
     todayRevenue: 0,
     monthlyRevenue: 0
+  })
+  const [newOrder, setNewOrder] = useState({
+    customer_name: '',
+    customer_phone: '',
+    customer_address: '',
+    customer_city: '',
+    customer_district: '',
+    products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+    note: ''
   })
   
   const c = colors[theme]
@@ -349,6 +705,57 @@ export default function HomePage() {
   const handleLogout = async () => {
     await supabase.auth.signOut()
     router.replace('/login')
+  }
+
+  const handleAddOrder = async () => {
+    if (!newOrder.customer_name || !newOrder.customer_phone) {
+      alert('Lütfen müşteri adı ve telefon numarası girin.')
+      return
+    }
+    const hasValidProduct = newOrder.products.some(p => p.product && p.unit_price)
+    if (!hasValidProduct) {
+      alert('Lütfen en az bir ürün ve fiyat girin.')
+      return
+    }
+    const productString = newOrder.products.filter(p => p.product).map(p => `${p.product} x${p.quantity}`).join(', ')
+    const totalPrice = calculateGrandTotal(newOrder.products)
+    const orderData = {
+      user_id: user.id,
+      customer_name: newOrder.customer_name,
+      customer_phone: newOrder.customer_phone,
+      customer_address: newOrder.customer_address,
+      customer_city: newOrder.customer_city,
+      customer_district: newOrder.customer_district,
+      product: productString,
+      price: totalPrice,
+      status: 'payment_pending',
+      note: newOrder.note
+    }
+    const { error } = await supabase.from('orders').insert([orderData])
+    if (error) {
+      console.error('Order error:', error)
+      alert('Sipariş oluşturulamadı.')
+      return
+    }
+    
+    // Reset form
+    setNewOrder({
+      customer_name: '',
+      customer_phone: '',
+      customer_address: '',
+      customer_city: '',
+      customer_district: '',
+      products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+      note: ''
+    })
+    
+    // Show success toast
+    setShowSuccessToast(true)
+    setTimeout(() => setShowSuccessToast(false), 3000)
+    
+    // Refresh stats
+    await fetchStats(user.id)
+    setOrdersCreatedCount(ordersCreatedCount + 1)
   }
 
   const handleTabChange = (tabId) => {
@@ -645,13 +1052,34 @@ export default function HomePage() {
         <BottomTabBar
           activeTab="home"
           onTabChange={handleTabChange}
-          onAddClick={() => router.push('/dashboard')}
+          onAddClick={() => setShowAddModal(true)}
         />
+
+        {/* Add Order Modal */}
+        <MobileAddOrderModal
+          isOpen={showAddModal}
+          onClose={() => setShowAddModal(false)}
+          newOrder={newOrder}
+          setNewOrder={setNewOrder}
+          handleAddOrder={handleAddOrder}
+          turkeyData={turkeyData}
+        />
+
+        {/* Success Toast */}
+        <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
 
         <style jsx global>{`
           @keyframes fadeIn {
             from { opacity: 0; }
             to { opacity: 1; }
+          }
+          @keyframes slideUp {
+            from { transform: translateY(30px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+          @keyframes slideDown {
+            from { transform: translate(-50%, -20px); opacity: 0; }
+            to { transform: translate(-50%, 0); opacity: 1; }
           }
         `}</style>
       </div>
