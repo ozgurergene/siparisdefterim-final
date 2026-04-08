@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
+import turkeyData from '../../lib/turkeyData'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import OrderForm from '../../components/OrderForm'
@@ -371,8 +372,11 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor }) {
 }
 
 // Mobile Add Order Modal
-function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder }) {
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData }) {
   if (!isOpen) return null
+
+  const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
+  const districts = newOrder.customer_city && turkeyData ? turkeyData[newOrder.customer_city] || [] : []
 
   return (
     <div style={{
@@ -419,12 +423,56 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         <h2 style={{ color: '#fff', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
 
+        {/* Müşteri Adı Soyadı ve Telefon */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Müşteri Adı Soyadı</label>
+            <input
+              type="text"
+              value={newOrder.customer_name}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="Adı Soyadı"
+            />
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Telefon</label>
+            <input
+              type="tel"
+              value={newOrder.customer_phone}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box'
+              }}
+              placeholder="5XX XXX XX XX"
+              maxLength="10"
+            />
+          </div>
+        </div>
+
+        {/* Adres */}
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Müşteri Adı</label>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adres</label>
           <input
             type="text"
-            value={newOrder.customer_name}
-            onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
+            value={newOrder.customer_address}
+            onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
             style={{
               width: '100%',
               padding: '14px 16px',
@@ -435,31 +483,64 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               fontSize: '16px',
               boxSizing: 'border-box'
             }}
-            placeholder="Adı Soyadı"
+            placeholder="Mahalle, sokak, bina no..."
           />
         </div>
 
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Telefon</label>
-          <input
-            type="tel"
-            value={newOrder.customer_phone}
-            onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
-            placeholder="5XX XXX XX XX"
-            maxLength="10"
-          />
+        {/* İl ve İlçe */}
+        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>İl</label>
+            <select
+              value={newOrder.customer_city}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                appearance: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <option value="">İl Seçin</option>
+              {cities.map(city => (
+                <option key={city} value={city}>{city}</option>
+              ))}
+            </select>
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>İlçe</label>
+            <select
+              value={newOrder.customer_district}
+              onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                appearance: 'none',
+                cursor: 'pointer'
+              }}
+              disabled={!newOrder.customer_city}
+            >
+              <option value="">İlçe Seçin</option>
+              {districts.map(district => (
+                <option key={district} value={district}>{district}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
+        {/* Ürün */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Ürün</label>
           <input
@@ -484,6 +565,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
+        {/* Adet, Birim Fiyat, KDV */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adet</label>
@@ -533,8 +615,33 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               placeholder="₺"
             />
           </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>KDV %</label>
+            <input
+              type="number"
+              value={newOrder.products[0]?.kdv_rate || ''}
+              onChange={(e) => {
+                const updatedProducts = [...newOrder.products]
+                updatedProducts[0] = { ...updatedProducts[0], kdv_rate: e.target.value }
+                setNewOrder({ ...newOrder, products: updatedProducts })
+              }}
+              style={{
+                width: '100%',
+                padding: '14px 16px',
+                background: 'rgba(26, 26, 46, 0.8)',
+                border: '1px solid #2a2a3e',
+                borderRadius: '12px',
+                color: '#fff',
+                fontSize: '16px',
+                boxSizing: 'border-box',
+                textAlign: 'center'
+              }}
+              placeholder="0"
+            />
+          </div>
         </div>
 
+        {/* Not */}
         <div style={{ marginBottom: '20px' }}>
           <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Not (Opsiyonel)</label>
           <input
@@ -845,10 +952,18 @@ export default function DashboardPage() {
 
   const startEditing = (order) => {
     const productParts = order.product.split(', ')
+    // Toplam fiyatı ürün sayısına bölerek tahmini birim fiyat hesapla
+    const totalPrice = parseFloat(order.price) || 0
+    const totalQuantity = productParts.reduce((sum, part) => {
+      const match = part.match(/(.+) x(\d+)/)
+      return sum + (match ? parseInt(match[2]) : 1)
+    }, 0)
+    const estimatedUnitPrice = totalQuantity > 0 ? (totalPrice / totalQuantity).toFixed(2) : ''
+    
     const products = productParts.map(part => {
       const match = part.match(/(.+) x(\d+)/)
-      if (match) return { product: match[1], quantity: parseInt(match[2]), unit_price: '', kdv_rate: '' }
-      return { product: part, quantity: 1, unit_price: '', kdv_rate: '' }
+      if (match) return { product: match[1], quantity: parseInt(match[2]), unit_price: estimatedUnitPrice, kdv_rate: '0' }
+      return { product: part, quantity: 1, unit_price: estimatedUnitPrice, kdv_rate: '0' }
     })
     setEditingId(order.id)
     setEditingData({
@@ -857,7 +972,7 @@ export default function DashboardPage() {
       customer_address: order.customer_address || '',
       customer_city: order.customer_city || '',
       customer_district: order.customer_district || '',
-      products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+      products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '0' }],
       note: order.note || '',
       status: order.status
     })
@@ -1118,6 +1233,7 @@ export default function DashboardPage() {
           newOrder={newOrder}
           setNewOrder={setNewOrder}
           handleAddOrder={handleAddOrder}
+          turkeyData={turkeyData}
         />
 
         {/* Edit Modal */}
