@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, metricGradients, glowEffects, buttonGradients, keyframesCSS, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
-import turkeyData from '../../lib/turkeyData'
+import { turkeyData } from '../../lib/turkeyData'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 

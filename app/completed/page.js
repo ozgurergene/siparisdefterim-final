@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
-import turkeyData from '../../lib/turkeyData'
+import { turkeyData } from '../../lib/turkeyData'
 import Footer from '../../components/Footer'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
