@@ -687,14 +687,19 @@ export default function HomePage() {
     // Kargoda = preparing + shipped durumundakiler
     const shipped = activeOrders.filter(o => o.status === 'preparing' || o.status === 'shipped').length
     
-    // Günlük ve aylık kazanç teslim edilen siparişlerden hesaplanır
-    const today = new Date().toISOString().split('T')[0]
-    const todayCompleted = completedOrders.filter(o => o.updated_at?.startsWith(today))
-    const todayRevenue = todayCompleted.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
+    // Ödeme alınan siparişler (paid, preparing, shipped, completed)
+    // payment_pending HARİÇ tüm siparişler kazanca dahil
+    const paidOrders = orders.filter(o => o.status !== 'payment_pending')
     
+    // Günlük kazanç - bugün ödeme alınan siparişler (updated_at'e göre)
+    const today = new Date().toISOString().split('T')[0]
+    const todayPaid = paidOrders.filter(o => o.updated_at?.startsWith(today))
+    const todayRevenue = todayPaid.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
+    
+    // Aylık kazanç - bu ay ödeme alınan siparişler
     const thisMonth = new Date().toISOString().slice(0, 7)
-    const monthlyCompleted = completedOrders.filter(o => o.updated_at?.startsWith(thisMonth))
-    const monthlyRevenue = monthlyCompleted.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
+    const monthlyPaid = paidOrders.filter(o => o.updated_at?.startsWith(thisMonth))
+    const monthlyRevenue = monthlyPaid.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
 
     setStats({
       total: activeOrders.length,
