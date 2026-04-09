@@ -624,27 +624,62 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
 }
 
 // Mobile Completed Order Card
-function MobileCompletedCard({ order, isDark = true, onRepeat }) {
+// Highlight matching text
+function HighlightText({ text, searchTerm, color = '#fff' }) {
+  if (!searchTerm || !searchTerm.trim()) {
+    return <span>{text}</span>
+  }
+  
+  const term = searchTerm.toLowerCase()
+  const lowerText = text.toLowerCase()
+  const index = lowerText.indexOf(term)
+  
+  if (index === -1) {
+    return <span>{text}</span>
+  }
+  
+  const before = text.slice(0, index)
+  const match = text.slice(index, index + term.length)
+  const after = text.slice(index + term.length)
+  
+  return (
+    <span>
+      {before}
+      <span style={{ 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: '#fff',
+        padding: '1px 4px',
+        borderRadius: '4px',
+        fontWeight: '600'
+      }}>
+        {match}
+      </span>
+      {after}
+    </span>
+  )
+}
+
+function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }) {
   return (
     <div style={{
       background: isDark ? 'rgba(26, 26, 46, 0.9)' : 'rgba(255, 255, 255, 0.95)',
-      borderRadius: '16px',
-      padding: '14px 16px',
-      borderLeft: '4px solid #22c55e',
+      borderRadius: '12px',
+      padding: '12px 14px',
+      borderLeft: '3px solid #22c55e',
       marginBottom: '8px',
       boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
     }}>
       {/* Row 1: Name + Repeat Button + Price */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5px' }}>
         <div style={{ flex: 1 }}>
           <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: isDark ? '#fff' : '#1a1a2e' }}>
-            {order.customer_name}
+            <HighlightText text={order.customer_name} searchTerm={searchTerm} />
           </p>
           <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
-            {order.product}
+            <HighlightText text={order.product} searchTerm={searchTerm} />
           </p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           {/* Repeat Order Button */}
           <button
             onClick={() => onRepeat(order)}
@@ -674,14 +709,19 @@ function MobileCompletedCard({ order, isDark = true, onRepeat }) {
         </div>
       </div>
       
-      {/* Row 2: Dates */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+      {/* Row 2: Phone + Dates */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
         <span style={{ fontSize: '11px', color: '#64748b' }}>
-          📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
+          📱 <HighlightText text={order.customer_phone} searchTerm={searchTerm} />
         </span>
-        <span style={{ fontSize: '11px', color: '#22c55e', fontWeight: '600' }}>
-          ✅ {new Date(order.updated_at).toLocaleDateString('tr-TR')}
-        </span>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <span style={{ fontSize: '11px', color: '#64748b' }}>
+            📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
+          </span>
+          <span style={{ fontSize: '11px', color: '#22c55e', fontWeight: '600' }}>
+            ✅ {new Date(order.updated_at).toLocaleDateString('tr-TR')}
+          </span>
+        </div>
       </div>
     </div>
   )
@@ -753,26 +793,17 @@ export default function CompletedPage() {
   useEffect(() => {
     let filtered = completedOrders
     
+    // Single search input searches across name, phone, and product
     if (searchName.trim()) {
+      const searchTerm = searchName.toLowerCase().trim()
       filtered = filtered.filter(order => 
-        order.customer_name.toLowerCase().startsWith(searchName.toLowerCase())
+        order.customer_name.toLowerCase().includes(searchTerm) ||
+        order.customer_phone.includes(searchTerm) ||
+        order.product.toLowerCase().includes(searchTerm)
       )
-    }
-    if (searchPhone.trim()) {
-      filtered = filtered.filter(order => 
-        order.customer_phone.startsWith(searchPhone)
-      )
-    }
-    if (searchProduct.trim()) {
-      filtered = filtered.filter(order => {
-        const products = order.product.split(', ')
-        return products.some(prod => 
-          prod.toLowerCase().startsWith(searchProduct.toLowerCase())
-        )
-      })
     }
     setFilteredOrders(filtered)
-  }, [searchName, searchPhone, searchProduct, completedOrders])
+  }, [searchName, completedOrders])
 
   const fetchCompletedOrders = async (userId) => {
     const { data } = await supabase
@@ -853,23 +884,42 @@ export default function CompletedPage() {
   // Siparişi tekrarla - geçmiş siparişin bilgilerini modal'a doldur
   const handleRepeatOrder = (order) => {
     // Parse product string back to products array
-    // Format: "Ürün1 x2, Ürün2 x1" -> [{ product: 'Ürün1', quantity: 2, ... }]
+    // Format: "Ürün1 x2 (₺100.00), Ürün2 x1 (₺50.00)" or "Ürün1 x2, Ürün2 x1"
     const productParts = order.product.split(', ')
+    const totalPrice = parseFloat(order.price) || 0
+    const totalQuantity = productParts.reduce((sum, part) => {
+      const match = part.match(/x(\d+)/)
+      return sum + (match ? parseInt(match[1]) : 1)
+    }, 0)
+    
+    // Estimate unit price by dividing total by quantity
+    const estimatedUnitPrice = totalQuantity > 0 ? (totalPrice / totalQuantity).toFixed(2) : ''
+    
     const products = productParts.map(part => {
-      const match = part.match(/^(.+?)\s*x(\d+)$/)
-      if (match) {
+      // Try to match "Ürün x2 (₺100.00)" or "Ürün x2"
+      const matchWithPrice = part.match(/^(.+?)\s*x(\d+)\s*\(₺?([\d.]+)\)?$/)
+      const matchSimple = part.match(/^(.+?)\s*x(\d+)$/)
+      
+      if (matchWithPrice) {
         return {
-          product: match[1].trim(),
-          quantity: parseInt(match[2]) || 1,
-          unit_price: '', // User needs to fill this
-          kdv_rate: ''
+          product: matchWithPrice[1].trim(),
+          quantity: parseInt(matchWithPrice[2]) || 1,
+          unit_price: matchWithPrice[3],
+          kdv_rate: '0'
+        }
+      } else if (matchSimple) {
+        return {
+          product: matchSimple[1].trim(),
+          quantity: parseInt(matchSimple[2]) || 1,
+          unit_price: estimatedUnitPrice,
+          kdv_rate: '0'
         }
       }
       return {
-        product: part,
+        product: part.trim(),
         quantity: 1,
-        unit_price: '',
-        kdv_rate: ''
+        unit_price: estimatedUnitPrice,
+        kdv_rate: '0'
       }
     })
 
@@ -929,140 +979,155 @@ export default function CompletedPage() {
     
     return (
       <div style={{
-        minHeight: '100vh',
+        height: '100vh',
         background: isDark 
           ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
           : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: 'Arial, sans-serif',
         color: isDark ? '#fff' : '#1a1a2e',
-        paddingBottom: '100px'
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
       }}>
-        {/* Mobile Header */}
+        {/* STICKY HEADER SECTION */}
         <div style={{
-          padding: '16px 16px 10px 16px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          flexShrink: 0,
+          background: isDark 
+            ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
+            : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              onClick={() => router.push('/home')}
+          {/* Mobile Header */}
+          <div style={{
+            padding: '16px 16px 10px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={() => router.push('/home')}
+                style={{
+                  padding: '8px',
+                  background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                  border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                <HomeIcon size={18} />
+              </button>
+              <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
+            </div>
+            
+            <div
+              onClick={() => setShowProfilePopup(!showProfilePopup)}
               style={{
-                padding: '8px',
-                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
-                borderRadius: '10px',
-                cursor: 'pointer',
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: getAvatarGradient(user.email),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
+                fontSize: '13px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
               }}
             >
-              <HomeIcon size={18} />
-            </button>
-            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
+              {getInitials(user.email)}
+            </div>
           </div>
-          
-          <div
-            onClick={() => setShowProfilePopup(!showProfilePopup)}
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '50%',
-              background: getAvatarGradient(user.email),
+
+          {/* Profile Popup */}
+          <ProfilePopup
+            user={user}
+            isOpen={showProfilePopup}
+            onClose={() => setShowProfilePopup(false)}
+            onLogout={handleLogout}
+            ordersCreatedCount={ordersCreatedCount}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+
+          {/* Stats Row - 4 cards */}
+          <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
+            <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{totalCompleted}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Toplam</span>
+            </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>₺{totalRevenue.toFixed(0)}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Gelir</span>
+            </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{thisMonth}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bu Ay</span>
+            </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{thisWeek}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bu Hafta</span>
+            </div>
+          </div>
+
+          {/* Search Row */}
+          <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
+            <div style={{
+              flex: 1,
+              background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+              borderRadius: '10px',
+              padding: '10px 12px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '13px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
-            }}
-          >
-            {getInitials(user.email)}
+              gap: '8px',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="İsim, telefon veya ürün ara..."
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  color: isDark ? '#fff' : '#1a1a2e',
+                  fontSize: '13px',
+                  outline: 'none'
+                }}
+              />
+            </div>
+            <div style={{
+              background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+              </svg>
+            </div>
           </div>
         </div>
 
-        {/* Profile Popup */}
-        <ProfilePopup
-          user={user}
-          isOpen={showProfilePopup}
-          onClose={() => setShowProfilePopup(false)}
-          onLogout={handleLogout}
-          ordersCreatedCount={ordersCreatedCount}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-
-        {/* Stats Row - 4 cards (same as Dashboard) */}
-        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
-          <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{totalCompleted}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Toplam</span>
-          </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>₺{totalRevenue.toFixed(0)}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Gelir</span>
-          </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{thisMonth}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bu Ay</span>
-          </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{thisWeek}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bu Hafta</span>
-          </div>
-        </div>
-
-        {/* Search Row (same as Dashboard) */}
-        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
-          <div style={{
-            flex: 1,
-            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '10px',
-            padding: '10px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-            <input
-              type="text"
-              placeholder="Ara..."
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                color: isDark ? '#fff' : '#1a1a2e',
-                fontSize: '13px',
-                outline: 'none'
-              }}
-            />
-          </div>
-          <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '10px',
-            padding: '10px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
-            </svg>
-          </div>
-        </div>
-
-        {/* Completed Orders List */}
-        <div style={{ padding: '0 16px', flex: 1, overflowY: 'auto' }}>
+        {/* SCROLLABLE ORDERS LIST */}
+        <div style={{ 
+          flex: 1, 
+          overflowY: 'auto', 
+          padding: '0 16px',
+          paddingBottom: '100px'
+        }}>
           {filteredOrders.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
@@ -1077,7 +1142,7 @@ export default function CompletedPage() {
             </div>
           ) : (
             filteredOrders.map(order => (
-              <MobileCompletedCard key={order.id} order={order} isDark={isDark} onRepeat={handleRepeatOrder} />
+              <MobileCompletedCard key={order.id} order={order} isDark={isDark} onRepeat={handleRepeatOrder} searchTerm={searchName} />
             ))
           )}
         </div>
