@@ -682,15 +682,18 @@ export default function HomePage() {
     const activeOrders = orders.filter(o => o.status !== 'completed')
     const completedOrders = orders.filter(o => o.status === 'completed')
     
-    const pending = activeOrders.filter(o => o.status === 'payment_pending' || o.status === 'paid').length
+    // Ödeme Bekleyen = sadece payment_pending durumundakiler
+    const pending = activeOrders.filter(o => o.status === 'payment_pending').length
+    // Kargoda = preparing + shipped durumundakiler
     const shipped = activeOrders.filter(o => o.status === 'preparing' || o.status === 'shipped').length
     
+    // Günlük ve aylık kazanç teslim edilen siparişlerden hesaplanır
     const today = new Date().toISOString().split('T')[0]
-    const todayCompleted = completedOrders.filter(o => o.created_at?.startsWith(today))
+    const todayCompleted = completedOrders.filter(o => o.updated_at?.startsWith(today))
     const todayRevenue = todayCompleted.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
     
     const thisMonth = new Date().toISOString().slice(0, 7)
-    const monthlyCompleted = completedOrders.filter(o => o.created_at?.startsWith(thisMonth))
+    const monthlyCompleted = completedOrders.filter(o => o.updated_at?.startsWith(thisMonth))
     const monthlyRevenue = monthlyCompleted.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
 
     setStats({
