@@ -802,16 +802,23 @@ export default function HomePage() {
   if (isMobile) {
     const isDark = theme === 'dark'
     
+    // Türkçe ay adları
+    const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
+    const currentMonth = monthNames[new Date().getMonth()]
+    
     return (
       <div style={{
-        minHeight: '100vh',
+        height: '100vh',
         background: isDark 
           ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
           : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: 'Arial, sans-serif',
         color: isDark ? '#fff' : '#1a1a2e',
-        paddingBottom: '100px',
-        position: 'relative'
+        paddingBottom: '80px',
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        flexDirection: 'column'
       }}>
         {/* Mobile Header */}
         <div style={{
@@ -871,11 +878,11 @@ export default function HomePage() {
         />
 
         {/* Welcome Section */}
-        <div style={{ textAlign: 'center', padding: '20px 20px 30px 20px' }}>
-          <h2 style={{ fontSize: '28px', fontWeight: 'bold', margin: '0 0 8px 0', color: isDark ? '#fff' : '#1a1a2e' }}>
+        <div style={{ textAlign: 'center', padding: '12px 20px 20px 20px' }}>
+          <h2 style={{ fontSize: '26px', fontWeight: 'bold', margin: '0 0 6px 0', color: isDark ? '#fff' : '#1a1a2e' }}>
             Hoş Geldin! 👋
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '15px', margin: 0 }}>
+          <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>
             İşte güncel sipariş durumun
           </p>
         </div>
@@ -885,8 +892,8 @@ export default function HomePage() {
           padding: '0 20px',
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px',
-          marginBottom: '20px'
+          gap: '10px',
+          marginBottom: '14px'
         }}>
           {metricCards.map((card) => (
             <div
@@ -894,17 +901,17 @@ export default function HomePage() {
               onClick={() => router.push('/dashboard')}
               style={{
                 background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                borderRadius: '16px',
-                padding: '16px',
+                borderRadius: '14px',
+                padding: '12px 14px',
                 borderTop: `3px solid transparent`,
                 borderImage: `${card.gradient} 1`,
                 cursor: 'pointer',
                 boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
               }}
             >
-              <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 8px 0' }}>{card.label}</p>
+              <p style={{ fontSize: '11px', color: '#94a3b8', margin: '0 0 4px 0' }}>{card.label}</p>
               <p style={{ 
-                fontSize: '32px', 
+                fontSize: '28px', 
                 fontWeight: 'bold', 
                 margin: 0,
                 background: card.gradient,
@@ -922,33 +929,33 @@ export default function HomePage() {
           padding: '0 20px',
           display: 'grid',
           gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px',
-          marginBottom: '24px'
+          gap: '10px',
+          marginBottom: '14px'
         }}>
           <div style={{
             background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '16px',
-            padding: '16px',
+            borderRadius: '14px',
+            padding: '12px 14px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '10px',
             boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
               background: 'rgba(67, 233, 123, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '20px'
+              fontSize: '18px'
             }}>
               💵
             </div>
             <div>
-              <p style={{ fontSize: '11px', color: '#94a3b8', margin: 0 }}>Bugünün Geliri</p>
-              <p style={{ fontSize: '20px', fontWeight: 'bold', margin: 0, color: '#43e97b' }}>
+              <p style={{ fontSize: '10px', color: '#94a3b8', margin: 0 }}>Bugünün Geliri</p>
+              <p style={{ fontSize: '18px', fontWeight: 'bold', margin: 0, color: '#43e97b' }}>
                 ₺{stats.todayRevenue.toFixed(0)}
               </p>
             </div>
@@ -956,29 +963,29 @@ export default function HomePage() {
 
           <div style={{
             background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '16px',
-            padding: '16px',
+            borderRadius: '14px',
+            padding: '12px 14px',
             display: 'flex',
             alignItems: 'center',
-            gap: '12px',
+            gap: '10px',
             boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
             <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '12px',
+              width: '40px',
+              height: '40px',
+              borderRadius: '10px',
               background: 'rgba(102, 126, 234, 0.15)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '20px'
+              fontSize: '18px'
             }}>
               📊
             </div>
             <div>
-              <p style={{ fontSize: '11px', color: '#94a3b8', margin: 0 }}>Bu Ayki Gelir</p>
+              <p style={{ fontSize: '10px', color: '#94a3b8', margin: 0 }}>{currentMonth} Geliri</p>
               <p style={{ 
-                fontSize: '20px', 
+                fontSize: '18px', 
                 fontWeight: 'bold', 
                 margin: 0,
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -991,83 +998,105 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div style={{ padding: '0 20px' }}>
+        {/* Quick Actions - Slim */}
+        <div style={{ padding: '0 20px', flex: 1 }}>
           <div style={{
             background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '20px',
-            padding: '20px',
+            borderRadius: '16px',
+            padding: '14px 16px',
             boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
           }}>
-            <h3 style={{ fontSize: '16px', fontWeight: '600', margin: '0 0 16px 0', display: 'flex', alignItems: 'center', gap: '8px', color: isDark ? '#fff' : '#1a1a2e' }}>
+            <h3 style={{ fontSize: '14px', fontWeight: '600', margin: '0 0 10px 0', display: 'flex', alignItems: 'center', gap: '6px', color: isDark ? '#fff' : '#1a1a2e' }}>
               <span>⚡</span> Hızlı İşlemler
             </h3>
             
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '12px' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '10px' }}>
               <button
                 onClick={() => setShowAddModal(true)}
                 style={{
-                  padding: '16px 8px',
-                  borderRadius: '14px',
+                  padding: '12px 6px',
+                  borderRadius: '12px',
                   border: 'none',
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   color: 'white',
-                  fontSize: '12px',
+                  fontSize: '10px',
                   fontWeight: '600',
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '4px'
                 }}
               >
-                <span style={{ fontSize: '24px' }}>➕</span>
-                <span style={{ lineHeight: '1.3', textAlign: 'center' }}>Yeni<br/>Sipariş Ekle</span>
+                <span style={{ fontSize: '20px' }}>➕</span>
+                <span style={{ lineHeight: '1.2', textAlign: 'center' }}>Yeni<br/>Sipariş Ekle</span>
               </button>
 
               <button
                 onClick={() => router.push('/dashboard')}
                 style={{
-                  padding: '16px 8px',
-                  borderRadius: '14px',
+                  padding: '12px 6px',
+                  borderRadius: '12px',
                   border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.4)'}`,
                   background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(102, 126, 234, 0.08)',
                   color: isDark ? '#fff' : '#1a1a2e',
-                  fontSize: '12px',
+                  fontSize: '10px',
                   fontWeight: '600',
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '4px'
                 }}
               >
-                <span style={{ fontSize: '24px' }}>📦</span>
-                <span style={{ lineHeight: '1.3', textAlign: 'center' }}>Siparişleri<br/>Görüntüle</span>
+                <span style={{ fontSize: '20px' }}>📦</span>
+                <span style={{ lineHeight: '1.2', textAlign: 'center' }}>Siparişleri<br/>Görüntüle</span>
               </button>
 
               <button
                 onClick={() => router.push('/completed')}
                 style={{
-                  padding: '16px 8px',
-                  borderRadius: '14px',
+                  padding: '12px 6px',
+                  borderRadius: '12px',
                   border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.4)'}`,
                   background: isDark ? 'rgba(255, 255, 255, 0.03)' : 'rgba(102, 126, 234, 0.08)',
                   color: isDark ? '#fff' : '#1a1a2e',
-                  fontSize: '12px',
+                  fontSize: '10px',
                   fontWeight: '600',
                   cursor: 'pointer',
                   display: 'flex',
                   flexDirection: 'column',
                   alignItems: 'center',
-                  gap: '8px'
+                  gap: '4px'
                 }}
               >
-                <span style={{ fontSize: '24px' }}>✅</span>
-                <span style={{ lineHeight: '1.3', textAlign: 'center' }}>Tamamlananları<br/>Gör</span>
+                <span style={{ fontSize: '20px' }}>✅</span>
+                <span style={{ lineHeight: '1.2', textAlign: 'center' }}>Tamamlananları<br/>Gör</span>
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{
+          padding: '12px 20px',
+          textAlign: 'center',
+          marginBottom: '70px'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            justifyContent: 'center', 
+            gap: '16px', 
+            marginBottom: '8px',
+            flexWrap: 'wrap'
+          }}>
+            <a href="/gizlilik" style={{ color: '#64748b', fontSize: '11px', textDecoration: 'none' }}>Gizlilik Politikası</a>
+            <a href="/kullanim" style={{ color: '#64748b', fontSize: '11px', textDecoration: 'none' }}>Kullanım Koşulları</a>
+            <a href="/kvkk" style={{ color: '#64748b', fontSize: '11px', textDecoration: 'none' }}>KVKK Aydınlatma</a>
+          </div>
+          <p style={{ color: '#4a5568', fontSize: '10px', margin: 0 }}>
+            © 2026 Deftertut.com - Tüm hakları saklıdır.
+          </p>
         </div>
 
         {/* Bottom Tab Bar */}
