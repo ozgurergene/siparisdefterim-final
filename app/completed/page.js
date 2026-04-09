@@ -797,14 +797,20 @@ export default function CompletedPage() {
   }, [searchName, completedOrders])
 
   const fetchCompletedOrders = async (userId) => {
-    const { data } = await supabase
+    // Fetch all orders to get total count for profile popup
+    const { data: allOrders } = await supabase
       .from('orders')
       .select('*')
       .eq('user_id', userId)
-      .eq('status', 'completed')
-      .order('updated_at', { ascending: false })
     
-    setCompletedOrders(data || [])
+    // Set total orders count
+    setOrdersCreatedCount(allOrders?.length || 0)
+    
+    // Filter and set completed orders
+    const completed = (allOrders || []).filter(o => o.status === 'completed')
+      .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
+    
+    setCompletedOrders(completed)
   }
 
   const toggleTheme = () => {
