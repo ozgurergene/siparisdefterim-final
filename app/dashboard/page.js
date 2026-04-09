@@ -453,22 +453,45 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
   )
 }
 
-// Mobile Add Order Modal
+// Mobile Add Order Modal - Same design as Edit Modal
 function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true }) {
   if (!isOpen) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
   const districts = newOrder.customer_city && turkeyData ? turkeyData[newOrder.customer_city] || [] : []
 
+  // Calculate totals
+  const calculateTotals = () => {
+    const product = newOrder.products[0] || {}
+    const quantity = parseInt(product.quantity) || 1
+    const unitPrice = parseFloat(product.unit_price) || 0
+    const kdvRate = parseFloat(product.kdv_rate) || 0
+    const tutar = quantity * unitPrice
+    const kdv = tutar * (kdvRate / 100)
+    const toplam = tutar + kdv
+    return { tutar, kdv, toplam }
+  }
+
+  const { tutar, kdv, toplam } = calculateTotals()
+
   const inputStyle = {
     width: '100%',
-    padding: '14px 16px',
+    padding: '12px',
     background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
     border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
-    borderRadius: '12px',
+    borderRadius: '10px',
     color: isDark ? '#fff' : '#1a1a2e',
-    fontSize: '16px',
+    fontSize: '14px',
     boxSizing: 'border-box'
+  }
+
+  const selectStyle = {
+    ...inputStyle,
+    appearance: 'none',
+    cursor: 'pointer',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center'
   }
 
   return (
@@ -478,7 +501,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
       left: 0,
       right: 0,
       bottom: 0,
-      background: isDark ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.5)',
+      background: isDark ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
       zIndex: 2000,
       display: 'flex',
       flexDirection: 'column',
@@ -489,37 +512,38 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         flex: 1,
         overflowY: 'auto',
         padding: '20px',
-        paddingTop: '60px',
+        paddingTop: '20px',
         animation: 'slideUp 0.3s ease'
       }}>
-        <button
-          onClick={onClose}
-          style={{
-            position: 'absolute',
-            top: '20px',
-            right: '20px',
-            background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
-            border: 'none',
-            color: isDark ? '#fff' : '#1a1a2e',
-            fontSize: '20px',
-            cursor: 'pointer',
-            width: '40px',
-            height: '40px',
-            borderRadius: '50%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          ✕
-        </button>
-
-        <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+          <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+            ✏️ Yeni Sipariş
+          </h2>
+          <button
+            onClick={onClose}
+            style={{
+              background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
+              border: 'none',
+              color: isDark ? '#fff' : '#1a1a2e',
+              fontSize: '18px',
+              cursor: 'pointer',
+              width: '36px',
+              height: '36px',
+              borderRadius: '50%',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}
+          >
+            ✕
+          </button>
+        </div>
 
         {/* Müşteri Adı Soyadı ve Telefon */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Müşteri Adı Soyadı</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
             <input
               type="text"
               value={newOrder.customer_name}
@@ -529,7 +553,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Telefon</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
             <input
               type="tel"
               value={newOrder.customer_phone}
@@ -542,8 +566,8 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         </div>
 
         {/* Adres */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adres</label>
+        <div style={{ marginBottom: '12px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
           <input
             type="text"
             value={newOrder.customer_address}
@@ -554,56 +578,54 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         </div>
 
         {/* İl ve İlçe */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>İl</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
             <select
               value={newOrder.customer_city}
               onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
-              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
+              style={selectStyle}
             >
               <option value="">İl Seçin</option>
               {cities.map(city => (
-                <option key={city} value={city}>{city}</option>
+                <option key={city} value={city} style={{ color: '#000', background: '#fff' }}>{city}</option>
               ))}
             </select>
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>İlçe</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
             <select
               value={newOrder.customer_district}
               onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
-              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
+              style={selectStyle}
               disabled={!newOrder.customer_city}
             >
               <option value="">İlçe Seçin</option>
               {districts.map(district => (
-                <option key={district} value={district}>{district}</option>
+                <option key={district} value={district} style={{ color: '#000', background: '#fff' }}>{district}</option>
               ))}
             </select>
           </div>
         </div>
 
-        {/* Ürün */}
-        <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Ürün</label>
-          <input
-            type="text"
-            value={newOrder.products[0]?.product || ''}
-            onChange={(e) => {
-              const updatedProducts = [...newOrder.products]
-              updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
-              setNewOrder({ ...newOrder, products: updatedProducts })
-            }}
-            style={inputStyle}
-            placeholder="Ürün adı"
-          />
-        </div>
-
-        {/* Adet, Birim Fiyat, KDV */}
-        <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
+        {/* Ürün Bilgileri */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ flex: 2 }}>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
+            <input
+              type="text"
+              value={newOrder.products[0]?.product || ''}
+              onChange={(e) => {
+                const updatedProducts = [...newOrder.products]
+                updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
+                setNewOrder({ ...newOrder, products: updatedProducts })
+              }}
+              style={inputStyle}
+              placeholder="Ürün adı"
+            />
+          </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Adet</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adet</label>
             <input
               type="number"
               value={newOrder.products[0]?.quantity || 1}
@@ -616,8 +638,12 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               min="1"
             />
           </div>
+        </div>
+
+        {/* Birim Fiyat ve KDV */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Birim Fiyat</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
             <input
               type="number"
               value={newOrder.products[0]?.unit_price || ''}
@@ -631,7 +657,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>KDV %</label>
+            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
             <input
               type="number"
               value={newOrder.products[0]?.kdv_rate || ''}
@@ -644,37 +670,73 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               placeholder="0"
             />
           </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: '#22c55e', marginBottom: '4px', fontSize: '12px' }}>Toplam</label>
+            <div style={{
+              width: '100%',
+              padding: '12px',
+              background: 'rgba(34, 197, 94, 0.15)',
+              border: '1px solid rgba(34, 197, 94, 0.3)',
+              borderRadius: '10px',
+              color: '#22c55e',
+              fontSize: '14px',
+              fontWeight: '600',
+              boxSizing: 'border-box',
+              textAlign: 'center'
+            }}>
+              ₺{toplam.toFixed(2)}
+            </div>
+          </div>
+        </div>
+
+        {/* Tutar Özeti */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
+            <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
+          </div>
+          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
+            <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
+          </div>
+          <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
+            <p style={{ color: '#22c55e', fontSize: '10px', margin: '0 0 4px 0' }}>Toplam</p>
+            <p style={{ color: '#22c55e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{toplam.toFixed(2)}</p>
+          </div>
         </div>
 
         {/* Not */}
-        <div style={{ marginBottom: '20px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '14px' }}>Not (Opsiyonel)</label>
-          <input
-            type="text"
+        <div style={{ marginBottom: '16px' }}>
+          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
+          <textarea
             value={newOrder.note}
             onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
-            style={inputStyle}
-            placeholder="Özel talep, açıklama..."
+            style={{
+              ...inputStyle,
+              minHeight: '60px',
+              resize: 'none'
+            }}
+            placeholder="Özel notlar..."
           />
         </div>
 
+        {/* Sipariş Oluştur Button */}
         <button
           onClick={() => { handleAddOrder(); onClose() }}
           style={{
             width: '100%',
-            padding: '16px',
+            padding: '14px',
             background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
             border: 'none',
-            borderRadius: '14px',
+            borderRadius: '12px',
             color: '#fff',
-            fontSize: '16px',
-            fontWeight: 'bold',
+            fontSize: '14px',
+            fontWeight: '600',
             cursor: 'pointer',
-            marginTop: '10px',
-            boxShadow: '0 4px 20px rgba(102, 126, 234, 0.4)'
+            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
           }}
         >
-          ✓ Sipariş Ekle
+          ✓ Sipariş Oluştur
         </button>
       </div>
     </div>
@@ -810,11 +872,17 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             <select
               value={editingData.customer_city}
               onChange={(e) => setEditingData({ ...editingData, customer_city: e.target.value, customer_district: '' })}
-              style={{ ...inputStyle, appearance: 'none' }}
+              style={{ 
+                ...inputStyle, 
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center'
+              }}
             >
               <option value="">İl Seçin</option>
               {cities.map(city => (
-                <option key={city} value={city}>{city}</option>
+                <option key={city} value={city} style={{ color: '#000', background: '#fff' }}>{city}</option>
               ))}
             </select>
           </div>
@@ -823,12 +891,18 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             <select
               value={editingData.customer_district}
               onChange={(e) => setEditingData({ ...editingData, customer_district: e.target.value })}
-              style={{ ...inputStyle, appearance: 'none' }}
+              style={{ 
+                ...inputStyle, 
+                appearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center'
+              }}
               disabled={!editingData.customer_city}
             >
               <option value="">İlçe Seçin</option>
               {districts.map(district => (
-                <option key={district} value={district}>{district}</option>
+                <option key={district} value={district} style={{ color: '#000', background: '#fff' }}>{district}</option>
               ))}
             </select>
           </div>
