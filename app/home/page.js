@@ -238,18 +238,23 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   }
 
   const selectStyle = {
-    ...inputStyle,
-    appearance: 'none',
-    WebkitAppearance: 'none',
-    MozAppearance: 'none',
-    cursor: 'pointer',
-    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
-    backgroundRepeat: 'no-repeat',
-    backgroundPosition: 'right 12px center'
+    width: '100%',
+    padding: '12px',
+    paddingRight: '32px',
+    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: '10px',
+    color: isDark ? '#fff' : '#1a1a2e',
+    fontSize: '14px',
+    boxSizing: 'border-box',
+    cursor: 'pointer'
   }
 
   // For native mobile select dropdowns
   const optionStyle = { color: '#000', backgroundColor: '#fff' }
+
+  // Debug: Log cities count
+  console.log('turkeyData:', turkeyData ? 'exists' : 'null', 'cities count:', cities.length)
 
   return (
     <div style={{
