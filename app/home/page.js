@@ -240,11 +240,16 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   const selectStyle = {
     ...inputStyle,
     appearance: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
     cursor: 'pointer',
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 12px center'
   }
+
+  // For native mobile select dropdowns
+  const optionStyle = { color: '#000', backgroundColor: '#fff' }
 
   return (
     <div style={{
@@ -338,9 +343,9 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
               style={selectStyle}
             >
-              <option value="">İl Seçin</option>
+              <option value="" style={optionStyle}>İl Seçin</option>
               {cities.map(city => (
-                <option key={city} value={city} style={{ color: '#000', background: '#fff' }}>{city}</option>
+                <option key={city} value={city} style={optionStyle}>{city}</option>
               ))}
             </select>
           </div>
@@ -352,9 +357,9 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               style={selectStyle}
               disabled={!newOrder.customer_city}
             >
-              <option value="">İlçe Seçin</option>
+              <option value="" style={optionStyle}>İlçe Seçin</option>
               {districts.map(district => (
-                <option key={district} value={district} style={{ color: '#000', background: '#fff' }}>{district}</option>
+                <option key={district} value={district} style={optionStyle}>{district}</option>
               ))}
             </select>
           </div>
@@ -632,6 +637,11 @@ export default function HomePage() {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
     window.addEventListener('resize', checkMobile)
+    
+    // Load theme from localStorage
+    const savedTheme = localStorage.getItem('siparisdefterim-theme')
+    if (savedTheme) setTheme(savedTheme)
+    
     return () => window.removeEventListener('resize', checkMobile)
   }, [])
 
