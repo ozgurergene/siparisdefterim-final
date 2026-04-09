@@ -930,146 +930,74 @@ export default function CompletedPage() {
           toggleTheme={toggleTheme}
         />
 
-        {/* Stats Cards - 2x2 Grid */}
-        <div style={{ 
-          padding: '0 20px 16px 20px',
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: '12px'
-        }}>
-          <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '16px',
-            padding: '16px',
-            borderTop: '3px solid #22c55e',
-            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
-          }}>
-            <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Toplam</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, color: '#22c55e' }}>{totalCompleted}</p>
+        {/* Stats Row - 4 cards (same as Dashboard) */}
+        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{totalCompleted}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Toplam</span>
           </div>
-          <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '16px',
-            padding: '16px',
-            borderTop: '3px solid #22c55e',
-            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
-          }}>
-            <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Toplam Gelir</p>
-            <p style={{ fontSize: '24px', fontWeight: 'bold', margin: 0, color: '#22c55e' }}>₺{totalRevenue.toFixed(0)}</p>
+          <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>₺{totalRevenue.toFixed(0)}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Gelir</span>
           </div>
-          <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '16px',
-            padding: '16px',
-            borderTop: '3px solid #667eea',
-            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
-          }}>
-            <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Bu Ay</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, color: '#667eea' }}>{thisMonth}</p>
+          <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{thisMonth}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bu Ay</span>
           </div>
-          <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '16px',
-            padding: '16px',
-            borderTop: '3px solid #667eea',
-            boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
-          }}>
-            <p style={{ fontSize: '12px', color: '#94a3b8', margin: '0 0 6px 0' }}>Bu Hafta</p>
-            <p style={{ fontSize: '28px', fontWeight: 'bold', margin: 0, color: '#667eea' }}>{thisWeek}</p>
+          <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+            <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{thisWeek}</p>
+            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bu Hafta</span>
           </div>
         </div>
 
-        {/* Search Toggle */}
-        <div style={{ padding: '0 20px 12px 20px' }}>
-          <button
-            onClick={() => setMobileSearchOpen(!mobileSearchOpen)}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-              border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
-              borderRadius: '12px',
-              color: isDark ? '#fff' : '#1a1a2e',
-              fontSize: '14px',
-              fontWeight: '500',
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
-            }}
-          >
-            <span>🔍 Ara ({filteredOrders.length} sonuç)</span>
-            <span style={{ 
-              transform: mobileSearchOpen ? 'rotate(180deg)' : 'rotate(0deg)',
-              transition: 'transform 0.2s ease'
-            }}>▼</span>
-          </button>
-          
-          {mobileSearchOpen && (
-            <div style={{
-              marginTop: '12px',
-              padding: '16px',
-              background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-              borderRadius: '12px',
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '12px',
-              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
-            }}>
-              <input
-                type="text"
-                placeholder="Müşteri adı..."
-                value={searchName}
-                onChange={(e) => setSearchName(e.target.value)}
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  background: isDark ? 'rgba(13, 13, 26, 0.8)' : 'rgba(248, 250, 252, 1)',
-                  border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
-                  borderRadius: '10px',
-                  color: isDark ? '#fff' : '#1a1a2e',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
-              />
-              <input
-                type="text"
-                placeholder="Telefon..."
-                value={searchPhone}
-                onChange={(e) => setSearchPhone(e.target.value.replace(/\D/g, ''))}
-                style={{
-                  width: '100%',
-                  padding: '12px 14px',
-                  background: isDark ? 'rgba(13, 13, 26, 0.8)' : 'rgba(248, 250, 252, 1)',
-                  border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
-                  borderRadius: '10px',
-                  color: isDark ? '#fff' : '#1a1a2e',
-                  fontSize: '14px',
-                  boxSizing: 'border-box'
-                }}
-              />
-              <button
-                onClick={() => { setSearchName(''); setSearchPhone(''); setSearchProduct('') }}
-                style={{
-                  padding: '12px',
-                  background: '#6c757d',
-                  border: 'none',
-                  borderRadius: '10px',
-                  color: '#fff',
-                  fontSize: '14px',
-                  fontWeight: '600',
-                  cursor: 'pointer'
-                }}
-              >
-                Temizle
-              </button>
-            </div>
-          )}
+        {/* Search Row (same as Dashboard) */}
+        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
+          <div style={{
+            flex: 1,
+            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '10px',
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+            </svg>
+            <input
+              type="text"
+              placeholder="Ara..."
+              value={searchName}
+              onChange={(e) => setSearchName(e.target.value)}
+              style={{
+                flex: 1,
+                background: 'transparent',
+                border: 'none',
+                color: isDark ? '#fff' : '#1a1a2e',
+                fontSize: '13px',
+                outline: 'none'
+              }}
+            />
+          </div>
+          <div style={{
+            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+            borderRadius: '10px',
+            padding: '10px 12px',
+            display: 'flex',
+            alignItems: 'center',
+            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
+          }}>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+            </svg>
+          </div>
         </div>
 
         {/* Completed Orders List */}
-        <div style={{ padding: '0 20px' }}>
+        <div style={{ padding: '0 16px', flex: 1, overflowY: 'auto' }}>
           {filteredOrders.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
