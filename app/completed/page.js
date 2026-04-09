@@ -874,46 +874,45 @@ export default function CompletedPage() {
       }}>
         {/* Mobile Header */}
         <div style={{
-          padding: '24px 20px 16px 20px',
+          padding: '16px 16px 10px 16px',
           display: 'flex',
           justifyContent: 'space-between',
           alignItems: 'center'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <button
               onClick={() => router.push('/home')}
               style={{
-                padding: '10px',
+                padding: '8px',
                 background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
                 border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
-                borderRadius: '12px',
+                borderRadius: '10px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                 boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
               }}
             >
-              <HomeIcon size={22} />
+              <HomeIcon size={18} />
             </button>
-            <h1 style={{ margin: 0, fontSize: '24px', fontWeight: 'bold', color: isDark ? '#fff' : '#1a1a2e' }}>Tamamlananlar</h1>
+            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
           </div>
           
           <div
             onClick={() => setShowProfilePopup(!showProfilePopup)}
             style={{
-              width: '46px',
-              height: '46px',
+              width: '38px',
+              height: '38px',
               borderRadius: '50%',
               background: getAvatarGradient(user.email),
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              fontSize: '16px',
+              fontSize: '13px',
               fontWeight: 'bold',
               cursor: 'pointer',
-              boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : '0 4px 15px rgba(102, 126, 234, 0.3)'
+              boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
             }}
           >
             {getInitials(user.email)}
