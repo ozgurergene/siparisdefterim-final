@@ -458,7 +458,9 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   if (!isOpen) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
-  const districts = newOrder.customer_city && turkeyData ? turkeyData[newOrder.customer_city] || [] : []
+  const districts = newOrder.customer_city && turkeyData 
+    ? (turkeyData[newOrder.customer_city] || []).slice().sort((a, b) => a.localeCompare(b, 'tr')) 
+    : []
 
   // Calculate totals
   const calculateTotals = () => {
@@ -496,16 +498,16 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     fontSize: '14px',
     boxSizing: 'border-box',
     cursor: 'pointer',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
     backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
     backgroundRepeat: 'no-repeat',
     backgroundPosition: 'right 12px center'
   }
 
-  // For native mobile select dropdowns, we need to ensure options are visible
+  // For native mobile select dropdowns
   const optionStyle = { color: '#000', backgroundColor: '#fff' }
-
-  // Debug: Log cities count
-  console.log('turkeyData:', turkeyData ? 'exists' : 'null', 'cities count:', cities.length)
 
   return (
     <div style={{
@@ -761,7 +763,9 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
   if (!isOpen || !editingData) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
-  const districts = editingData.customer_city && turkeyData ? turkeyData[editingData.customer_city] || [] : []
+  const districts = editingData.customer_city && turkeyData 
+    ? (turkeyData[editingData.customer_city] || []).slice().sort((a, b) => a.localeCompare(b, 'tr')) 
+    : []
 
   const statusOptions = [
     { value: 'payment_pending', label: 'Ödeme Bekleniyor', color: '#3b82f6', icon: '💳' },
@@ -895,7 +899,13 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 color: isDark ? '#fff' : '#1a1a2e',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center'
               }}
             >
               <option value="" style={{ color: '#000', backgroundColor: '#fff' }}>İl Seçin</option>
@@ -919,7 +929,13 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 color: isDark ? '#fff' : '#1a1a2e',
                 fontSize: '14px',
                 boxSizing: 'border-box',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                appearance: 'none',
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'right 12px center'
               }}
               disabled={!editingData.customer_city}
             >
