@@ -624,35 +624,62 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
 }
 
 // Mobile Completed Order Card
-function MobileCompletedCard({ order, isDark = true }) {
+function MobileCompletedCard({ order, isDark = true, onRepeat }) {
   return (
     <div style={{
       background: isDark ? 'rgba(26, 26, 46, 0.9)' : 'rgba(255, 255, 255, 0.95)',
       borderRadius: '16px',
-      padding: '16px 18px',
+      padding: '14px 16px',
       borderLeft: '4px solid #22c55e',
-      marginBottom: '12px',
+      marginBottom: '8px',
       boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '8px' }}>
-        <div>
-          <p style={{ margin: 0, fontSize: '18px', fontWeight: '600', color: isDark ? '#fff' : '#1a1a2e' }}>
-            {order.customer_name.split(' ')[0]} {order.customer_name.split(' ')[1]?.[0]}.
+      {/* Row 1: Name + Repeat Button + Price */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+        <div style={{ flex: 1 }}>
+          <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: isDark ? '#fff' : '#1a1a2e' }}>
+            {order.customer_name}
           </p>
-          <p style={{ margin: '4px 0 0 0', fontSize: '14px', color: '#94a3b8' }}>
+          <p style={{ margin: '2px 0 0 0', fontSize: '12px', color: '#94a3b8' }}>
             {order.product}
           </p>
         </div>
-        <p style={{ margin: 0, fontSize: '20px', fontWeight: 'bold', color: '#22c55e' }}>
-          ₺{order.price}
-        </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          {/* Repeat Order Button */}
+          <button
+            onClick={() => onRepeat(order)}
+            style={{
+              width: '32px',
+              height: '32px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              border: 'none',
+              borderRadius: '8px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              cursor: 'pointer'
+            }}
+            title="Siparişi Tekrarla"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M17 1l4 4-4 4"/>
+              <path d="M3 11V9a4 4 0 0 1 4-4h14"/>
+              <path d="M7 23l-4-4 4-4"/>
+              <path d="M21 13v2a4 4 0 0 1-4 4H3"/>
+            </svg>
+          </button>
+          <p style={{ margin: 0, fontSize: '16px', fontWeight: 'bold', color: '#22c55e' }}>
+            ₺{order.price}
+          </p>
+        </div>
       </div>
       
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '12px', paddingTop: '12px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
-        <span style={{ fontSize: '12px', color: '#64748b' }}>
+      {/* Row 2: Dates */}
+      <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.08)'}` }}>
+        <span style={{ fontSize: '11px', color: '#64748b' }}>
           📅 {new Date(order.created_at).toLocaleDateString('tr-TR')}
         </span>
-        <span style={{ fontSize: '12px', color: '#22c55e', fontWeight: '600' }}>
+        <span style={{ fontSize: '11px', color: '#22c55e', fontWeight: '600' }}>
           ✅ {new Date(order.updated_at).toLocaleDateString('tr-TR')}
         </span>
       </div>
@@ -821,6 +848,44 @@ export default function CompletedPage() {
     setTimeout(() => setShowSuccessToast(false), 3000)
     
     setOrdersCreatedCount(ordersCreatedCount + 1)
+  }
+
+  // Siparişi tekrarla - geçmiş siparişin bilgilerini modal'a doldur
+  const handleRepeatOrder = (order) => {
+    // Parse product string back to products array
+    // Format: "Ürün1 x2, Ürün2 x1" -> [{ product: 'Ürün1', quantity: 2, ... }]
+    const productParts = order.product.split(', ')
+    const products = productParts.map(part => {
+      const match = part.match(/^(.+?)\s*x(\d+)$/)
+      if (match) {
+        return {
+          product: match[1].trim(),
+          quantity: parseInt(match[2]) || 1,
+          unit_price: '', // User needs to fill this
+          kdv_rate: ''
+        }
+      }
+      return {
+        product: part,
+        quantity: 1,
+        unit_price: '',
+        kdv_rate: ''
+      }
+    })
+
+    // Fill the form with order data
+    setNewOrder({
+      customer_name: order.customer_name || '',
+      customer_phone: order.customer_phone || '',
+      customer_address: order.customer_address || '',
+      customer_city: order.customer_city || '',
+      customer_district: order.customer_district || '',
+      products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+      note: order.note || ''
+    })
+
+    // Open the add order modal
+    setShowAddModal(true)
   }
 
   const totalCompleted = completedOrders.length
@@ -1012,7 +1077,7 @@ export default function CompletedPage() {
             </div>
           ) : (
             filteredOrders.map(order => (
-              <MobileCompletedCard key={order.id} order={order} isDark={isDark} />
+              <MobileCompletedCard key={order.id} order={order} isDark={isDark} onRepeat={handleRepeatOrder} />
             ))
           )}
         </div>
