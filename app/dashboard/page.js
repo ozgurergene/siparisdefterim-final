@@ -233,8 +233,43 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, the
   )
 }
 
+// Highlight matching text
+function HighlightText({ text, searchTerm, color = '#fff' }) {
+  if (!searchTerm || !searchTerm.trim()) {
+    return <span>{text}</span>
+  }
+  
+  const term = searchTerm.toLowerCase()
+  const lowerText = text.toLowerCase()
+  const index = lowerText.indexOf(term)
+  
+  if (index === -1) {
+    return <span>{text}</span>
+  }
+  
+  const before = text.slice(0, index)
+  const match = text.slice(index, index + term.length)
+  const after = text.slice(index + term.length)
+  
+  return (
+    <span>
+      {before}
+      <span style={{ 
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: '#fff',
+        padding: '1px 4px',
+        borderRadius: '4px',
+        fontWeight: '600'
+      }}>
+        {match}
+      </span>
+      {after}
+    </span>
+  )
+}
+
 // Mobile Order Card Component with Swipe
-function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isDark = true }) {
+function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isDark = true, searchTerm = '' }) {
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
   const [swiped, setSwiped] = useState(false)
@@ -344,7 +379,9 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
         {/* Row 1: Name + Status + Price */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600' }}>{order.customer_name}</span>
+            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600' }}>
+              <HighlightText text={order.customer_name} searchTerm={searchTerm} />
+            </span>
             <span style={{
               background: getStatusBgColor(order.status),
               color: getStatusTextColor(order.status),
@@ -361,7 +398,9 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
 
         {/* Row 2: Product + Location */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-          <span style={{ color: isDark ? '#cbd5e1' : '#4a5568', fontSize: '12px' }}>{order.product}</span>
+          <span style={{ color: isDark ? '#cbd5e1' : '#4a5568', fontSize: '12px' }}>
+            <HighlightText text={order.product} searchTerm={searchTerm} />
+          </span>
           {order.customer_city && order.customer_district && (
             <span style={{ color: '#6b7280', fontSize: '11px' }}>📍 {order.customer_city}/{order.customer_district}</span>
           )}
@@ -369,7 +408,9 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
 
         {/* Row 3: Phone + Buttons */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
-          <span style={{ color: '#64748b', fontSize: '11px' }}>📱 {order.customer_phone}</span>
+          <span style={{ color: '#64748b', fontSize: '11px' }}>
+            📱 <HighlightText text={order.customer_phone} searchTerm={searchTerm} />
+          </span>
           <div style={{ display: 'flex', gap: '8px' }}>
             {/* WhatsApp Button - 35x35 */}
             <button
@@ -413,11 +454,22 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
 }
 
 // Mobile Add Order Modal
-function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData }) {
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true }) {
   if (!isOpen) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
   const districts = newOrder.customer_city && turkeyData ? turkeyData[newOrder.customer_city] || [] : []
+
+  const inputStyle = {
+    width: '100%',
+    padding: '14px 16px',
+    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: '12px',
+    color: isDark ? '#fff' : '#1a1a2e',
+    fontSize: '16px',
+    boxSizing: 'border-box'
+  }
 
   return (
     <div style={{
@@ -426,14 +478,14 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0,0,0,0.85)',
+      background: isDark ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.5)',
       zIndex: 2000,
       display: 'flex',
       flexDirection: 'column',
       animation: 'fadeIn 0.3s ease'
     }}>
       <div style={{
-        background: '#0d0d1a',
+        background: isDark ? '#0d0d1a' : '#ffffff',
         flex: 1,
         overflowY: 'auto',
         padding: '20px',
@@ -446,9 +498,9 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             position: 'absolute',
             top: '20px',
             right: '20px',
-            background: 'rgba(255,255,255,0.1)',
+            background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
             border: 'none',
-            color: '#fff',
+            color: isDark ? '#fff' : '#1a1a2e',
             fontSize: '20px',
             cursor: 'pointer',
             width: '40px',
@@ -462,7 +514,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           ✕
         </button>
 
-        <h2 style={{ color: '#fff', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
+        <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
 
         {/* Müşteri Adı Soyadı ve Telefon */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
@@ -472,16 +524,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               type="text"
               value={newOrder.customer_name}
               onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
               placeholder="Adı Soyadı"
             />
           </div>
@@ -491,16 +534,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               type="tel"
               value={newOrder.customer_phone}
               onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
               placeholder="5XX XXX XX XX"
               maxLength="10"
             />
@@ -514,16 +548,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             type="text"
             value={newOrder.customer_address}
             onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
             placeholder="Mahalle, sokak, bina no..."
           />
         </div>
@@ -535,18 +560,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             <select
               value={newOrder.customer_city}
               onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                appearance: 'none',
-                cursor: 'pointer'
-              }}
+              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
             >
               <option value="">İl Seçin</option>
               {cities.map(city => (
@@ -559,18 +573,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             <select
               value={newOrder.customer_district}
               onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                appearance: 'none',
-                cursor: 'pointer'
-              }}
+              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
               disabled={!newOrder.customer_city}
             >
               <option value="">İlçe Seçin</option>
@@ -592,16 +595,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
               setNewOrder({ ...newOrder, products: updatedProducts })
             }}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
             placeholder="Ürün adı"
           />
         </div>
@@ -618,17 +612,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
                 updatedProducts[0] = { ...updatedProducts[0], quantity: parseInt(e.target.value) || 1 }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               min="1"
             />
           </div>
@@ -642,17 +626,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
                 updatedProducts[0] = { ...updatedProducts[0], unit_price: e.target.value }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               placeholder="₺"
             />
           </div>
@@ -666,17 +640,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
                 updatedProducts[0] = { ...updatedProducts[0], kdv_rate: e.target.value }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               placeholder="0"
             />
           </div>
@@ -689,16 +653,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             type="text"
             value={newOrder.note}
             onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
             placeholder="Özel talep, açıklama..."
           />
         </div>
@@ -727,7 +682,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 }
 
 // Mobile Edit Modal with Status Dropdown
-function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancelEdit, deleteOrder, editingId, turkeyData }) {
+function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancelEdit, deleteOrder, editingId, turkeyData, isDark = true }) {
   if (!isOpen || !editingData) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
@@ -757,6 +712,17 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 
   const { tutar, kdv, toplam } = calculateTotals()
 
+  const inputStyle = {
+    width: '100%',
+    padding: '12px',
+    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: '10px',
+    color: isDark ? '#fff' : '#1a1a2e',
+    fontSize: '14px',
+    boxSizing: 'border-box'
+  }
+
   return (
     <div style={{
       position: 'fixed',
@@ -764,14 +730,14 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0,0,0,0.9)',
+      background: isDark ? 'rgba(0,0,0,0.9)' : 'rgba(0,0,0,0.5)',
       zIndex: 2000,
       display: 'flex',
       flexDirection: 'column',
       animation: 'fadeIn 0.3s ease'
     }}>
       <div style={{
-        background: '#0d0d1a',
+        background: isDark ? '#0d0d1a' : '#ffffff',
         flex: 1,
         overflowY: 'auto',
         padding: '20px',
@@ -780,15 +746,15 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
       }}>
         {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
-          <h2 style={{ color: '#fff', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             ✏️ Siparişi Düzenle
           </h2>
           <button
             onClick={cancelEdit}
             style={{
-              background: 'rgba(255,255,255,0.1)',
+              background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
               border: 'none',
-              color: '#fff',
+              color: isDark ? '#fff' : '#1a1a2e',
               fontSize: '18px',
               cursor: 'pointer',
               width: '36px',
@@ -811,16 +777,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
               type="text"
               value={editingData.customer_name}
               onChange={(e) => setEditingData({ ...editingData, customer_name: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
             />
           </div>
           <div style={{ flex: 1 }}>
@@ -829,16 +786,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
               type="tel"
               value={editingData.customer_phone}
               onChange={(e) => setEditingData({ ...editingData, customer_phone: e.target.value.replace(/\D/g, '') })}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
               maxLength="10"
             />
           </div>
@@ -851,16 +799,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             type="text"
             value={editingData.customer_address}
             onChange={(e) => setEditingData({ ...editingData, customer_address: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '12px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '10px',
-              color: '#fff',
-              fontSize: '14px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
           />
         </div>
 
@@ -871,17 +810,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             <select
               value={editingData.customer_city}
               onChange={(e) => setEditingData({ ...editingData, customer_city: e.target.value, customer_district: '' })}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                appearance: 'none'
-              }}
+              style={{ ...inputStyle, appearance: 'none' }}
             >
               <option value="">İl Seçin</option>
               {cities.map(city => (
@@ -894,17 +823,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             <select
               value={editingData.customer_district}
               onChange={(e) => setEditingData({ ...editingData, customer_district: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                appearance: 'none'
-              }}
+              style={{ ...inputStyle, appearance: 'none' }}
               disabled={!editingData.customer_city}
             >
               <option value="">İlçe Seçin</option>
@@ -927,16 +846,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
                 setEditingData({ ...editingData, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
             />
           </div>
           <div style={{ flex: 1 }}>
@@ -949,17 +859,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 updatedProducts[0] = { ...updatedProducts[0], quantity: parseInt(e.target.value) || 1 }
                 setEditingData({ ...editingData, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               min="1"
             />
           </div>
@@ -977,17 +877,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 updatedProducts[0] = { ...updatedProducts[0], unit_price: e.target.value }
                 setEditingData({ ...editingData, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               placeholder="₺"
             />
           </div>
@@ -1001,17 +891,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 updatedProducts[0] = { ...updatedProducts[0], kdv_rate: e.target.value }
                 setEditingData({ ...editingData, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '12px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '10px',
-                color: '#fff',
-                fontSize: '14px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               placeholder="0"
             />
           </div>
@@ -1036,13 +916,13 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 
         {/* Tutar Özeti */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ flex: 1, background: 'rgba(26, 26, 46, 0.6)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
             <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
-            <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
+            <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
           </div>
-          <div style={{ flex: 1, background: 'rgba(26, 26, 46, 0.6)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
+          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
             <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
-            <p style={{ color: '#fff', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
+            <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
           </div>
           <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
             <p style={{ color: '#22c55e', fontSize: '10px', margin: '0 0 4px 0' }}>Toplam</p>
@@ -1083,14 +963,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             value={editingData.note}
             onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
             style={{
-              width: '100%',
-              padding: '12px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '10px',
-              color: '#fff',
-              fontSize: '14px',
-              boxSizing: 'border-box',
+              ...inputStyle,
               minHeight: '60px',
               resize: 'none'
             }}
@@ -1309,15 +1182,19 @@ export default function DashboardPage() {
 
   useEffect(() => {
     let filtered = orders
-    if (searchName.trim()) filtered = filtered.filter(order => order.customer_name.toLowerCase().startsWith(searchName.toLowerCase()))
-    if (searchPhone.trim()) filtered = filtered.filter(order => order.customer_phone.startsWith(searchPhone))
-    if (searchProduct.trim()) filtered = filtered.filter(order => {
-      const products = order.product.split(', ')
-      return products.some(prod => prod.toLowerCase().startsWith(searchProduct.toLowerCase()))
-    })
+    
+    // Single search input searches across name, phone, and product
+    if (searchName.trim()) {
+      const searchTerm = searchName.toLowerCase().trim()
+      filtered = filtered.filter(order => 
+        order.customer_name.toLowerCase().includes(searchTerm) ||
+        order.customer_phone.includes(searchTerm) ||
+        order.product.toLowerCase().includes(searchTerm)
+      )
+    }
     if (statusFilter !== 'all') filtered = filtered.filter(order => order.status === statusFilter)
     setFilteredOrders(filtered)
-  }, [searchName, searchPhone, searchProduct, statusFilter, orders])
+  }, [searchName, statusFilter, orders])
 
   const fetchUserData = async (userId) => {
     try {
@@ -1516,150 +1393,164 @@ export default function DashboardPage() {
     
     return (
       <div style={{
-        minHeight: '100vh',
+        height: '100vh',
         background: isDark 
           ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
           : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
         fontFamily: 'Arial, sans-serif',
         color: isDark ? '#fff' : '#1a1a2e',
-        paddingBottom: '100px',
-        position: 'relative'
+        display: 'flex',
+        flexDirection: 'column',
+        overflow: 'hidden'
       }}>
-        {/* Mobile Header */}
+        {/* STICKY HEADER SECTION */}
         <div style={{
-          padding: '16px 16px 10px 16px',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center'
+          flexShrink: 0,
+          background: isDark 
+            ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
+            : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)'
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <button
-              onClick={() => router.push('/home')}
-              style={{
-                padding: '8px',
-                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
-                border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
+          {/* Mobile Header */}
+          <div style={{
+            padding: '16px 16px 10px 16px',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center'
+          }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <button
+                onClick={() => router.push('/home')}
+                style={{
+                  padding: '8px',
+                  background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                  border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
+                  borderRadius: '10px',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                <HomeIcon size={18} />
+              </button>
+              <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
+              <span style={{
+                background: isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(102, 126, 234, 0.15)',
+                color: '#667eea',
+                fontSize: '11px',
+                padding: '3px 8px',
                 borderRadius: '10px',
-                cursor: 'pointer',
+                fontWeight: '500'
+              }}>{filteredOrders.length}</span>
+            </div>
+            
+            {/* Avatar */}
+            <div
+              onClick={() => setShowProfilePopup(!showProfilePopup)}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: getAvatarGradient(user.email),
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
+                fontSize: '13px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
               }}
             >
-              <HomeIcon size={18} />
-            </button>
-            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
-            <span style={{
-              background: isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(102, 126, 234, 0.15)',
-              color: '#667eea',
-              fontSize: '11px',
-              padding: '3px 8px',
-              borderRadius: '10px',
-              fontWeight: '500'
-            }}>{filteredOrders.length}</span>
+              {getInitials(user.email)}
+            </div>
           </div>
-          
-          {/* Avatar */}
-          <div
-            onClick={() => setShowProfilePopup(!showProfilePopup)}
-            style={{
-              width: '38px',
-              height: '38px',
-              borderRadius: '50%',
-              background: getAvatarGradient(user.email),
+
+          {/* Profile Popup */}
+          <ProfilePopup
+            user={user}
+            isOpen={showProfilePopup}
+            onClose={() => setShowProfilePopup(false)}
+            onLogout={handleLogout}
+            ordersCreatedCount={ordersCreatedCount}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
+
+          {/* Stats Row - 4 cards */}
+          <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
+            <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{activeOrders}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Aktif</span>
+            </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(251, 191, 36, 0.12)' : 'rgba(251, 191, 36, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bekleyen</span>
+            </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargo</span>
+            </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{completedCount}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bitti</span>
+            </div>
+          </div>
+
+          {/* Search Row */}
+          <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
+            <div style={{
+              flex: 1,
+              background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+              borderRadius: '10px',
+              padding: '10px 12px',
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'center',
-              fontSize: '13px',
-              fontWeight: 'bold',
-              cursor: 'pointer',
-              boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
-            }}
-          >
-            {getInitials(user.email)}
+              gap: '8px',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <input
+                type="text"
+                placeholder="İsim, telefon veya ürün ara..."
+                value={searchName}
+                onChange={(e) => setSearchName(e.target.value)}
+                style={{
+                  flex: 1,
+                  background: 'transparent',
+                  border: 'none',
+                  color: isDark ? '#fff' : '#1a1a2e',
+                  fontSize: '13px',
+                  outline: 'none'
+                }}
+              />
+            </div>
+            <div style={{
+              background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+              borderRadius: '10px',
+              padding: '10px 12px',
+              display: 'flex',
+              alignItems: 'center',
+              border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
+              boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
+            }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
+                <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
+              </svg>
+            </div>
           </div>
         </div>
 
-        {/* Profile Popup */}
-        <ProfilePopup
-          user={user}
-          isOpen={showProfilePopup}
-          onClose={() => setShowProfilePopup(false)}
-          onLogout={handleLogout}
-          ordersCreatedCount={ordersCreatedCount}
-          theme={theme}
-          toggleTheme={toggleTheme}
-        />
-
-        {/* Stats Row - 4 cards */}
-        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
-          <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{activeOrders}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Aktif</span>
-          </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(251, 191, 36, 0.12)' : 'rgba(251, 191, 36, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bekleyen</span>
-          </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargo</span>
-          </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-            <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{completedCount}</p>
-            <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bitti</span>
-          </div>
-        </div>
-
-        {/* Search Row */}
-        <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
-          <div style={{
-            flex: 1,
-            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '10px',
-            padding: '10px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-              <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
-            </svg>
-            <input
-              type="text"
-              placeholder="Ara..."
-              value={searchName}
-              onChange={(e) => setSearchName(e.target.value)}
-              style={{
-                flex: 1,
-                background: 'transparent',
-                border: 'none',
-                color: isDark ? '#fff' : '#1a1a2e',
-                fontSize: '13px',
-                outline: 'none'
-              }}
-            />
-          </div>
-          <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
-            borderRadius: '10px',
-            padding: '10px 12px',
-            display: 'flex',
-            alignItems: 'center',
-            border: `1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.08)'}`,
-            boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)'
-          }}>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
-              <path d="M22 3H2l8 9.46V19l4 2v-8.54L22 3z"/>
-            </svg>
-          </div>
-        </div>
-
-        {/* Orders List */}
-        <div style={{ padding: '0 16px' }}>
+        {/* SCROLLABLE ORDERS LIST */}
+        <div style={{ 
+          flex: 1, 
+          overflowY: 'auto', 
+          padding: '0 16px',
+          paddingBottom: '100px'
+        }}>
           {filteredOrders.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
@@ -1667,7 +1558,6 @@ export default function DashboardPage() {
               padding: '60px 20px',
               background: isDark ? 'rgba(26, 26, 46, 0.4)' : 'rgba(255, 255, 255, 0.8)',
               borderRadius: '20px',
-              marginTop: '20px',
               boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
             }}>
               <p style={{ fontSize: '56px', marginBottom: '16px' }}>📭</p>
@@ -1684,6 +1574,7 @@ export default function DashboardPage() {
                 onWhatsApp={handleWhatsApp}
                 statusColor={getStatusColor(order.status)}
                 isDark={isDark}
+                searchTerm={searchName}
               />
             ))
           )}
@@ -1705,6 +1596,7 @@ export default function DashboardPage() {
           setNewOrder={setNewOrder}
           handleAddOrder={handleAddOrder}
           turkeyData={turkeyData}
+          isDark={isDark}
         />
 
         {/* Mobile Edit Modal */}
@@ -1717,6 +1609,7 @@ export default function DashboardPage() {
           deleteOrder={deleteOrder}
           editingId={editingId}
           turkeyData={turkeyData}
+          isDark={isDark}
         />
 
         {/* Success Toast */}

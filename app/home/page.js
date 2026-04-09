@@ -206,11 +206,22 @@ function SuccessToast({ show, message }) {
 }
 
 // Mobile Add Order Modal
-function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData }) {
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true }) {
   if (!isOpen) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
   const districts = newOrder.customer_city && turkeyData ? turkeyData[newOrder.customer_city] || [] : []
+
+  const inputStyle = {
+    width: '100%',
+    padding: '14px 16px',
+    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: '12px',
+    color: isDark ? '#fff' : '#1a1a2e',
+    fontSize: '16px',
+    boxSizing: 'border-box'
+  }
 
   return (
     <div style={{
@@ -219,14 +230,14 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
       left: 0,
       right: 0,
       bottom: 0,
-      background: 'rgba(0,0,0,0.85)',
+      background: isDark ? 'rgba(0,0,0,0.85)' : 'rgba(0,0,0,0.5)',
       zIndex: 2000,
       display: 'flex',
       flexDirection: 'column',
       animation: 'fadeIn 0.3s ease'
     }}>
       <div style={{
-        background: '#0d0d1a',
+        background: isDark ? '#0d0d1a' : '#ffffff',
         flex: 1,
         overflowY: 'auto',
         padding: '20px',
@@ -239,9 +250,9 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             position: 'absolute',
             top: '20px',
             right: '20px',
-            background: 'rgba(255,255,255,0.1)',
+            background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)',
             border: 'none',
-            color: '#fff',
+            color: isDark ? '#fff' : '#1a1a2e',
             fontSize: '20px',
             cursor: 'pointer',
             width: '40px',
@@ -255,7 +266,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           ✕
         </button>
 
-        <h2 style={{ color: '#fff', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
+        <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', marginBottom: '24px', fontSize: '24px' }}>Yeni Sipariş</h2>
 
         {/* Müşteri Adı Soyadı ve Telefon */}
         <div style={{ display: 'flex', gap: '12px', marginBottom: '16px' }}>
@@ -265,16 +276,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               type="text"
               value={newOrder.customer_name}
               onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
               placeholder="Adı Soyadı"
             />
           </div>
@@ -284,16 +286,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               type="tel"
               value={newOrder.customer_phone}
               onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box'
-              }}
+              style={inputStyle}
               placeholder="5XX XXX XX XX"
               maxLength="10"
             />
@@ -307,16 +300,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             type="text"
             value={newOrder.customer_address}
             onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
             placeholder="Mahalle, sokak, bina no..."
           />
         </div>
@@ -328,18 +312,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             <select
               value={newOrder.customer_city}
               onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                appearance: 'none',
-                cursor: 'pointer'
-              }}
+              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
             >
               <option value="">İl Seçin</option>
               {cities.map(city => (
@@ -352,18 +325,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             <select
               value={newOrder.customer_district}
               onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                appearance: 'none',
-                cursor: 'pointer'
-              }}
+              style={{ ...inputStyle, appearance: 'none', cursor: 'pointer' }}
               disabled={!newOrder.customer_city}
             >
               <option value="">İlçe Seçin</option>
@@ -385,16 +347,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
               updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
               setNewOrder({ ...newOrder, products: updatedProducts })
             }}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
             placeholder="Ürün adı"
           />
         </div>
@@ -411,17 +364,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
                 updatedProducts[0] = { ...updatedProducts[0], quantity: parseInt(e.target.value) || 1 }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               min="1"
             />
           </div>
@@ -435,17 +378,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
                 updatedProducts[0] = { ...updatedProducts[0], unit_price: e.target.value }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               placeholder="₺"
             />
           </div>
@@ -459,17 +392,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
                 updatedProducts[0] = { ...updatedProducts[0], kdv_rate: e.target.value }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={{
-                width: '100%',
-                padding: '14px 16px',
-                background: 'rgba(26, 26, 46, 0.8)',
-                border: '1px solid #2a2a3e',
-                borderRadius: '12px',
-                color: '#fff',
-                fontSize: '16px',
-                boxSizing: 'border-box',
-                textAlign: 'center'
-              }}
+              style={{ ...inputStyle, textAlign: 'center' }}
               placeholder="0"
             />
           </div>
@@ -482,16 +405,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             type="text"
             value={newOrder.note}
             onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
-            style={{
-              width: '100%',
-              padding: '14px 16px',
-              background: 'rgba(26, 26, 46, 0.8)',
-              border: '1px solid #2a2a3e',
-              borderRadius: '12px',
-              color: '#fff',
-              fontSize: '16px',
-              boxSizing: 'border-box'
-            }}
+            style={inputStyle}
             placeholder="Özel talep, açıklama..."
           />
         </div>
@@ -1115,6 +1029,7 @@ export default function HomePage() {
           setNewOrder={setNewOrder}
           handleAddOrder={handleAddOrder}
           turkeyData={turkeyData}
+          isDark={isDark}
         />
 
         {/* Success Toast */}
