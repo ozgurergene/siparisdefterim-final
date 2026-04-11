@@ -206,7 +206,7 @@ function SuccessToast({ show, message }) {
   )
 }
 
-// Mobile Add Order Modal - Same design as Edit Modal
+// Mobile Add Order Modal
 function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true }) {
   if (!isOpen) return null
 
@@ -511,7 +511,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
-// Bottom Tab Bar Component - Same as Dashboard
+// Bottom Tab Bar Component
 function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
@@ -615,7 +615,6 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
 }
 
 // Mobile Completed Order Card
-// Highlight matching text
 function HighlightText({ text, searchTerm, color = '#fff' }) {
   if (!searchTerm || !searchTerm.trim()) {
     return <span>{text}</span>
@@ -878,10 +877,8 @@ export default function CompletedPage() {
     setOrdersCreatedCount(ordersCreatedCount + 1)
   }
 
-  // Siparişi tekrarla - geçmiş siparişin bilgilerini modal'a doldur
+  // Siparişi tekrarla
   const handleRepeatOrder = (order) => {
-    // Parse product string back to products array
-    // Format: "Ürün1 x2 (₺100.00), Ürün2 x1 (₺50.00)" or "Ürün1 x2, Ürün2 x1"
     const productParts = order.product.split(', ')
     const totalPrice = parseFloat(order.price) || 0
     const totalQuantity = productParts.reduce((sum, part) => {
@@ -889,11 +886,9 @@ export default function CompletedPage() {
       return sum + (match ? parseInt(match[1]) : 1)
     }, 0)
     
-    // Estimate unit price by dividing total by quantity
     const estimatedUnitPrice = totalQuantity > 0 ? (totalPrice / totalQuantity).toFixed(2) : ''
     
     const products = productParts.map(part => {
-      // Try to match "Ürün x2 (₺100.00)" or "Ürün x2"
       const matchWithPrice = part.match(/^(.+?)\s*x(\d+)\s*\(₺?([\d.]+)\)?$/)
       const matchSimple = part.match(/^(.+?)\s*x(\d+)$/)
       
@@ -920,7 +915,6 @@ export default function CompletedPage() {
       }
     })
 
-    // Fill the form with order data
     setNewOrder({
       customer_name: order.customer_name || '',
       customer_phone: order.customer_phone || '',
@@ -931,7 +925,6 @@ export default function CompletedPage() {
       note: order.note || ''
     })
 
-    // Open the add order modal
     setShowAddModal(true)
   }
 
@@ -993,7 +986,7 @@ export default function CompletedPage() {
             ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
             : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)'
         }}>
-          {/* Mobile Header */}
+          {/* Mobile Header - Ana Sayfa ile aynı hizalama */}
           <div style={{
             padding: '16px 16px 10px 16px',
             display: 'flex',
@@ -1012,20 +1005,13 @@ export default function CompletedPage() {
                   display: 'flex',
                   alignItems: 'center',
                   justifyContent: 'center',
+                  transition: 'transform 0.2s ease, box-shadow 0.2s ease',
                   boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.1)'
                 }}
               >
                 <HomeIcon size={18} />
               </button>
               <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
-              <span style={{
-                background: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
-                color: '#22c55e',
-                fontSize: '11px',
-                padding: '3px 8px',
-                borderRadius: '10px',
-                fontWeight: '500'
-              }}>{filteredOrders.length}</span>
             </div>
             
             {/* Avatar */}
@@ -1042,7 +1028,8 @@ export default function CompletedPage() {
                 fontSize: '13px',
                 fontWeight: 'bold',
                 cursor: 'pointer',
-                boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none'
+                boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : '0 4px 15px rgba(102, 126, 234, 0.3)',
+                transition: 'box-shadow 0.2s ease'
               }}
             >
               {getInitials(user.email)}
@@ -1193,7 +1180,7 @@ export default function CompletedPage() {
     )
   }
 
-  // ========== DESKTOP VIEW (unchanged) ==========
+  // ========== DESKTOP VIEW ==========
   return (
     <div style={{ 
       minHeight: '100vh', 
