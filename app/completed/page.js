@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
@@ -719,6 +719,7 @@ function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }
 
 export default function CompletedPage() {
   const router = useRouter()
+  const pathname = usePathname()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [completedOrders, setCompletedOrders] = useState([])
@@ -942,6 +943,11 @@ export default function CompletedPage() {
     const orderDate = new Date(order.updated_at)
     return orderDate >= oneWeekAgo
   }).length
+
+  // Progress bar için hesaplama
+  const maxOrders = 50
+  const progressPercent = Math.min((ordersCreatedCount / maxOrders) * 100, 100)
+  const progressColor = ordersCreatedCount >= 50 ? '#ff6b6b' : ordersCreatedCount >= 40 ? '#fbbf24' : '#667eea'
 
   if (loading || !user) {
     return (
@@ -1180,7 +1186,7 @@ export default function CompletedPage() {
     )
   }
 
-  // ========== DESKTOP VIEW ==========
+  // ========== DESKTOP VIEW - HOME İLE AYNI HEADER YAPISI ==========
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -1194,18 +1200,30 @@ export default function CompletedPage() {
       overflowX: 'hidden',
       boxSizing: 'border-box'
     }}>
-      {/* Header */}
-      <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 24px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
-          
+      {/* Header - HOME İLE AYNI YAPI */}
+      <div style={{ 
+        background: c.header, 
+        borderBottom: `1px solid ${c.border}`, 
+        padding: '12px 24px',
+        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
+      }}>
+        <div style={{ 
+          display: 'flex', 
+          justifyContent: 'space-between', 
+          alignItems: 'center',
+          maxWidth: '1400px',
+          margin: '0 auto'
+        }}>
+          {/* Sol: Home Icon + Logo + Nav Buttons */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+            {/* Home Icon Button */}
             <button
               onClick={() => router.push('/home')}
               style={{
-                padding: '8px',
+                padding: '10px',
                 background: c.bgSecondary,
                 border: `1px solid ${c.border}`,
-                borderRadius: '8px',
+                borderRadius: '10px',
                 cursor: 'pointer',
                 display: 'flex',
                 alignItems: 'center',
@@ -1222,51 +1240,131 @@ export default function CompletedPage() {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              <HomeIcon size={22} />
+              <HomeIcon size={20} />
             </button>
-            <h1 
-              onClick={() => router.push('/home')}
-              style={{ 
-                margin: 0, 
-                fontSize: '24px', 
-                color: c.text,
-                cursor: 'pointer',
-                transition: 'opacity 0.2s'
-              }}
-              onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
-              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-            >
-              📱 SiparişDefterim
-            </h1>
-          </div>
-          
-          <div style={{ display: 'flex', gap: '10px' }}>
-            <button
-              onClick={() => router.push('/dashboard')}
-              style={{ padding: '8px 16px', background: c.bgSecondary, border: `1px solid ${c.border}`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: c.text }}
-            >
-              📋 Siparişler
-            </button>
-            <button
-              style={{ padding: '8px 16px', background: '#95e1d3', border: '2px solid #1D9E75', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: '#085041' }}
-            >
-              ✓ Tamamlananlar
-            </button>
+            
+            {/* Logo */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '20px' }}>📱</span>
+              <h1 
+                onClick={() => router.push('/home')}
+                style={{ 
+                  fontSize: '18px', 
+                  fontWeight: '600', 
+                  color: c.text,
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  margin: 0,
+                  cursor: 'pointer'
+                }}
+              >
+                SiparişDefterim
+              </h1>
+            </div>
+
+            {/* Navigation Tabs */}
+            <nav style={{ display: 'flex', gap: '8px', marginLeft: '20px' }}>
+              <button
+                onClick={() => router.push('/dashboard')}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.3s ease',
+                  background: pathname === '/dashboard' 
+                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                    : 'rgba(102, 126, 234, 0.1)',
+                  color: pathname === '/dashboard' ? 'white' : c.text,
+                  boxShadow: pathname === '/dashboard' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
+                }}
+                onMouseEnter={(e) => {
+                  if (pathname !== '/dashboard') {
+                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.2)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (pathname !== '/dashboard') {
+                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.1)'
+                  }
+                }}
+              >
+                <span>📦</span>
+                Siparişler
+              </button>
+
+              <button
+                onClick={() => router.push('/completed')}
+                style={{
+                  padding: '10px 20px',
+                  borderRadius: '10px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'all 0.3s ease',
+                  background: pathname === '/completed' 
+                    ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' 
+                    : 'rgba(67, 233, 123, 0.1)',
+                  color: pathname === '/completed' ? 'white' : c.text,
+                  boxShadow: pathname === '/completed' ? '0 4px 15px rgba(67, 233, 123, 0.4)' : 'none',
+                }}
+                onMouseEnter={(e) => {
+                  if (pathname !== '/completed') {
+                    e.currentTarget.style.background = 'rgba(67, 233, 123, 0.2)'
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (pathname !== '/completed') {
+                    e.currentTarget.style.background = 'rgba(67, 233, 123, 0.1)'
+                  }
+                }}
+              >
+                <span>✅</span>
+                Tamamlananlar
+              </button>
+            </nav>
           </div>
 
-          <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-            <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
+          {/* Sağ: Progress + Theme + User + Logout */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            {/* Order Progress */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <span style={{ fontSize: '13px', fontWeight: '500', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/{maxOrders}</span>
+              <div style={{ width: '80px', height: '6px', background: c.border, borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${progressPercent}%`, height: '100%', background: `linear-gradient(90deg, #667eea, ${progressColor})`, borderRadius: '3px', transition: 'width 0.5s ease' }} />
+              </div>
+            </div>
+
+            {/* User Email */}
+            <span style={{ fontSize: '13px', color: c.textSecondary }}>{user.email}</span>
+
+            {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
               style={{
-                padding: '8px 12px',
-                background: c.bgSecondary,
+                width: '40px',
+                height: '40px',
+                borderRadius: '10px',
                 border: `1px solid ${c.border}`,
-                borderRadius: '6px',
+                background: c.bgSecondary,
                 cursor: 'pointer',
-                fontSize: '16px',
-                transition: 'transform 0.2s, box-shadow 0.2s'
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '18px',
+                transition: 'all 0.2s ease',
               }}
+              title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'scale(1.05)'
                 e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : '0 4px 15px rgba(255, 193, 7, 0.5)'
@@ -1276,19 +1374,23 @@ export default function CompletedPage() {
                 e.currentTarget.style.boxShadow = 'none'
               }}
             >
-              {theme === 'light' ? '🌙' : '☀️'}
+              {theme === 'dark' ? '☀️' : '🌙'}
             </button>
+
+            {/* Logout Button */}
             <button
               onClick={handleLogout}
               style={{
-                padding: '8px 15px',
-                background: '#ff6b6b',
+                padding: '10px 20px',
+                background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%)',
                 color: 'white',
                 border: 'none',
-                borderRadius: '6px',
+                borderRadius: '10px',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                transition: 'transform 0.2s, box-shadow 0.2s'
+                fontWeight: '600',
+                fontSize: '14px',
+                transition: 'all 0.2s ease',
+                boxShadow: '0 2px 8px rgba(255, 107, 107, 0.3)'
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.transform = 'scale(1.05)'
@@ -1296,7 +1398,7 @@ export default function CompletedPage() {
               }}
               onMouseOut={(e) => {
                 e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = 'none'
+                e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 107, 107, 0.3)'
               }}
             >
               Çıkış
