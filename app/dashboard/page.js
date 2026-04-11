@@ -1598,15 +1598,15 @@ export default function DashboardPage() {
             </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(251, 191, 36, 0.12)' : 'rgba(251, 191, 36, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bekleyen</span>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Ödeme Bekleniyor</span>
             </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{toShipOrders}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Verilecek</span>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargoya Verilecek</span>
             </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargo</span>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargoda</span>
             </div>
           </div>
 
