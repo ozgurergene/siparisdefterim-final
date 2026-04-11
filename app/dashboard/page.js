@@ -1382,14 +1382,12 @@ export default function DashboardPage() {
     setShowSuccessToast(true)
     setTimeout(() => setShowSuccessToast(false), 3000)
   }
-
   const deleteOrder = async (orderId) => {
     if (!confirm('Siparişi silmek istediğinize emin misiniz?')) return
     const { error } = await supabase.from('orders').delete().eq('id', orderId)
     if (error) { alert('Sipariş silinemedi.'); return }
     setOrders(orders.filter(o => o.id !== orderId))
-    setOrdersCreatedCount(ordersCreatedCount - 1)
-    await supabase.from('users').update({ orders_created_count: ordersCreatedCount - 1 }).eq('id', user.id)
+    // Sipariş sayısı azaltılamıyor - ücretsiz plan kotası için kullanılan hak geri verilemez.
   }
 
   const updateOrderStatus = async (orderId, newStatus) => {
