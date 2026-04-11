@@ -1318,7 +1318,9 @@ export default function DashboardPage() {
       const { data: ordersData } = await supabase.from('orders').select('*').eq('user_id', userId).order('created_at', { ascending: false })
       const allOrders = ordersData || []
       setOrders(allOrders.filter(o => o.status !== 'completed'))
-      setOrdersCreatedCount(allOrders.length)
+      // Kota sayısını users tablosundaki orders_created_count'tan oku
+      const { data: freshUserData } = await supabase.from('users').select('orders_created_count').eq('id', userId).single()
+      setOrdersCreatedCount(freshUserData?.orders_created_count || 0)
     } catch (error) {
       console.error('fetchUserData error:', error)
     }
@@ -1384,10 +1386,28 @@ export default function DashboardPage() {
   }
   const deleteOrder = async (orderId) => {
     if (!confirm('Siparişi silmek istediğinize emin misiniz?')) return
+    
+    // Silinecek siparişin created_at bilgisini bul
+    const orderToDelete = orders.find(o => o.id === orderId)
+    
     const { error } = await supabase.from('orders').delete().eq('id', orderId)
     if (error) { alert('Sipariş silinemedi.'); return }
     setOrders(orders.filter(o => o.id !== orderId))
-    // Sipariş sayısı azaltılamıyor - ücretsiz plan kotası için kullanılan hak geri verilemez.
+    
+    // 12 saat kontrolü: sipariş 12 saatten önce oluşturulduysa kota iade et
+    if (orderToDelete) {
+      const createdAt = new Date(orderToDelete.created_at)
+      const now = new Date()
+      const hoursDiff = (now - createdAt) / (1000 * 60 * 60)
+      
+      if (hoursDiff < 12) {
+        // 12 saatten az geçmiş - kotayı 1 azalt (iade)
+        const newCount = Math.max(0, ordersCreatedCount - 1)
+        await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
+        setOrdersCreatedCount(newCount)
+      }
+      // 12 saatten fazla geçmişse kota değişmez - hak yanmış
+    }
   }
 
   const updateOrderStatus = async (orderId, newStatus) => {

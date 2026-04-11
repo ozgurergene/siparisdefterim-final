@@ -797,14 +797,15 @@ export default function CompletedPage() {
   }, [searchName, completedOrders])
 
   const fetchCompletedOrders = async (userId) => {
-    // Fetch all orders to get total count for profile popup
+    // Fetch all orders to get completed list
     const { data: allOrders } = await supabase
       .from('orders')
       .select('*')
       .eq('user_id', userId)
     
-    // Set total orders count
-    setOrdersCreatedCount(allOrders?.length || 0)
+    // Kota sayısını users tablosundaki orders_created_count'tan oku
+    const { data: userData } = await supabase.from('users').select('orders_created_count').eq('id', userId).single()
+    setOrdersCreatedCount(userData?.orders_created_count || 0)
     
     // Filter and set completed orders
     const completed = (allOrders || []).filter(o => o.status === 'completed')
@@ -860,6 +861,11 @@ export default function CompletedPage() {
       return
     }
     
+    // Kota güncelle - users tablosunda orders_created_count'u artır
+    const newCount = ordersCreatedCount + 1
+    await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
+    setOrdersCreatedCount(newCount)
+    
     // Reset form
     setNewOrder({
       customer_name: '',
@@ -874,8 +880,6 @@ export default function CompletedPage() {
     // Show success toast
     setShowSuccessToast(true)
     setTimeout(() => setShowSuccessToast(false), 3000)
-    
-    setOrdersCreatedCount(ordersCreatedCount + 1)
   }
 
   // Siparişi tekrarla

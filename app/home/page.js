@@ -677,7 +677,9 @@ export default function HomePage() {
       .eq('user_id', userId)
 
     const orders = allOrders || []
-    setOrdersCreatedCount(orders.length)
+    // Kota sayısını users tablosundaki orders_created_count'tan oku
+    const { data: userData } = await supabase.from('users').select('orders_created_count').eq('id', userId).single()
+    setOrdersCreatedCount(userData?.orders_created_count || 0)
 
     const activeOrders = orders.filter(o => o.status !== 'completed')
     const completedOrders = orders.filter(o => o.status === 'completed')
@@ -756,6 +758,11 @@ export default function HomePage() {
       return
     }
     
+    // Kota güncelle - users tablosunda orders_created_count'u artır
+    const newCount = ordersCreatedCount + 1
+    await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
+    setOrdersCreatedCount(newCount)
+    
     // Reset form
     setNewOrder({
       customer_name: '',
@@ -773,7 +780,6 @@ export default function HomePage() {
     
     // Refresh stats
     await fetchStats(user.id)
-    setOrdersCreatedCount(ordersCreatedCount + 1)
   }
 
   const handleTabChange = (tabId) => {
