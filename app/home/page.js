@@ -684,8 +684,8 @@ export default function HomePage() {
     
     // Ödeme Bekleyen = sadece payment_pending durumundakiler
     const pending = activeOrders.filter(o => o.status === 'payment_pending').length
-    // Kargoya Verilecek = preparing (Paketlendi) durumundakiler
-    const preparing = activeOrders.filter(o => o.status === 'preparing').length
+    // Kargoya Verilecek = paid (Ödeme Alındı) + preparing (Paketlendi) durumundakiler
+    const toShip = activeOrders.filter(o => o.status === 'paid' || o.status === 'preparing').length
     // Kargo Sürecinde = shipped (Kargoda) durumundakiler
     const shipped = activeOrders.filter(o => o.status === 'shipped').length
     
@@ -706,7 +706,7 @@ export default function HomePage() {
     setStats({
       total: activeOrders.length,
       pending,
-      preparing,
+      toShip,
       shipped,
       completed: completedOrders.length,
       todayRevenue,
@@ -801,7 +801,7 @@ export default function HomePage() {
   const metricCards = [
     { label: 'Aktif Siparişler', value: stats.total, icon: '📦', gradient: metricGradients.active, glow: glowEffects.primary },
     { label: 'Ödeme Bekleyen', value: stats.pending, icon: '💰', gradient: metricGradients.pending, glow: glowEffects.danger },
-    { label: 'Kargoya Verilecek', value: stats.preparing, icon: '📦', gradient: metricGradients.completed, glow: glowEffects.primary },
+    { label: 'Kargoya Verilecek', value: stats.toShip, icon: '📦', gradient: metricGradients.completed, glow: glowEffects.primary },
     { label: 'Kargo Sürecinde', value: stats.shipped, icon: '🚚', gradient: metricGradients.shipped, glow: glowEffects.info },
   ]
 
