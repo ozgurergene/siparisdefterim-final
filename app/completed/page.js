@@ -1249,15 +1249,18 @@ export default function CompletedPage() {
               <h1 
                 onClick={() => router.push('/home')}
                 style={{ 
-                  fontSize: '18px', 
+                  fontSize: '24px', 
                   fontWeight: '600', 
-                  color: c.text,
                   background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
                   margin: 0,
-                  cursor: 'pointer'
+                  cursor: 'pointer',
+                  transition: 'opacity 0.2s'
                 }}
+                onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
+                onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
               >
                 SiparişDefterim
               </h1>

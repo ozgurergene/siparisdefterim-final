@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { colors } from '../lib/theme'
 
 // Gradient Home Icon SVG Component
@@ -40,6 +40,7 @@ function HomeIcon({ size = 24 }) {
 export default function Header({ user, ordersCreatedCount, theme, toggleTheme, handleLogout }) {
   const c = colors[theme]
   const router = useRouter()
+  const pathname = usePathname()
 
   return (
     <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
@@ -72,53 +73,119 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
           >
             <HomeIcon size={22} />
           </button>
-          <h1 
-            onClick={() => router.push('/home')}
-            style={{ 
-              margin: 0, 
-              fontSize: '24px', 
-              color: c.text,
-              cursor: 'pointer',
-              transition: 'opacity 0.2s'
-            }}
-            onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
-            onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-          >
-            📱 SiparişDefterim
-          </h1>
+          
+          {/* Logo with gradient text */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '20px' }}>📱</span>
+            <h1 
+              onClick={() => router.push('/home')}
+              style={{ 
+                margin: 0, 
+                fontSize: '24px', 
+                fontWeight: '600',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                cursor: 'pointer',
+                transition: 'opacity 0.2s'
+              }}
+              onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
+              onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
+            >
+              SiparişDefterim
+            </h1>
+          </div>
         </div>
         
-        <div style={{ display: 'flex', gap: '10px' }}>
+        {/* Navigation Tabs */}
+        <nav style={{ display: 'flex', gap: '8px', marginLeft: '20px' }}>
           <button
-            style={{ padding: '8px 16px', background: '#007bff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: 'white' }}
+            onClick={() => router.push('/dashboard')}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              background: pathname === '/dashboard' 
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                : 'rgba(102, 126, 234, 0.1)',
+              color: pathname === '/dashboard' ? 'white' : c.text,
+              boxShadow: pathname === '/dashboard' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (pathname !== '/dashboard') {
+                e.currentTarget.style.background = 'rgba(102, 126, 234, 0.2)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (pathname !== '/dashboard') {
+                e.currentTarget.style.background = 'rgba(102, 126, 234, 0.1)'
+              }
+            }}
           >
-            📋 Siparişler
+            <span>📦</span>
+            Siparişler
           </button>
+
           <button
             onClick={() => router.push('/completed')}
-            style={{ padding: '8px 16px', background: c.bgSecondary, border: `2px solid #1D9E75`, borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold', fontSize: '14px', color: '#1D9E75' }}
+            style={{
+              padding: '10px 20px',
+              borderRadius: '10px',
+              border: 'none',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '500',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              transition: 'all 0.3s ease',
+              background: pathname === '/completed' 
+                ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' 
+                : 'rgba(67, 233, 123, 0.1)',
+              color: pathname === '/completed' ? 'white' : c.text,
+              boxShadow: pathname === '/completed' ? '0 4px 15px rgba(67, 233, 123, 0.4)' : 'none',
+            }}
+            onMouseEnter={(e) => {
+              if (pathname !== '/completed') {
+                e.currentTarget.style.background = 'rgba(67, 233, 123, 0.2)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (pathname !== '/completed') {
+                e.currentTarget.style.background = 'rgba(67, 233, 123, 0.1)'
+              }
+            }}
           >
-            ✓ Tamamlananlar
+            <span>✅</span>
+            Tamamlananlar
           </button>
-        </div>
+        </nav>
 
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
           <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: '0 0 5px 0', fontSize: '16px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
-            <div style={{ width: '150px', height: '8px', background: c.bgSecondary, borderRadius: '4px', overflow: 'hidden' }}>
-              <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : '#007bff', transition: 'width 0.3s' }} />
+            <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
+            <div style={{ width: '100px', height: '6px', background: c.bgSecondary, borderRadius: '3px', overflow: 'hidden' }}>
+              <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : 'linear-gradient(90deg, #667eea, #764ba2)', transition: 'width 0.3s' }} />
             </div>
           </div>
-          <span style={{ color: c.textSecondary, fontSize: '16px', minWidth: '120px' }}>{user.email}</span>
+          <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
           
-          {/* Theme Toggle Button with Yellow/Orange glow */}
+          {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
             style={{
               padding: '8px 12px',
               background: c.bgSecondary,
               border: `1px solid ${c.border}`,
-              borderRadius: '6px',
+              borderRadius: '8px',
               cursor: 'pointer',
               fontSize: '16px',
               transition: 'transform 0.2s, box-shadow 0.2s'
@@ -135,7 +202,7 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
           
-          {/* Logout Button with Red glow */}
+          {/* Logout Button */}
           <button
             onClick={handleLogout}
             style={{
