@@ -1477,8 +1477,8 @@ export default function DashboardPage() {
 
   const activeOrders = orders.filter(o => o.status !== 'completed').length
   const pendingPayments = orders.filter(o => o.status === 'payment_pending').length
+  const toShipOrders = orders.filter(o => o.status === 'paid' || o.status === 'preparing').length
   const shippedOrders = orders.filter(o => o.status === 'shipped').length
-  const completedCount = ordersCreatedCount - activeOrders
 
   if (loading || !user) {
     return (
@@ -1600,13 +1600,13 @@ export default function DashboardPage() {
               <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
               <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bekleyen</span>
             </div>
+            <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
+              <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{toShipOrders}</p>
+              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Verilecek</span>
+            </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
               <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargo</span>
-            </div>
-            <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
-              <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{completedCount}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Bitti</span>
             </div>
           </div>
 
@@ -1773,16 +1773,12 @@ export default function DashboardPage() {
             <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#f39c12' }}>{pendingPayments}</p>
           </div>
           <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>🚚 Kargoda</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#9b59b6' }}>{shippedOrders}</p>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📦 Kargoya Verilecek</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#667eea' }}>{toShipOrders}</p>
           </div>
           <div style={{ background: c.header, padding: '20px', borderRadius: '8px', border: `1px solid ${c.border}` }}>
-            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>📅 Bugün Eklenen</p>
-            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#1D9E75' }}>{orders.filter(o => {
-              const orderDate = new Date(o.created_at)
-              const today = new Date()
-              return orderDate.toDateString() === today.toDateString()
-            }).length}</p>
+            <p style={{ margin: '0 0 8px 0', fontSize: '13px', color: c.textSecondary }}>🚚 Kargo Sürecinde</p>
+            <p style={{ margin: 0, fontSize: '28px', fontWeight: 'bold', color: '#9b59b6' }}>{shippedOrders}</p>
           </div>
         </div>
 

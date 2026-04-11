@@ -1018,8 +1018,17 @@ export default function CompletedPage() {
                 <HomeIcon size={18} />
               </button>
               <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
+              <span style={{
+                background: isDark ? 'rgba(34, 197, 94, 0.2)' : 'rgba(34, 197, 94, 0.15)',
+                color: '#22c55e',
+                fontSize: '11px',
+                padding: '3px 8px',
+                borderRadius: '10px',
+                fontWeight: '500'
+              }}>{filteredOrders.length}</span>
             </div>
             
+            {/* Avatar */}
             <div
               onClick={() => setShowProfilePopup(!showProfilePopup)}
               style={{
