@@ -15,9 +15,9 @@ export default function Footer({ theme }) {
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '10px', flexWrap: 'wrap' }}>
-          <a href="/gizlilik" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Gizlilik Politikası</a>
-          <a href="/kullanim" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Kullanım Koşulları</a>
-          <a href="/kvkk" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>KVKK Aydınlatma</a>
+          <a href="/privacy-policy" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Gizlilik Politikası</a>
+          <a href="/terms-of-use" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Kullanım Koşulları</a>
+          <a href="/gdpr-disclosure" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>KVKK Aydınlatma</a>
         </div>
         <p style={{ margin: 0, fontSize: '12px', color: c.textSecondary }}>
           © 2026 Deftertut.com - Tüm hakları saklıdır.

@@ -30,8 +30,9 @@ export function SkeletonBox({ width, height, borderRadius = 4, theme = 'light' }
     <div style={{
       width,
       height,
-      background: `linear-gradient(90deg, ${c.bgSecondary} 25%, ${c.border} 50%, ${c.bgSecondary} 75%)`,
+      backgroundImage: `linear-gradient(90deg, ${c.bgSecondary} 25%, ${c.border} 50%, ${c.bgSecondary} 75%)`,
       backgroundSize: '200% 100%',
+      backgroundRepeat: 'no-repeat',
       animation: 'shimmer 1.5s infinite',
       borderRadius
     }}>

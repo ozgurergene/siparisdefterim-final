@@ -345,7 +345,7 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
                       e.currentTarget.style.transform = 'scale(1)'
                       e.currentTarget.style.boxShadow = 'none'
                     }}
-                  >➕</button>
+                  >+</button>
                 </div>
               </th>
               <th style={{ padding: '8px', textAlign: 'center', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, width: '8%', color: c.text }}>Adet</th>
@@ -434,24 +434,21 @@ export default function OrderForm({ newOrder, setNewOrder, ordersCreatedCount, h
 
       <button 
         onClick={handleAddOrder} 
-        disabled={ordersCreatedCount >= 50} 
         style={{ 
           width: '100%', 
           padding: '12px', 
-          background: ordersCreatedCount >= 50 ? '#ccc' : '#007bff', 
+          background: '#007bff', 
           color: 'white', 
           border: 'none', 
           borderRadius: '6px', 
-          cursor: ordersCreatedCount >= 50 ? 'not-allowed' : 'pointer', 
+          cursor: 'pointer', 
           fontWeight: 'bold', 
           fontSize: '14px',
           transition: 'transform 0.2s, box-shadow 0.2s'
         }}
         onMouseOver={(e) => {
-          if (ordersCreatedCount < 50) {
-            e.currentTarget.style.transform = 'scale(1.02)'
-            e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
-          }
+          e.currentTarget.style.transform = 'scale(1.02)'
+          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
         }}
         onMouseOut={(e) => {
           e.currentTarget.style.transform = 'scale(1)'

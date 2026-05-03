@@ -1,11 +1,27 @@
-'use client';
+'use client'
 
-import { useRouter } from 'next/navigation';
+import { colors } from '../../lib/theme'
 
-export default function UpgradeModal({ isOpen, onClose }) {
-  const router = useRouter();
+// Lemon Squeezy Checkout URLs (Test Mode)
+const CHECKOUT_URLS = {
+  monthly: 'https://siparisdefterim-final.lemonsqueezy.com/checkout/buy/c2ec9f39-40ec-4f7a-a0eb-f6a6f5ce2461',
+  yearly: 'https://siparisdefterim-final.lemonsqueezy.com/checkout/buy/a4c6b3d5-dc9b-4375-babf-69ab15ca4999'
+}
 
-  if (!isOpen) return null;
+const SUPPORT_EMAIL = 'destek@deftertut.com'
+
+export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
+  const c = colors[theme]
+
+  if (!isOpen) return null
+
+  const handleMonthly = () => {
+    window.open(CHECKOUT_URLS.monthly, '_blank')
+  }
+
+  const handleYearly = () => {
+    window.open(CHECKOUT_URLS.yearly, '_blank')
+  }
 
   return (
     <div style={{
@@ -14,202 +30,195 @@ export default function UpgradeModal({ isOpen, onClose }) {
       left: 0,
       right: 0,
       bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.7)',
+      background: 'rgba(0,0,0,0.7)',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       zIndex: 1000,
+      padding: '20px',
+      animation: 'fadeIn 0.2s ease'
     }}>
       <div style={{
-        backgroundColor: '#F5F5F5',
+        background: c.header,
+        padding: '35px',
         borderRadius: '16px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.2)',
-        padding: '60px 40px',
-        maxWidth: '500px',
-        width: '90%',
+        maxWidth: '440px',
+        width: '100%',
         textAlign: 'center',
+        border: `1px solid ${c.border}`,
+        boxShadow: '0 20px 60px rgba(0,0,0,0.4)'
       }}>
-        
-        {/* WARNING ICON */}
-        <div style={{
-          width: '80px',
-          height: '80px',
-          backgroundColor: '#FF9800',
-          borderRadius: '50%',
-          margin: '0 auto 24px',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '40px',
-          color: '#FFFFFF',
-        }}>
-          ⚠️
-        </div>
+        {/* Icon */}
+        <div style={{ fontSize: '64px', marginBottom: '15px' }}>🚀</div>
 
-        {/* TITLE */}
-        <h2 style={{
-          fontSize: '28px',
-          fontWeight: 'bold',
-          color: '#333',
-          margin: '0 0 16px 0',
-        }}>
-          LİMİT AŞILDI!
+        {/* Title */}
+        <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: c.text }}>
+          Limit Doldu!
         </h2>
 
-        {/* SUBTITLE */}
-        <p style={{
-          fontSize: '16px',
-          color: '#666',
-          margin: '0 0 32px 0',
-          lineHeight: '1.6',
-        }}>
-          Ücretsiz planda <strong>50 sipariş</strong>'e kadar sipariş oluşturabilirsiniz.
+        {/* Subtitle */}
+        <p style={{ margin: '0 0 25px 0', fontSize: '15px', color: c.textSecondary, lineHeight: '1.6' }}>
+          50 sipariş limitine ulaştınız. Pro'ya yükselterek{' '}
+          <strong style={{ color: '#667eea' }}>sınırsız sipariş</strong>{' '}
+          oluşturabilirsiniz.
         </p>
 
-        {/* LIMIT INFO */}
+        {/* Features */}
         <div style={{
-          backgroundColor: '#FFF3E0',
-          border: '2px solid #FF9800',
-          borderRadius: '12px',
-          padding: '20px',
-          marginBottom: '32px',
+          background: c.bgSecondary,
+          padding: '18px',
+          borderRadius: '10px',
+          marginBottom: '20px',
+          textAlign: 'left'
         }}>
-          <p style={{
-            fontSize: '14px',
-            color: '#E65100',
-            margin: '0',
-            fontWeight: '600',
-          }}>
-            📊 Mevcut durumu: 50/50 sipariş
-          </p>
-        </div>
-
-        {/* BENEFITS */}
-        <div style={{
-          backgroundColor: '#F9F9F9',
-          border: '2px solid #EEEEEE',
-          borderRadius: '12px',
-          padding: '20px',
-          marginBottom: '32px',
-          textAlign: 'left',
-        }}>
-          <p style={{
-            fontSize: '12px',
-            color: '#999',
-            margin: '0 0 12px 0',
-            textTransform: 'uppercase',
-            fontWeight: '600',
-          }}>
-            Pro Plana Yükselt ve Şunları Kazan:
-          </p>
-          <div style={{ fontSize: '14px', color: '#333', lineHeight: '1.8' }}>
-            <div>✓ <strong>Sınırsız sipariş</strong></div>
-            <div>✓ Gelişmiş raporlar</div>
-            <div>✓ WhatsApp bildirimleri</div>
-            <div>✓ Gelişmiş analitik</div>
-            <div>✓ Öncelikli destek</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            <span style={{ color: '#1D9E75', fontSize: '16px', fontWeight: 'bold' }}>✓</span>
+            <span style={{ color: c.text, fontSize: '14px' }}>Sınırsız sipariş oluşturma</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '10px' }}>
+            <span style={{ color: '#1D9E75', fontSize: '16px', fontWeight: 'bold' }}>✓</span>
+            <span style={{ color: c.text, fontSize: '14px' }}>Gelişmiş raporlama</span>
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ color: '#1D9E75', fontSize: '16px', fontWeight: 'bold' }}>✓</span>
+            <span style={{ color: c.text, fontSize: '14px' }}>Öncelikli destek</span>
           </div>
         </div>
 
-        {/* PRICING */}
-        <div style={{
-          backgroundColor: '#E8F5E9',
-          border: '2px solid #4CAF50',
-          borderRadius: '12px',
-          padding: '16px',
-          marginBottom: '32px',
-        }}>
-          <p style={{
-            fontSize: '12px',
-            color: '#2E7D32',
-            margin: '0 0 8px 0',
-            textTransform: 'uppercase',
-            fontWeight: '600',
-          }}>
-            Fiyatlandırma
-          </p>
-          <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
-            <div>
-              <p style={{ fontSize: '12px', color: '#666', margin: '0 0 4px 0' }}>Aylık</p>
-              <p style={{ fontSize: '24px', color: '#4CAF50', fontWeight: 'bold', margin: '0' }}>
-                ₺99<span style={{ fontSize: '14px' }}>/ay</span>
-              </p>
-            </div>
-            <div style={{ borderLeft: '2px solid #DDD' }}></div>
-            <div>
-              <p style={{ fontSize: '12px', color: '#666', margin: '0 0 4px 0' }}>Yıllık</p>
-              <p style={{ fontSize: '24px', color: '#4CAF50', fontWeight: 'bold', margin: '0' }}>
-                ₺999<span style={{ fontSize: '14px' }}>/yıl</span>
-              </p>
-            </div>
-          </div>
+        {/* Pricing Cards - Now Clickable */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
+          {/* Monthly - Clickable */}
+          <button
+            onClick={handleMonthly}
+            style={{
+              flex: 1,
+              background: c.bgSecondary,
+              padding: '14px',
+              borderRadius: '10px',
+              border: `1px solid ${c.border}`,
+              cursor: 'pointer',
+              textAlign: 'center',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            <p style={{ margin: '0 0 6px 0', fontSize: '11px', color: c.textSecondary, textTransform: 'uppercase', letterSpacing: '0.5px' }}>
+              Aylık
+            </p>
+            <p style={{ margin: 0, fontSize: '22px', fontWeight: 'bold', color: c.text }}>
+              ₺99<span style={{ fontSize: '12px', color: c.textSecondary, fontWeight: 'normal' }}>/ay</span>
+            </p>
+          </button>
+
+          {/* Yearly - Clickable, highlighted */}
+          <button
+            onClick={handleYearly}
+            style={{
+              flex: 1,
+              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+              padding: '14px',
+              borderRadius: '10px',
+              border: '1px solid #667eea',
+              position: 'relative',
+              cursor: 'pointer',
+              textAlign: 'center',
+              transition: 'transform 0.2s, box-shadow 0.2s'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.transform = 'translateY(-2px)'
+              e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.transform = 'translateY(0)'
+              e.currentTarget.style.boxShadow = 'none'
+            }}
+          >
+            <span style={{
+              position: 'absolute',
+              top: '-8px',
+              right: '8px',
+              background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+              color: '#fff',
+              fontSize: '9px',
+              padding: '2px 6px',
+              borderRadius: '4px',
+              fontWeight: '700'
+            }}>
+              %16 İNDİRİM
+            </span>
+            <p style={{ margin: '0 0 6px 0', fontSize: '11px', color: '#667eea', textTransform: 'uppercase', letterSpacing: '0.5px', fontWeight: '600' }}>
+              Yıllık
+            </p>
+            <p style={{ margin: 0, fontSize: '22px', fontWeight: 'bold', color: c.text }}>
+              ₺83<span style={{ fontSize: '12px', color: c.textSecondary, fontWeight: 'normal' }}>/ay</span>
+            </p>
+            <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: c.textSecondary }}>
+              ₺999 yıllık ödeme
+            </p>
+          </button>
         </div>
 
-        {/* BUTTONS */}
-        <button
-          onClick={() => {
-            onClose();
-            router.push('/pricing');
-          }}
-          style={{
-            width: '100%',
-            padding: '16px 24px',
-            backgroundColor: '#4CAF50',
-            color: '#FFFFFF',
-            border: 'none',
-            borderRadius: '8px',
-            fontSize: '16px',
-            fontWeight: 'bold',
-            cursor: 'pointer',
-            transition: 'all 0.3s',
-            textTransform: 'uppercase',
-            marginBottom: '12px',
-          }}
-          onMouseEnter={(e) => e.target.style.backgroundColor = '#45A049'}
-          onMouseLeave={(e) => e.target.style.backgroundColor = '#4CAF50'}
-        >
-          🚀 PRO'YA YÜKSEL
-        </button>
+        {/* Hint Text */}
+        <p style={{ margin: '0 0 18px 0', fontSize: '11px', color: c.textSecondary }}>
+          💡 Yukarıdaki plana tıklayarak ödeme yapabilirsiniz
+        </p>
 
+        {/* Close Button */}
         <button
           onClick={onClose}
           style={{
             width: '100%',
-            padding: '14px 24px',
-            backgroundColor: 'transparent',
-            color: '#666',
-            border: '2px solid #DDD',
+            padding: '14px',
+            background: 'transparent',
+            color: c.textSecondary,
+            border: `1px solid ${c.border}`,
             borderRadius: '8px',
-            fontSize: '14px',
-            fontWeight: 'bold',
             cursor: 'pointer',
-            transition: 'all 0.3s',
-          }}
-          onMouseEnter={(e) => {
-            e.target.style.backgroundColor = '#EEEEEE';
-            e.target.style.borderColor = '#BBB';
-          }}
-          onMouseLeave={(e) => {
-            e.target.style.backgroundColor = 'transparent';
-            e.target.style.borderColor = '#DDD';
+            fontSize: '14px',
+            fontWeight: '600',
+            marginBottom: '16px'
           }}
         >
-          DAHA SONRA
+          Sonra
         </button>
 
-        {/* FOOTER */}
+        {/* Footer - Support Email */}
         <p style={{
+          margin: 0,
           fontSize: '12px',
-          color: '#999',
-          margin: '24px 0 0 0',
+          color: c.textSecondary,
+          paddingTop: '16px',
+          borderTop: `1px solid ${c.border}`
         }}>
-          Herhangi bir soru? <a href="mailto:support@siparisdefterim.com" style={{
-            color: '#4CAF50',
-            textDecoration: 'none',
-            fontWeight: '600',
-          }}>Bize Ulaşın</a>
+          Herhangi bir soru?{' '}
+          <a
+            href={`mailto:${SUPPORT_EMAIL}`}
+            style={{
+              color: '#667eea',
+              textDecoration: 'none',
+              fontWeight: '600'
+            }}
+            onMouseOver={(e) => { e.currentTarget.style.textDecoration = 'underline' }}
+            onMouseOut={(e) => { e.currentTarget.style.textDecoration = 'none' }}
+          >
+            {SUPPORT_EMAIL}
+          </a>
         </p>
       </div>
+
+      <style jsx>{`
+        @keyframes fadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+      `}</style>
     </div>
-  );
+  )
 }

@@ -12,6 +12,7 @@ import OrderForm from '../../components/OrderForm'
 import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
+import UpgradeModal from '../components/UpgradeModal'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
 // Gradient Home Icon SVG Component
@@ -1236,8 +1237,10 @@ export default function DashboardPage() {
   const [filteredOrders, setFilteredOrders] = useState([])
   const [theme, setTheme] = useState('light')
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
+  const [isPro, setIsPro] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [activeTab, setActiveTab] = useState('orders')
@@ -1319,8 +1322,9 @@ export default function DashboardPage() {
       const allOrders = ordersData || []
       setOrders(allOrders.filter(o => o.status !== 'completed'))
       // Kota sayısını users tablosundaki orders_created_count'tan oku
-      const { data: freshUserData } = await supabase.from('users').select('orders_created_count').eq('id', userId).single()
+      const { data: freshUserData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
       setOrdersCreatedCount(freshUserData?.orders_created_count || 0)
+      setIsPro(freshUserData?.is_pro || false)
     } catch (error) {
       console.error('fetchUserData error:', error)
     }
@@ -1338,6 +1342,12 @@ export default function DashboardPage() {
   }
 
   const handleAddOrder = async () => {
+    // Kota kontrolü: Pro değilse ve 50+ siparişi varsa upgrade modal aç
+    if (!isPro && ordersCreatedCount >= 50) {
+      setShowUpgradeModal(true)
+      return
+    }
+    
     if (!newOrder.customer_name || !newOrder.customer_phone) {
       alert('Lütfen müşteri adı ve telefon numarası girin.')
       return
@@ -1359,7 +1369,8 @@ export default function DashboardPage() {
       product: productString,
       price: totalPrice,
       status: 'payment_pending',
-      note: newOrder.note
+      note: newOrder.note,
+      products_detail: newOrder.products
     }
     const { data, error } = await supabase.from('orders').insert([orderData]).select()
     if (error) {
@@ -1418,6 +1429,23 @@ export default function DashboardPage() {
   }
 
   const startEditing = (order) => {
+    // YENİ MANTIK: products_detail varsa onu kullan (KDV/birim fiyat doğru gelir)
+    if (order.products_detail && Array.isArray(order.products_detail) && order.products_detail.length > 0) {
+      setEditingId(order.id)
+      setEditingData({
+        customer_name: order.customer_name,
+        customer_phone: order.customer_phone,
+        customer_address: order.customer_address || '',
+        customer_city: order.customer_city || '',
+        customer_district: order.customer_district || '',
+        products: order.products_detail,
+        note: order.note || '',
+        status: order.status
+      })
+      return
+    }
+    
+    // ESKİ MANTIK: products_detail yoksa (eski siparişler için) tahmin yap
     const productParts = order.product.split(', ')
     // Toplam fiyatı ürün sayısına bölerek tahmini birim fiyat hesapla
     const totalPrice = parseFloat(order.price) || 0
@@ -1457,7 +1485,8 @@ export default function DashboardPage() {
       product: productString,
       price: totalPrice,
       note: editingData.note,
-      status: editingData.status
+      status: editingData.status,
+      products_detail: editingData.products
     }
     const { error } = await supabase.from('orders').update(updateData).eq('id', editingId)
     if (error) { alert('Sipariş güncellenemedi.'); return }
@@ -1743,6 +1772,13 @@ export default function DashboardPage() {
           isDark={isDark}
         />
 
+        {/* Upgrade Modal */}
+        <UpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          theme={theme}
+        />
+
         {/* Success Toast */}
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
 
@@ -1806,6 +1842,7 @@ export default function DashboardPage() {
       </div>
 
       <EditModal editingId={editingId} editingData={editingData} setEditingData={setEditingData} saveEdit={saveEdit} cancelEdit={cancelEdit} deleteOrder={deleteOrder} theme={theme} />
+      <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} theme={theme} />
       <Footer theme={theme} />
     </div>
   )
