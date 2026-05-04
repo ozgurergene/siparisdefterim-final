@@ -15,6 +15,23 @@ export default function Footer({ theme }) {
     }}>
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginBottom: '10px', flexWrap: 'wrap' }}>
+          {/* Pricing — en başa, vurgulu mor */}
+          <a 
+            href="/pricing" 
+            style={{ 
+              color: '#667eea', 
+              textDecoration: 'none', 
+              fontSize: '13px',
+              fontWeight: '600',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px'
+            }}
+            onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+            onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+          >
+            ⭐ Pro Üyelik
+          </a>
           <a href="/privacy-policy" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Gizlilik Politikası</a>
           <a href="/terms-of-use" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Kullanım Koşulları</a>
           <a href="/gdpr-disclosure" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>KVKK Aydınlatma</a>

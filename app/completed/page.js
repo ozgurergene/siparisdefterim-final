@@ -1,16 +1,17 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter, usePathname } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
 import { turkeyData } from '../../lib/turkeyData'
+import Header from '../../components/Header'
 import Footer from '../../components/Footer'
 import UpgradeModal from '../components/UpgradeModal'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
-// Gradient Home Icon SVG Component
+// Gradient Home Icon SVG Component (mobile için kullanılıyor)
 function HomeIcon({ size = 22 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -280,7 +281,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     backgroundPosition: 'right 12px center'
   }
 
-  // For native mobile select dropdowns
   const optionStyle = { color: '#000', backgroundColor: '#fff' }
 
   return (
@@ -304,7 +304,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         paddingTop: '20px',
         animation: 'slideUp 0.3s ease'
       }}>
-        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             ✏️ Yeni Sipariş
@@ -329,7 +328,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </button>
         </div>
 
-        {/* Müşteri Adı Soyadı ve Telefon */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
@@ -354,7 +352,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Adres */}
         <div style={{ marginBottom: '12px' }}>
           <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
           <input
@@ -366,7 +363,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
-        {/* İl ve İlçe */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
@@ -397,7 +393,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Ürün Bilgileri */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 2 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
@@ -429,7 +424,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Birim Fiyat ve KDV */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
@@ -478,7 +472,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Tutar Özeti */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
             <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
@@ -494,7 +487,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Not */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
           <textarea
@@ -509,7 +501,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
-        {/* Sipariş Oluştur Button */}
         <button
           onClick={() => { handleAddOrder(); onClose() }}
           style={{
@@ -618,7 +609,6 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDar
                 position: 'relative'
               }}
             >
-              {/* Kilit ikonu — kilitli tab'larda ikonun sağ üstünde */}
               {tab.locked && (
                 <span style={{
                   position: 'absolute',
@@ -655,7 +645,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDar
   )
 }
 
-// Mobile Completed Order Card
+// Highlight matching text
 function HighlightText({ text, searchTerm, color = '#fff' }) {
   if (!searchTerm || !searchTerm.trim()) {
     return <span>{text}</span>
@@ -690,6 +680,7 @@ function HighlightText({ text, searchTerm, color = '#fff' }) {
   )
 }
 
+// Mobile Completed Order Card
 function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }) {
   return (
     <div style={{
@@ -700,7 +691,6 @@ function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }
       marginBottom: '8px',
       boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
     }}>
-      {/* Row 1: Name + Repeat Button + Price */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '5px' }}>
         <div style={{ flex: 1 }}>
           <p style={{ margin: 0, fontSize: '14px', fontWeight: '600', color: isDark ? '#fff' : '#1a1a2e' }}>
@@ -711,7 +701,6 @@ function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }
           </p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          {/* Repeat Order Button */}
           <button
             onClick={() => onRepeat(order)}
             style={{
@@ -740,7 +729,6 @@ function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }
         </div>
       </div>
       
-      {/* Row 2: Phone + Dates */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
         <span style={{ fontSize: '11px', color: '#64748b' }}>
           📱 <HighlightText text={order.customer_phone} searchTerm={searchTerm} />
@@ -760,7 +748,6 @@ function MobileCompletedCard({ order, isDark = true, onRepeat, searchTerm = '' }
 
 export default function CompletedPage() {
   const router = useRouter()
-  const pathname = usePathname()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [completedOrders, setCompletedOrders] = useState([])
@@ -793,7 +780,6 @@ export default function CompletedPage() {
 
   const hasActiveSearch = searchName || searchPhone || searchProduct
 
-  // Check if mobile
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
     checkMobile()
@@ -826,8 +812,6 @@ export default function CompletedPage() {
   }, [router])
 
   // ========== REALTIME SUBSCRIPTION ==========
-  // users tablosundaki bu kullanıcının is_pro / orders_created_count değişikliklerini anlık dinler.
-  // Lemon webhook is_pro = true yapınca, F5 olmadan UI güncellenir.
   useEffect(() => {
     if (!user?.id) return
 
@@ -844,7 +828,6 @@ export default function CompletedPage() {
         (payload) => {
           const updated = payload.new || {}
           setIsPro((prevIsPro) => {
-            // Free → Pro geçişi yakalandıysa kutlama toast'ı göster
             if (!prevIsPro && updated.is_pro === true) {
               setShowProUpgradeToast(true)
               setTimeout(() => setShowProUpgradeToast(false), 5000)
@@ -864,34 +847,60 @@ export default function CompletedPage() {
     }
   }, [user?.id])
 
+  // ========== SEARCH FILTER (DESKTOP: 3 ayrı input AND mantığı, MOBILE: tek input OR) ==========
   useEffect(() => {
     let filtered = completedOrders
-    
-    // Single search input searches across name, phone, and product
+
+    // searchPhone veya searchProduct doluysa Desktop modu (3 ayrı input AND)
+    // Aksi halde Mobile modu (tek input OR — isim/telefon/ürün hepsinde)
+    const isMultiInputMode = searchPhone.trim() || searchProduct.trim()
+
+    // Müşteri Adı filtresi
     if (searchName.trim()) {
-      const searchTerm = searchName.toLowerCase().trim()
-      filtered = filtered.filter(order => 
-        order.customer_name.toLowerCase().includes(searchTerm) ||
-        order.customer_phone.includes(searchTerm) ||
-        order.product.toLowerCase().includes(searchTerm)
+      const nameTerm = searchName.toLowerCase().trim()
+      
+      if (isMultiInputMode) {
+        // Desktop: sadece isimde ara
+        filtered = filtered.filter(order =>
+          order.customer_name.toLowerCase().includes(nameTerm)
+        )
+      } else {
+        // Mobile: isim/telefon/ürün hepsinde ara (OR)
+        filtered = filtered.filter(order =>
+          order.customer_name.toLowerCase().includes(nameTerm) ||
+          order.customer_phone.includes(nameTerm) ||
+          order.product.toLowerCase().includes(nameTerm)
+        )
+      }
+    }
+
+    // Telefon filtresi (sadece Desktop'ta dolu olur, AND mantığı)
+    if (searchPhone.trim()) {
+      filtered = filtered.filter(order =>
+        order.customer_phone.includes(searchPhone.trim())
       )
     }
+
+    // Ürün filtresi (sadece Desktop'ta dolu olur, AND mantığı)
+    if (searchProduct.trim()) {
+      filtered = filtered.filter(order =>
+        order.product.toLowerCase().includes(searchProduct.toLowerCase().trim())
+      )
+    }
+
     setFilteredOrders(filtered)
-  }, [searchName, completedOrders])
+  }, [searchName, searchPhone, searchProduct, completedOrders])
 
   const fetchCompletedOrders = async (userId) => {
-    // Fetch all orders to get completed list
     const { data: allOrders } = await supabase
       .from('orders')
       .select('*')
       .eq('user_id', userId)
     
-    // Kota sayısını ve is_pro durumunu users tablosundan oku
     const { data: userData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
     setOrdersCreatedCount(userData?.orders_created_count || 0)
     setIsPro(userData?.is_pro || false)
     
-    // Filter and set completed orders
     const completed = (allOrders || []).filter(o => o.status === 'completed')
       .sort((a, b) => new Date(b.updated_at) - new Date(a.updated_at))
     
@@ -945,12 +954,10 @@ export default function CompletedPage() {
       return
     }
     
-    // Kota güncelle - users tablosunda orders_created_count'u artır
     const newCount = ordersCreatedCount + 1
     await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
     setOrdersCreatedCount(newCount)
     
-    // Reset form
     setNewOrder({
       customer_name: '',
       customer_phone: '',
@@ -961,7 +968,6 @@ export default function CompletedPage() {
       note: ''
     })
     
-    // Show success toast
     setShowSuccessToast(true)
     setTimeout(() => setShowSuccessToast(false), 3000)
   }
@@ -1032,11 +1038,6 @@ export default function CompletedPage() {
     return orderDate >= oneWeekAgo
   }).length
 
-  // Progress bar için hesaplama (sadece Free kullanıcılar için kullanılıyor)
-  const maxOrders = 50
-  const progressPercent = Math.min((ordersCreatedCount / maxOrders) * 100, 100)
-  const progressColor = ordersCreatedCount >= 50 ? '#ff6b6b' : ordersCreatedCount >= 40 ? '#fbbf24' : '#667eea'
-
   if (loading || !user) {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', overflowX: 'hidden' }}>
@@ -1073,14 +1074,12 @@ export default function CompletedPage() {
         flexDirection: 'column',
         overflow: 'hidden'
       }}>
-        {/* STICKY HEADER SECTION */}
         <div style={{
           flexShrink: 0,
           background: isDark 
             ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
             : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)'
         }}>
-          {/* Mobile Header - Ana Sayfa ile aynı hizalama */}
           <div style={{
             padding: '16px 16px 10px 16px',
             display: 'flex',
@@ -1106,7 +1105,6 @@ export default function CompletedPage() {
                 <HomeIcon size={18} />
               </button>
               <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
-              {/* Pro rozeti — sadece mobil header */}
               {isPro && (
                 <span style={{
                   background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
@@ -1121,7 +1119,6 @@ export default function CompletedPage() {
               )}
             </div>
             
-            {/* Avatar */}
             <div
               onClick={() => setShowProfilePopup(!showProfilePopup)}
               style={{
@@ -1143,7 +1140,6 @@ export default function CompletedPage() {
             </div>
           </div>
 
-          {/* Profile Popup */}
           <ProfilePopup
             user={user}
             isOpen={showProfilePopup}
@@ -1155,7 +1151,6 @@ export default function CompletedPage() {
             toggleTheme={toggleTheme}
           />
 
-          {/* Stats Row - 4 cards */}
           <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
             <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{totalCompleted}</p>
@@ -1175,7 +1170,6 @@ export default function CompletedPage() {
             </div>
           </div>
 
-          {/* Search Row */}
           <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
             <div style={{
               flex: 1,
@@ -1222,7 +1216,6 @@ export default function CompletedPage() {
           </div>
         </div>
 
-        {/* SCROLLABLE ORDERS LIST */}
         <div style={{ 
           flex: 1, 
           overflowY: 'auto', 
@@ -1248,7 +1241,6 @@ export default function CompletedPage() {
           )}
         </div>
 
-        {/* Bottom Tab Bar — Müşteri/Rapor kilitli, tıklayınca UpgradeModal aç */}
         <BottomTabBar
           activeTab="completed"
           onTabChange={handleTabChange}
@@ -1257,7 +1249,6 @@ export default function CompletedPage() {
           isDark={isDark}
         />
 
-        {/* Add Order Modal */}
         <MobileAddOrderModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
@@ -1268,16 +1259,13 @@ export default function CompletedPage() {
           isDark={isDark}
         />
 
-        {/* Upgrade Modal — Müşteri/Rapor kilitli tab'a tıklayınca açılır */}
         <UpgradeModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
           theme={theme}
         />
 
-        {/* Success Toast */}
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
-        {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik */}
         <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
         <style jsx global>{`
@@ -1298,7 +1286,7 @@ export default function CompletedPage() {
     )
   }
 
-  // ========== DESKTOP VIEW - HOME İLE AYNI HEADER YAPISI ==========
+  // ========== DESKTOP VIEW — HEADER COMPONENT KULLANIYOR ==========
   return (
     <div style={{ 
       minHeight: '100vh', 
@@ -1312,246 +1300,15 @@ export default function CompletedPage() {
       overflowX: 'hidden',
       boxSizing: 'border-box'
     }}>
-      {/* Header - HOME İLE AYNI YAPI */}
-      <div style={{ 
-        background: c.header, 
-        borderBottom: `1px solid ${c.border}`, 
-        padding: '12px 24px',
-        boxShadow: '0 2px 8px rgba(0,0,0,0.05)'
-      }}>
-        <div style={{ 
-          display: 'flex', 
-          justifyContent: 'space-between', 
-          alignItems: 'center',
-          maxWidth: '1400px',
-          margin: '0 auto'
-        }}>
-          {/* Sol: Home Icon + Logo + Nav Buttons */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* Home Icon Button */}
-            <button
-              onClick={() => router.push('/home')}
-              style={{
-                padding: '10px',
-                background: c.bgSecondary,
-                border: `1px solid ${c.border}`,
-                borderRadius: '10px',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                transition: 'transform 0.2s, box-shadow 0.2s'
-              }}
-              title="Ana Sayfa"
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)'
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            >
-              <HomeIcon size={20} />
-            </button>
-            
-            {/* Logo */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '20px' }}>📱</span>
-              <h1 
-                onClick={() => router.push('/home')}
-                style={{ 
-                  fontSize: '24px', 
-                  fontWeight: '600', 
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  margin: 0,
-                  cursor: 'pointer',
-                  transition: 'opacity 0.2s'
-                }}
-                onMouseOver={(e) => e.currentTarget.style.opacity = '0.7'}
-                onMouseOut={(e) => e.currentTarget.style.opacity = '1'}
-              >
-                SiparişDefterim
-              </h1>
-            </div>
-
-            {/* Navigation Tabs */}
-            <nav style={{ display: 'flex', gap: '8px', marginLeft: '20px' }}>
-              <button
-                onClick={() => router.push('/dashboard')}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.3s ease',
-                  background: pathname === '/dashboard' 
-                    ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
-                    : 'rgba(102, 126, 234, 0.1)',
-                  color: pathname === '/dashboard' ? 'white' : c.text,
-                  boxShadow: pathname === '/dashboard' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
-                }}
-                onMouseEnter={(e) => {
-                  if (pathname !== '/dashboard') {
-                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.2)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (pathname !== '/dashboard') {
-                    e.currentTarget.style.background = 'rgba(102, 126, 234, 0.1)'
-                  }
-                }}
-              >
-                <span>📦</span>
-                Siparişler
-              </button>
-
-              <button
-                onClick={() => router.push('/completed')}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.3s ease',
-                  background: pathname === '/completed' 
-                    ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' 
-                    : 'rgba(67, 233, 123, 0.1)',
-                  color: pathname === '/completed' ? 'white' : c.text,
-                  boxShadow: pathname === '/completed' ? '0 4px 15px rgba(67, 233, 123, 0.4)' : 'none',
-                }}
-                onMouseEnter={(e) => {
-                  if (pathname !== '/completed') {
-                    e.currentTarget.style.background = 'rgba(67, 233, 123, 0.2)'
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (pathname !== '/completed') {
-                    e.currentTarget.style.background = 'rgba(67, 233, 123, 0.1)'
-                  }
-                }}
-              >
-                <span>✅</span>
-                Tamamlananlar
-              </button>
-            </nav>
-          </div>
-
-          {/* Sağ: Progress (Free) / Pro Rozeti / Theme + User + Logout */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {/* Sipariş Sayacı — Pro / Free durumu */}
-            {isPro ? (
-              // PRO görünümü: rozet + sayı, /50 yok
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-                padding: '8px 14px',
-                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-                border: '1px solid rgba(102, 126, 234, 0.4)',
-                borderRadius: '20px',
-                boxShadow: '0 2px 8px rgba(102, 126, 234, 0.15)'
-              }}>
-                <span style={{
-                  fontSize: '13px',
-                  fontWeight: '700',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '0.5px'
-                }}>
-                  ✨ PRO
-                </span>
-                <span style={{ width: '1px', height: '14px', background: c.border }} />
-                <span style={{ fontSize: '13px', color: c.textSecondary }}>
-                  Siparişler: <strong style={{ color: c.text }}>{ordersCreatedCount}</strong>
-                </span>
-              </div>
-            ) : (
-              // FREE görünümü: orijinal /50 progress bar
-              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                <span style={{ fontSize: '13px', fontWeight: '500', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/{maxOrders}</span>
-                <div style={{ width: '80px', height: '6px', background: c.border, borderRadius: '3px', overflow: 'hidden' }}>
-                  <div style={{ width: `${progressPercent}%`, height: '100%', background: `linear-gradient(90deg, #667eea, ${progressColor})`, borderRadius: '3px', transition: 'width 0.5s ease' }} />
-                </div>
-              </div>
-            )}
-
-            {/* User Email */}
-            <span style={{ fontSize: '13px', color: c.textSecondary }}>{user.email}</span>
-
-            {/* Theme Toggle */}
-            <button
-              onClick={toggleTheme}
-              style={{
-                width: '40px',
-                height: '40px',
-                borderRadius: '10px',
-                border: `1px solid ${c.border}`,
-                background: c.bgSecondary,
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                fontSize: '18px',
-                transition: 'all 0.2s ease',
-              }}
-              title={theme === 'dark' ? 'Açık Tema' : 'Koyu Tema'}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)'
-                e.currentTarget.style.boxShadow = theme === 'light' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : '0 4px 15px rgba(255, 193, 7, 0.5)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = 'none'
-              }}
-            >
-              {theme === 'dark' ? '☀️' : '🌙'}
-            </button>
-
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              style={{
-                padding: '10px 20px',
-                background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a5a 100%)',
-                color: 'white',
-                border: 'none',
-                borderRadius: '10px',
-                cursor: 'pointer',
-                fontWeight: '600',
-                fontSize: '14px',
-                transition: 'all 0.2s ease',
-                boxShadow: '0 2px 8px rgba(255, 107, 107, 0.3)'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.transform = 'scale(1.05)'
-                e.currentTarget.style.boxShadow = '0 4px 15px rgba(255, 107, 107, 0.5)'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.transform = 'scale(1)'
-                e.currentTarget.style.boxShadow = '0 2px 8px rgba(255, 107, 107, 0.3)'
-              }}
-            >
-              Çıkış
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Header Component — dashboard ve home ile aynı */}
+      <Header 
+        user={user} 
+        ordersCreatedCount={ordersCreatedCount}
+        isPro={isPro}
+        theme={theme} 
+        toggleTheme={toggleTheme} 
+        handleLogout={handleLogout}
+      />
 
       <div style={{ flex: 1, width: '100%', padding: '20px 24px', boxSizing: 'border-box' }}>
         {/* Stats Cards */}

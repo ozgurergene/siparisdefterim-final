@@ -1372,20 +1372,54 @@ export default function DashboardPage() {
     }
   }, [user?.id])
 
+  // ========== SEARCH FILTER (DESKTOP: 3 ayrı input AND mantığı, MOBILE: tek input OR) ==========
   useEffect(() => {
     let filtered = orders
-    
+
+    // searchPhone veya searchProduct doluysa Desktop modu (3 ayrı input AND)
+    // Aksi halde Mobile modu (tek input OR — isim/telefon/ürün hepsinde)
+    const isMultiInputMode = searchPhone.trim() || searchProduct.trim()
+
+    // Müşteri Adı filtresi
     if (searchName.trim()) {
-      const searchTerm = searchName.toLowerCase().trim()
-      filtered = filtered.filter(order => 
-        order.customer_name.toLowerCase().includes(searchTerm) ||
-        order.customer_phone.includes(searchTerm) ||
-        order.product.toLowerCase().includes(searchTerm)
+      const nameTerm = searchName.toLowerCase().trim()
+      
+      if (isMultiInputMode) {
+        // Desktop: sadece isimde ara
+        filtered = filtered.filter(order =>
+          order.customer_name.toLowerCase().includes(nameTerm)
+        )
+      } else {
+        // Mobile: isim/telefon/ürün hepsinde ara (OR)
+        filtered = filtered.filter(order =>
+          order.customer_name.toLowerCase().includes(nameTerm) ||
+          order.customer_phone.includes(nameTerm) ||
+          order.product.toLowerCase().includes(nameTerm)
+        )
+      }
+    }
+
+    // Telefon filtresi (sadece Desktop'ta dolu olur, AND mantığı)
+    if (searchPhone.trim()) {
+      filtered = filtered.filter(order =>
+        order.customer_phone.includes(searchPhone.trim())
       )
     }
-    if (statusFilter !== 'all') filtered = filtered.filter(order => order.status === statusFilter)
+
+    // Ürün filtresi (sadece Desktop'ta dolu olur, AND mantığı)
+    if (searchProduct.trim()) {
+      filtered = filtered.filter(order =>
+        order.product.toLowerCase().includes(searchProduct.toLowerCase().trim())
+      )
+    }
+
+    // Status filter
+    if (statusFilter !== 'all') {
+      filtered = filtered.filter(order => order.status === statusFilter)
+    }
+
     setFilteredOrders(filtered)
-  }, [searchName, statusFilter, orders])
+  }, [searchName, searchPhone, searchProduct, statusFilter, orders])
 
   const fetchUserData = async (userId) => {
     try {

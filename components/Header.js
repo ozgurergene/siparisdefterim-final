@@ -209,6 +209,40 @@ export default function Header({ user, ordersCreatedCount, isPro = false, theme,
             </div>
           )}
 
+          {/* Pro'ya Geç Butonu — sadece Free kullanıcılarda */}
+          {!isPro && (
+            <button
+              onClick={() => router.push('/pricing')}
+              style={{
+                padding: '8px 16px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                color: '#fff',
+                border: 'none',
+                borderRadius: '10px',
+                cursor: 'pointer',
+                fontWeight: '600',
+                fontSize: '13px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '4px',
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                whiteSpace: 'nowrap'
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.05)'
+                e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.5)'
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)'
+                e.currentTarget.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)'
+              }}
+            >
+              <span>⭐</span>
+              Pro'ya Geç
+            </button>
+          )}
+
           <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
           
           {/* Theme Toggle Button */}
