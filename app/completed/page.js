@@ -26,7 +26,7 @@ function HomeIcon({ size = 22 }) {
 }
 
 // Profile Popup Component
-function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, theme, toggleTheme }) {
+function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isPro, theme, toggleTheme }) {
   if (!isOpen) return null
 
   const isDark = theme === 'dark'
@@ -91,20 +91,42 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, the
           </div>
         </div>
 
+        {/* Order Quota — Pro / Free durumu */}
         <div style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
-            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
-          </div>
-          <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-            <div style={{
-              width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
-              height: '100%',
-              background: 'linear-gradient(90deg, #667eea, #764ba2)',
-              borderRadius: '2px'
-            }} />
-          </div>
-          <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
+          {isPro ? (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  letterSpacing: '0.5px'
+                }}>✨ PRO ÜYELİK</span>
+                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} sipariş</span>
+              </div>
+              <div style={{ height: '4px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }} />
+              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Sınırsız sipariş hakkı aktif</p>
+            </>
+          ) : (
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
+                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
+              </div>
+              <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{
+                  width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                  borderRadius: '2px'
+                }} />
+              </div>
+              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
+            </>
+          )}
         </div>
 
         <div style={{ padding: '8px' }}>
@@ -151,19 +173,22 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, the
             <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Profili Düzenle</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>⭐</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
-            <span style={{
-              marginLeft: 'auto',
-              background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
-              color: '#fff',
-              fontSize: '8px',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontWeight: '600'
-            }}>YENİ</span>
-          </div>
+          {/* Pro'ya Yükselt — sadece Free'de göster */}
+          {!isPro && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+              <span style={{ fontSize: '16px' }}>⭐</span>
+              <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
+              <span style={{
+                marginLeft: 'auto',
+                background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                color: '#fff',
+                fontSize: '8px',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                fontWeight: '600'
+              }}>YENİ</span>
+            </div>
+          )}
 
           <div style={{ height: '1px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', margin: '6px 0' }} />
 
@@ -733,8 +758,10 @@ export default function CompletedPage() {
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
+  const [showProUpgradeToast, setShowProUpgradeToast] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
+  const [isPro, setIsPro] = useState(false)
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
@@ -781,6 +808,45 @@ export default function CompletedPage() {
     checkUser()
   }, [router])
 
+  // ========== REALTIME SUBSCRIPTION ==========
+  // users tablosundaki bu kullanıcının is_pro / orders_created_count değişikliklerini anlık dinler.
+  // Lemon webhook is_pro = true yapınca, F5 olmadan UI güncellenir.
+  useEffect(() => {
+    if (!user?.id) return
+
+    const channel = supabase
+      .channel(`user-changes-completed-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updated = payload.new || {}
+          setIsPro((prevIsPro) => {
+            // Free → Pro geçişi yakalandıysa kutlama toast'ı göster
+            if (!prevIsPro && updated.is_pro === true) {
+              setShowProUpgradeToast(true)
+              setTimeout(() => setShowProUpgradeToast(false), 5000)
+            }
+            return updated.is_pro ?? prevIsPro
+          })
+
+          if (typeof updated.orders_created_count === 'number') {
+            setOrdersCreatedCount(updated.orders_created_count)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user?.id])
+
   useEffect(() => {
     let filtered = completedOrders
     
@@ -803,9 +869,10 @@ export default function CompletedPage() {
       .select('*')
       .eq('user_id', userId)
     
-    // Kota sayısını users tablosundaki orders_created_count'tan oku
-    const { data: userData } = await supabase.from('users').select('orders_created_count').eq('id', userId).single()
+    // Kota sayısını ve is_pro durumunu users tablosundan oku
+    const { data: userData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
     setOrdersCreatedCount(userData?.orders_created_count || 0)
+    setIsPro(userData?.is_pro || false)
     
     // Filter and set completed orders
     const completed = (allOrders || []).filter(o => o.status === 'completed')
@@ -948,7 +1015,7 @@ export default function CompletedPage() {
     return orderDate >= oneWeekAgo
   }).length
 
-  // Progress bar için hesaplama
+  // Progress bar için hesaplama (sadece Free kullanıcılar için kullanılıyor)
   const maxOrders = 50
   const progressPercent = Math.min((ordersCreatedCount / maxOrders) * 100, 100)
   const progressColor = ordersCreatedCount >= 50 ? '#ff6b6b' : ordersCreatedCount >= 40 ? '#fbbf24' : '#667eea'
@@ -1022,6 +1089,19 @@ export default function CompletedPage() {
                 <HomeIcon size={18} />
               </button>
               <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Tamamlananlar</span>
+              {/* Pro rozeti — sadece mobil header */}
+              {isPro && (
+                <span style={{
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
+                  color: '#667eea',
+                  fontSize: '10px',
+                  padding: '3px 8px',
+                  borderRadius: '10px',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  border: '1px solid rgba(102, 126, 234, 0.3)'
+                }}>✨ PRO</span>
+              )}
             </div>
             
             {/* Avatar */}
@@ -1053,6 +1133,7 @@ export default function CompletedPage() {
             onClose={() => setShowProfilePopup(false)}
             onLogout={handleLogout}
             ordersCreatedCount={ordersCreatedCount}
+            isPro={isPro}
             theme={theme}
             toggleTheme={toggleTheme}
           />
@@ -1171,6 +1252,8 @@ export default function CompletedPage() {
 
         {/* Success Toast */}
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
+        {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik */}
+        <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
         <style jsx global>{`
           @keyframes fadeIn {
@@ -1342,15 +1425,46 @@ export default function CompletedPage() {
             </nav>
           </div>
 
-          {/* Sağ: Progress + Theme + User + Logout */}
+          {/* Sağ: Progress (Free) / Pro Rozeti / Theme + User + Logout */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-            {/* Order Progress */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <span style={{ fontSize: '13px', fontWeight: '500', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/{maxOrders}</span>
-              <div style={{ width: '80px', height: '6px', background: c.border, borderRadius: '3px', overflow: 'hidden' }}>
-                <div style={{ width: `${progressPercent}%`, height: '100%', background: `linear-gradient(90deg, #667eea, ${progressColor})`, borderRadius: '3px', transition: 'width 0.5s ease' }} />
+            {/* Sipariş Sayacı — Pro / Free durumu */}
+            {isPro ? (
+              // PRO görünümü: rozet + sayı, /50 yok
+              <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+                padding: '8px 14px',
+                background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+                border: '1px solid rgba(102, 126, 234, 0.4)',
+                borderRadius: '20px',
+                boxShadow: '0 2px 8px rgba(102, 126, 234, 0.15)'
+              }}>
+                <span style={{
+                  fontSize: '13px',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  letterSpacing: '0.5px'
+                }}>
+                  ✨ PRO
+                </span>
+                <span style={{ width: '1px', height: '14px', background: c.border }} />
+                <span style={{ fontSize: '13px', color: c.textSecondary }}>
+                  Siparişler: <strong style={{ color: c.text }}>{ordersCreatedCount}</strong>
+                </span>
               </div>
-            </div>
+            ) : (
+              // FREE görünümü: orijinal /50 progress bar
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <span style={{ fontSize: '13px', fontWeight: '500', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/{maxOrders}</span>
+                <div style={{ width: '80px', height: '6px', background: c.border, borderRadius: '3px', overflow: 'hidden' }}>
+                  <div style={{ width: `${progressPercent}%`, height: '100%', background: `linear-gradient(90deg, #667eea, ${progressColor})`, borderRadius: '3px', transition: 'width 0.5s ease' }} />
+                </div>
+              </div>
+            )}
 
             {/* User Email */}
             <span style={{ fontSize: '13px', color: c.textSecondary }}>{user.email}</span>
@@ -1530,6 +1644,9 @@ export default function CompletedPage() {
       </div>
 
       <Footer theme={theme} />
+
+      {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik (desktop) */}
+      <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
     </div>
   )
 }
