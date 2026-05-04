@@ -7,6 +7,7 @@ import { calculateGrandTotal } from '../../lib/calculations'
 import { turkeyData } from '../../lib/turkeyData'
 import Header from '../../components/Header'
 import Footer from '../../components/Footer'
+import UpgradeModal from '../components/UpgradeModal'
 
 // Gradient Home Icon SVG Component
 function HomeIcon({ size = 18 }) {
@@ -167,11 +168,6 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
             </div>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>✏️</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Profili Düzenle</span>
-          </div>
-
           {/* Pro'ya Yükselt — sadece Free'de göster */}
           {!isPro && (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
@@ -239,7 +235,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     ? (turkeyData[newOrder.customer_city] || []).slice().sort((a, b) => a.localeCompare(b, 'tr')) 
     : []
 
-  // Calculate totals
   const calculateTotals = () => {
     const product = newOrder.products[0] || {}
     const quantity = parseInt(product.quantity) || 1
@@ -283,7 +278,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     backgroundPosition: 'right 12px center'
   }
 
-  // For native mobile select dropdowns
   const optionStyle = { color: '#000', backgroundColor: '#fff' }
 
   return (
@@ -307,7 +301,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         paddingTop: '20px',
         animation: 'slideUp 0.3s ease'
       }}>
-        {/* Header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             ✏️ Yeni Sipariş
@@ -332,7 +325,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </button>
         </div>
 
-        {/* Müşteri Adı Soyadı ve Telefon */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
@@ -357,7 +349,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Adres */}
         <div style={{ marginBottom: '12px' }}>
           <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
           <input
@@ -369,7 +360,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
-        {/* İl ve İlçe */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
@@ -400,7 +390,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Ürün Bilgileri */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 2 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
@@ -432,7 +421,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Birim Fiyat ve KDV */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
             <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
@@ -481,7 +469,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Tutar Özeti */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
             <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
@@ -497,7 +484,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Not */}
         <div style={{ marginBottom: '16px' }}>
           <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
           <textarea
@@ -512,7 +498,6 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           />
         </div>
 
-        {/* Sipariş Oluştur Button */}
         <button
           onClick={() => { handleAddOrder(); onClose() }}
           style={{
@@ -535,14 +520,14 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
-// Bottom Tab Bar Component
-function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
+// Bottom Tab Bar Component — Pro tier yoksa Müşteri/Rapor kilitli
+function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
-    { id: 'customers', icon: '👥', label: 'Müşteri' },
-    { id: 'reports', icon: '📊', label: 'Rapor' }
+    { id: 'customers', icon: '👥', label: 'Müşteri', locked: true },
+    { id: 'reports', icon: '📊', label: 'Rapor', locked: true }
   ]
 
   return (
@@ -605,7 +590,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
           ) : (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => tab.locked ? onLockedClick && onLockedClick() : onTabChange(tab.id)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -615,15 +600,34 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
                 justifyContent: 'center',
                 gap: '3px',
                 cursor: 'pointer',
-                opacity: activeTab === tab.id ? 1 : 0.5,
+                opacity: tab.locked ? 0.4 : (activeTab === tab.id ? 1 : 0.5),
                 padding: '4px 0',
-                width: '60px'
+                width: '60px',
+                position: 'relative'
               }}
             >
-              <span style={{ fontSize: '20px' }}>{tab.icon}</span>
+              {tab.locked && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '8px',
+                  fontSize: '10px',
+                  background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                  color: '#fff',
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.4)'
+                }}>🔒</span>
+              )}
+              <span style={{ fontSize: '20px', filter: tab.locked ? 'grayscale(0.6)' : 'none' }}>{tab.icon}</span>
               <span style={{ 
                 fontSize: '10px', 
-                color: activeTab === tab.id ? '#22c55e' : '#64748b',
+                color: tab.locked ? '#64748b' : (activeTab === tab.id ? '#22c55e' : '#64748b'),
                 fontWeight: activeTab === tab.id ? '600' : '400',
                 textAlign: 'center',
                 whiteSpace: 'nowrap'
@@ -648,6 +652,7 @@ export default function HomePage() {
   const [isMobile, setIsMobile] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [showProUpgradeToast, setShowProUpgradeToast] = useState(false)
   const [stats, setStats] = useState({
@@ -675,7 +680,6 @@ export default function HomePage() {
     checkMobile()
     window.addEventListener('resize', checkMobile)
     
-    // Load theme from localStorage
     const savedTheme = localStorage.getItem('siparisdefterim-theme')
     if (savedTheme) setTheme(savedTheme)
     
@@ -687,8 +691,6 @@ export default function HomePage() {
   }, [])
 
   // ========== REALTIME SUBSCRIPTION ==========
-  // users tablosundaki bu kullanıcının is_pro / orders_created_count değişikliklerini anlık dinler.
-  // Lemon webhook is_pro = true yapınca, F5 olmadan UI güncellenir.
   useEffect(() => {
     if (!user?.id) return
 
@@ -705,7 +707,6 @@ export default function HomePage() {
         (payload) => {
           const updated = payload.new || {}
           setIsPro((prevIsPro) => {
-            // Free → Pro geçişi yakalandıysa kutlama toast'ı göster
             if (!prevIsPro && updated.is_pro === true) {
               setShowProUpgradeToast(true)
               setTimeout(() => setShowProUpgradeToast(false), 5000)
@@ -743,7 +744,6 @@ export default function HomePage() {
       .eq('user_id', userId)
 
     const orders = allOrders || []
-    // Kota sayısını ve is_pro durumunu users tablosundan oku
     const { data: userData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
     setOrdersCreatedCount(userData?.orders_created_count || 0)
     setIsPro(userData?.is_pro || false)
@@ -751,23 +751,16 @@ export default function HomePage() {
     const activeOrders = orders.filter(o => o.status !== 'completed')
     const completedOrders = orders.filter(o => o.status === 'completed')
     
-    // Ödeme Bekleyen = sadece payment_pending durumundakiler
     const pending = activeOrders.filter(o => o.status === 'payment_pending').length
-    // Kargoya Verilecek = paid (Ödeme Alındı) + preparing (Paketlendi) durumundakiler
     const toShip = activeOrders.filter(o => o.status === 'paid' || o.status === 'preparing').length
-    // Kargo Sürecinde = shipped (Kargoda) durumundakiler
     const shipped = activeOrders.filter(o => o.status === 'shipped').length
     
-    // Ödeme alınan siparişler (paid, preparing, shipped, completed)
-    // payment_pending HARİÇ tüm siparişler kazanca dahil
     const paidOrders = orders.filter(o => o.status !== 'payment_pending')
     
-    // Günlük kazanç - bugün ödeme alınan siparişler (updated_at'e göre)
     const today = new Date().toISOString().split('T')[0]
     const todayPaid = paidOrders.filter(o => o.updated_at?.startsWith(today))
     const todayRevenue = todayPaid.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
     
-    // Aylık kazanç - bu ay ödeme alınan siparişler
     const thisMonth = new Date().toISOString().slice(0, 7)
     const monthlyPaid = paidOrders.filter(o => o.updated_at?.startsWith(thisMonth))
     const monthlyRevenue = monthlyPaid.reduce((sum, o) => sum + (parseFloat(o.price) || 0), 0)
@@ -825,12 +818,10 @@ export default function HomePage() {
       return
     }
     
-    // Kota güncelle - users tablosunda orders_created_count'u artır
     const newCount = ordersCreatedCount + 1
     await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
     setOrdersCreatedCount(newCount)
     
-    // Reset form
     setNewOrder({
       customer_name: '',
       customer_phone: '',
@@ -841,11 +832,9 @@ export default function HomePage() {
       note: ''
     })
     
-    // Show success toast
     setShowSuccessToast(true)
     setTimeout(() => setShowSuccessToast(false), 3000)
     
-    // Refresh stats
     await fetchStats(user.id)
   }
 
@@ -882,7 +871,6 @@ export default function HomePage() {
   if (isMobile) {
     const isDark = theme === 'dark'
     
-    // Türkçe ay adları
     const monthNames = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık']
     const currentMonth = monthNames[new Date().getMonth()]
     
@@ -900,7 +888,6 @@ export default function HomePage() {
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Mobile Header */}
         <div style={{
           padding: '16px 16px 10px 16px',
           display: 'flex',
@@ -924,7 +911,6 @@ export default function HomePage() {
               <HomeIcon size={18} />
             </button>
             <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Ana Sayfa</span>
-            {/* Pro rozeti — sadece mobil header */}
             {isPro && (
               <span style={{
                 background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
@@ -959,7 +945,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Profile Popup */}
         <ProfilePopup
           user={user}
           isOpen={showProfilePopup}
@@ -971,7 +956,6 @@ export default function HomePage() {
           toggleTheme={toggleTheme}
         />
 
-        {/* Welcome Section */}
         <div style={{ textAlign: 'center', padding: '12px 20px 20px 20px' }}>
           <h2 style={{ fontSize: '26px', fontWeight: 'bold', margin: '0 0 6px 0', color: isDark ? '#fff' : '#1a1a2e' }}>
             Hoş Geldin! 👋
@@ -981,7 +965,6 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Metric Cards - 2x2 Grid */}
         <div style={{ 
           padding: '0 20px',
           display: 'grid',
@@ -1018,7 +1001,6 @@ export default function HomePage() {
           ))}
         </div>
 
-        {/* Revenue Cards */}
         <div style={{ 
           padding: '0 20px',
           display: 'grid',
@@ -1092,7 +1074,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Quick Actions - Slim */}
         <div style={{ padding: '0 20px', flex: 1 }}>
           <div style={{
             background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(255, 255, 255, 0.9)',
@@ -1171,7 +1152,6 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Footer */}
         <div style={{
           padding: '12px 20px',
           textAlign: 'center',
@@ -1193,15 +1173,15 @@ export default function HomePage() {
           </p>
         </div>
 
-        {/* Bottom Tab Bar */}
+        {/* Bottom Tab Bar — Müşteri/Rapor kilitli */}
         <BottomTabBar
           activeTab="home"
           onTabChange={handleTabChange}
           onAddClick={() => setShowAddModal(true)}
+          onLockedClick={() => setShowUpgradeModal(true)}
           isDark={isDark}
         />
 
-        {/* Add Order Modal */}
         <MobileAddOrderModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
@@ -1212,9 +1192,13 @@ export default function HomePage() {
           isDark={isDark}
         />
 
-        {/* Success Toast */}
+        <UpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          theme={theme}
+        />
+
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
-        {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik */}
         <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
         <style jsx global>{`
@@ -1257,7 +1241,6 @@ export default function HomePage() {
       <main style={{ flex: 1, padding: '32px 24px', boxSizing: 'border-box' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           
-          {/* Welcome Section */}
           <div style={{ textAlign: 'center', marginBottom: 40, animation: 'fadeIn 0.5s ease-out' }}>
             <h1 style={{ fontSize: 32, fontWeight: 700, color: c.text, marginBottom: 8 }}>
               Hoş Geldin! 👋
@@ -1267,7 +1250,6 @@ export default function HomePage() {
             </p>
           </div>
 
-          {/* Metric Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 20, marginBottom: 32 }}>
             {metricCards.map((card, index) => (
               <div
@@ -1325,7 +1307,6 @@ export default function HomePage() {
             ))}
           </div>
 
-          {/* Revenue Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20, marginBottom: 32 }}>
             <div style={{
               background: c.bgCard,
@@ -1395,7 +1376,6 @@ export default function HomePage() {
             </div>
           </div>
 
-          {/* Quick Actions */}
           <div style={{
             background: c.bgCard,
             backdropFilter: 'blur(20px)',
@@ -1507,7 +1487,6 @@ export default function HomePage() {
 
       <Footer theme={theme} />
 
-      {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik (desktop) */}
       <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
       <style jsx global>{`

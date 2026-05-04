@@ -7,6 +7,7 @@ import { colors, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
 import { turkeyData } from '../../lib/turkeyData'
 import Footer from '../../components/Footer'
+import UpgradeModal from '../components/UpgradeModal'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
 
 // Gradient Home Icon SVG Component
@@ -166,11 +167,6 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
                 boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
               }} />
             </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>✏️</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Profili Düzenle</span>
           </div>
 
           {/* Pro'ya Yükselt — sadece Free'de göster */}
@@ -536,14 +532,14 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
-// Bottom Tab Bar Component
-function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
+// Bottom Tab Bar Component — Pro tier yoksa Müşteri/Rapor kilitli
+function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
-    { id: 'customers', icon: '👥', label: 'Müşteri' },
-    { id: 'reports', icon: '📊', label: 'Rapor' }
+    { id: 'customers', icon: '👥', label: 'Müşteri', locked: true },
+    { id: 'reports', icon: '📊', label: 'Rapor', locked: true }
   ]
 
   return (
@@ -606,7 +602,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
           ) : (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => tab.locked ? onLockedClick && onLockedClick() : onTabChange(tab.id)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -616,15 +612,35 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
                 justifyContent: 'center',
                 gap: '3px',
                 cursor: 'pointer',
-                opacity: activeTab === tab.id ? 1 : 0.5,
+                opacity: tab.locked ? 0.4 : (activeTab === tab.id ? 1 : 0.5),
                 padding: '4px 0',
-                width: '60px'
+                width: '60px',
+                position: 'relative'
               }}
             >
-              <span style={{ fontSize: '20px' }}>{tab.icon}</span>
+              {/* Kilit ikonu — kilitli tab'larda ikonun sağ üstünde */}
+              {tab.locked && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '8px',
+                  fontSize: '10px',
+                  background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                  color: '#fff',
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.4)'
+                }}>🔒</span>
+              )}
+              <span style={{ fontSize: '20px', filter: tab.locked ? 'grayscale(0.6)' : 'none' }}>{tab.icon}</span>
               <span style={{ 
                 fontSize: '10px', 
-                color: activeTab === tab.id ? '#22c55e' : '#64748b',
+                color: tab.locked ? '#64748b' : (activeTab === tab.id ? '#22c55e' : '#64748b'),
                 fontWeight: activeTab === tab.id ? '600' : '400',
                 textAlign: 'center',
                 whiteSpace: 'nowrap'
@@ -757,6 +773,7 @@ export default function CompletedPage() {
   const [isMobile, setIsMobile] = useState(false)
   const [mobileSearchOpen, setMobileSearchOpen] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+  const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
   const [showProUpgradeToast, setShowProUpgradeToast] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
@@ -1231,11 +1248,12 @@ export default function CompletedPage() {
           )}
         </div>
 
-        {/* Bottom Tab Bar */}
+        {/* Bottom Tab Bar — Müşteri/Rapor kilitli, tıklayınca UpgradeModal aç */}
         <BottomTabBar
           activeTab="completed"
           onTabChange={handleTabChange}
           onAddClick={() => setShowAddModal(true)}
+          onLockedClick={() => setShowUpgradeModal(true)}
           isDark={isDark}
         />
 
@@ -1248,6 +1266,13 @@ export default function CompletedPage() {
           handleAddOrder={handleAddOrder}
           turkeyData={turkeyData}
           isDark={isDark}
+        />
+
+        {/* Upgrade Modal — Müşteri/Rapor kilitli tab'a tıklayınca açılır */}
+        <UpgradeModal
+          isOpen={showUpgradeModal}
+          onClose={() => setShowUpgradeModal(false)}
+          theme={theme}
         />
 
         {/* Success Toast */}

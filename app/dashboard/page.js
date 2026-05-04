@@ -149,7 +149,6 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
         {/* Order Quota — Pro / Free durumu */}
         <div style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
           {isPro ? (
-            // PRO görünümü
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
                 <span style={{
@@ -167,7 +166,6 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
               <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Sınırsız sipariş hakkı aktif</p>
             </>
           ) : (
-            // FREE görünümü
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
@@ -224,11 +222,6 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
                 boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
               }} />
             </div>
-          </div>
-
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>✏️</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Profili Düzenle</span>
           </div>
 
           {/* Pro'ya Yükselt — sadece Free'de göster */}
@@ -1152,14 +1145,14 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
   )
 }
 
-// Bottom Tab Bar Component
-function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
+// Bottom Tab Bar Component — Pro tier yoksa Müşteri/Rapor kilitli
+function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
-    { id: 'customers', icon: '👥', label: 'Müşteri' },
-    { id: 'reports', icon: '📊', label: 'Rapor' }
+    { id: 'customers', icon: '👥', label: 'Müşteri', locked: true },
+    { id: 'reports', icon: '📊', label: 'Rapor', locked: true }
   ]
 
   return (
@@ -1222,7 +1215,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
           ) : (
             <button
               key={tab.id}
-              onClick={() => onTabChange(tab.id)}
+              onClick={() => tab.locked ? onLockedClick && onLockedClick() : onTabChange(tab.id)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -1232,15 +1225,35 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, isDark = true }) {
                 justifyContent: 'center',
                 gap: '3px',
                 cursor: 'pointer',
-                opacity: activeTab === tab.id ? 1 : 0.5,
+                opacity: tab.locked ? 0.4 : (activeTab === tab.id ? 1 : 0.5),
                 padding: '4px 0',
-                width: '60px'
+                width: '60px',
+                position: 'relative'
               }}
             >
-              <span style={{ fontSize: '20px' }}>{tab.icon}</span>
+              {/* Kilit ikonu — kilitli tab'larda ikonun sağ üstünde */}
+              {tab.locked && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-2px',
+                  right: '8px',
+                  fontSize: '10px',
+                  background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                  color: '#fff',
+                  width: '14px',
+                  height: '14px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  fontWeight: '700',
+                  boxShadow: '0 2px 6px rgba(245, 158, 11, 0.4)'
+                }}>🔒</span>
+              )}
+              <span style={{ fontSize: '20px', filter: tab.locked ? 'grayscale(0.6)' : 'none' }}>{tab.icon}</span>
               <span style={{ 
                 fontSize: '10px', 
-                color: activeTab === tab.id ? '#22c55e' : '#64748b',
+                color: tab.locked ? '#64748b' : (activeTab === tab.id ? '#22c55e' : '#64748b'),
                 fontWeight: activeTab === tab.id ? '600' : '400',
                 textAlign: 'center',
                 whiteSpace: 'nowrap'
@@ -1324,8 +1337,6 @@ export default function DashboardPage() {
   }, [router])
 
   // ========== REALTIME SUBSCRIPTION ==========
-  // users tablosundaki bu kullanıcının is_pro / orders_created_count değişikliklerini anlık dinler.
-  // Lemon webhook is_pro = true yapınca, F5 olmadan UI güncellenir.
   useEffect(() => {
     if (!user?.id) return
 
@@ -1341,9 +1352,7 @@ export default function DashboardPage() {
         },
         (payload) => {
           const updated = payload.new || {}
-          // Önceki state'i bilmek için fonksiyonel update kullan
           setIsPro((prevIsPro) => {
-            // Free → Pro geçişi yakalandıysa kutlama toast'ı göster
             if (!prevIsPro && updated.is_pro === true) {
               setShowProUpgradeToast(true)
               setTimeout(() => setShowProUpgradeToast(false), 5000)
@@ -1366,7 +1375,6 @@ export default function DashboardPage() {
   useEffect(() => {
     let filtered = orders
     
-    // Single search input searches across name, phone, and product
     if (searchName.trim()) {
       const searchTerm = searchName.toLowerCase().trim()
       filtered = filtered.filter(order => 
@@ -1388,7 +1396,6 @@ export default function DashboardPage() {
       const { data: ordersData } = await supabase.from('orders').select('*').eq('user_id', userId).order('created_at', { ascending: false })
       const allOrders = ordersData || []
       setOrders(allOrders.filter(o => o.status !== 'completed'))
-      // Kota sayısını users tablosundaki orders_created_count'tan oku
       const { data: freshUserData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
       setOrdersCreatedCount(freshUserData?.orders_created_count || 0)
       setIsPro(freshUserData?.is_pro || false)
@@ -1409,7 +1416,6 @@ export default function DashboardPage() {
   }
 
   const handleAddOrder = async () => {
-    // Kota kontrolü: Pro değilse ve 50+ siparişi varsa upgrade modal aç
     if (!isPro && ordersCreatedCount >= 50) {
       setShowUpgradeModal(true)
       return
@@ -1458,33 +1464,28 @@ export default function DashboardPage() {
       note: ''
     })
     
-    // Show success toast
     setShowSuccessToast(true)
     setTimeout(() => setShowSuccessToast(false), 3000)
   }
   const deleteOrder = async (orderId) => {
     if (!confirm('Siparişi silmek istediğinize emin misiniz?')) return
     
-    // Silinecek siparişin created_at bilgisini bul
     const orderToDelete = orders.find(o => o.id === orderId)
     
     const { error } = await supabase.from('orders').delete().eq('id', orderId)
     if (error) { alert('Sipariş silinemedi.'); return }
     setOrders(orders.filter(o => o.id !== orderId))
     
-    // 12 saat kontrolü: sipariş 12 saatten önce oluşturulduysa kota iade et
     if (orderToDelete) {
       const createdAt = new Date(orderToDelete.created_at)
       const now = new Date()
       const hoursDiff = (now - createdAt) / (1000 * 60 * 60)
       
       if (hoursDiff < 12) {
-        // 12 saatten az geçmiş - kotayı 1 azalt (iade)
         const newCount = Math.max(0, ordersCreatedCount - 1)
         await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
         setOrdersCreatedCount(newCount)
       }
-      // 12 saatten fazla geçmişse kota değişmez - hak yanmış
     }
   }
 
@@ -1496,7 +1497,6 @@ export default function DashboardPage() {
   }
 
   const startEditing = (order) => {
-    // YENİ MANTIK: products_detail varsa onu kullan (KDV/birim fiyat doğru gelir)
     if (order.products_detail && Array.isArray(order.products_detail) && order.products_detail.length > 0) {
       setEditingId(order.id)
       setEditingData({
@@ -1512,9 +1512,7 @@ export default function DashboardPage() {
       return
     }
     
-    // ESKİ MANTIK: products_detail yoksa (eski siparişler için) tahmin yap
     const productParts = order.product.split(', ')
-    // Toplam fiyatı ürün sayısına bölerek tahmini birim fiyat hesapla
     const totalPrice = parseFloat(order.price) || 0
     const totalQuantity = productParts.reduce((sum, part) => {
       const match = part.match(/(.+) x(\d+)/)
@@ -1662,7 +1660,6 @@ export default function DashboardPage() {
                 <HomeIcon size={18} />
               </button>
               <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
-              {/* Pro rozeti — sadece mobil header */}
               {isPro && (
                 <span style={{
                   background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
@@ -1685,7 +1682,6 @@ export default function DashboardPage() {
               }}>{filteredOrders.length}</span>
             </div>
             
-            {/* Avatar */}
             <div
               onClick={() => setShowProfilePopup(!showProfilePopup)}
               style={{
@@ -1706,7 +1702,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Profile Popup */}
           <ProfilePopup
             user={user}
             isOpen={showProfilePopup}
@@ -1718,7 +1713,7 @@ export default function DashboardPage() {
             toggleTheme={toggleTheme}
           />
 
-          {/* Stats Row - 4 cards */}
+          {/* Stats Row */}
           <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
             <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{activeOrders}</p>
@@ -1738,7 +1733,6 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {/* Search Row */}
           <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
             <div style={{
               flex: 1,
@@ -1785,7 +1779,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* SCROLLABLE ORDERS LIST */}
         <div style={{ 
           flex: 1, 
           overflowY: 'auto', 
@@ -1821,15 +1814,15 @@ export default function DashboardPage() {
           )}
         </div>
 
-        {/* Bottom Tab Bar */}
+        {/* Bottom Tab Bar — Müşteri/Rapor kilitli, tıklayınca UpgradeModal aç */}
         <BottomTabBar
           activeTab={activeTab}
           onTabChange={handleTabChange}
           onAddClick={() => setShowAddModal(true)}
+          onLockedClick={() => setShowUpgradeModal(true)}
           isDark={isDark}
         />
 
-        {/* Add Order Modal */}
         <MobileAddOrderModal
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
@@ -1840,7 +1833,6 @@ export default function DashboardPage() {
           isDark={isDark}
         />
 
-        {/* Mobile Edit Modal */}
         <MobileEditModal
           isOpen={editingId !== null}
           editingData={editingData}
@@ -1853,16 +1845,13 @@ export default function DashboardPage() {
           isDark={isDark}
         />
 
-        {/* Upgrade Modal */}
         <UpgradeModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
           theme={theme}
         />
 
-        {/* Success Toast */}
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
-        {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik */}
         <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
         <style jsx global>{`
@@ -1927,7 +1916,6 @@ export default function DashboardPage() {
       <EditModal editingId={editingId} editingData={editingData} setEditingData={setEditingData} saveEdit={saveEdit} cancelEdit={cancelEdit} deleteOrder={deleteOrder} theme={theme} />
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} theme={theme} />
 
-      {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik (desktop) */}
       <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
       <Footer theme={theme} />

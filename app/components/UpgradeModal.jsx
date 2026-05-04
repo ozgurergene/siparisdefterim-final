@@ -172,21 +172,19 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
 
         {/* Close Button */}
         <button
-          onClick={onClose}
-          style={{
-            width: '100%',
-            padding: '14px',
-            background: 'transparent',
-            color: c.textSecondary,
-            border: `1px solid ${c.border}`,
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontSize: '14px',
-            fontWeight: '600',
-            marginBottom: '16px'
+          onClick={onClose} style={{
+          width: '100%',
+          padding: '14px',
+          background: 'rgba(182, 126, 234, 0.15)',
+          border: '1px solid rgba(102, 126, 234, 0.4)',
+          borderRadius: '12px',
+          color: '#a5b4fc',
+          fontSize: '14px',
+          fontWeight: '600',
+          cursor: 'pointer'
           }}
         >
-          Sonra
+          Kapat
         </button>
 
         {/* Footer - Support Email */}
