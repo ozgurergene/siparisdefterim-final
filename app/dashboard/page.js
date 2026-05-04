@@ -80,7 +80,7 @@ function SuccessToast({ show, message }) {
 }
 
 // Profile Popup Component
-function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, theme, toggleTheme }) {
+function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isPro, theme, toggleTheme }) {
   if (!isOpen) return null
 
   const isDark = theme === 'dark'
@@ -146,21 +146,44 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, the
           </div>
         </div>
 
-        {/* Order Quota */}
+        {/* Order Quota — Pro / Free durumu */}
         <div style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-            <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
-            <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
-          </div>
-          <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-            <div style={{
-              width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
-              height: '100%',
-              background: 'linear-gradient(90deg, #667eea, #764ba2)',
-              borderRadius: '2px'
-            }} />
-          </div>
-          <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
+          {isPro ? (
+            // PRO görünümü
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                <span style={{
+                  fontSize: '11px',
+                  fontWeight: '700',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  WebkitBackgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  backgroundClip: 'text',
+                  letterSpacing: '0.5px'
+                }}>✨ PRO ÜYELİK</span>
+                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} sipariş</span>
+              </div>
+              <div style={{ height: '4px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }} />
+              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Sınırsız sipariş hakkı aktif</p>
+            </>
+          ) : (
+            // FREE görünümü
+            <>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
+                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
+              </div>
+              <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
+                <div style={{
+                  width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
+                  height: '100%',
+                  background: 'linear-gradient(90deg, #667eea, #764ba2)',
+                  borderRadius: '2px'
+                }} />
+              </div>
+              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
+            </>
+          )}
         </div>
 
         {/* Menu Items */}
@@ -208,19 +231,22 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, the
             <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Profili Düzenle</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>⭐</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
-            <span style={{
-              marginLeft: 'auto',
-              background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
-              color: '#fff',
-              fontSize: '8px',
-              padding: '2px 6px',
-              borderRadius: '4px',
-              fontWeight: '600'
-            }}>YENİ</span>
-          </div>
+          {/* Pro'ya Yükselt — sadece Free'de göster */}
+          {!isPro && (
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+              <span style={{ fontSize: '16px' }}>⭐</span>
+              <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
+              <span style={{
+                marginLeft: 'auto',
+                background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
+                color: '#fff',
+                fontSize: '8px',
+                padding: '2px 6px',
+                borderRadius: '4px',
+                fontWeight: '600'
+              }}>YENİ</span>
+            </div>
+          )}
 
           <div style={{ height: '1px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', margin: '6px 0' }} />
 
@@ -1243,6 +1269,7 @@ export default function DashboardPage() {
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
+  const [showProUpgradeToast, setShowProUpgradeToast] = useState(false)
   const [activeTab, setActiveTab] = useState('orders')
   
   const [searchName, setSearchName] = useState('')
@@ -1295,6 +1322,46 @@ export default function DashboardPage() {
     }
     checkUser()
   }, [router])
+
+  // ========== REALTIME SUBSCRIPTION ==========
+  // users tablosundaki bu kullanıcının is_pro / orders_created_count değişikliklerini anlık dinler.
+  // Lemon webhook is_pro = true yapınca, F5 olmadan UI güncellenir.
+  useEffect(() => {
+    if (!user?.id) return
+
+    const channel = supabase
+      .channel(`user-changes-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'users',
+          filter: `id=eq.${user.id}`,
+        },
+        (payload) => {
+          const updated = payload.new || {}
+          // Önceki state'i bilmek için fonksiyonel update kullan
+          setIsPro((prevIsPro) => {
+            // Free → Pro geçişi yakalandıysa kutlama toast'ı göster
+            if (!prevIsPro && updated.is_pro === true) {
+              setShowProUpgradeToast(true)
+              setTimeout(() => setShowProUpgradeToast(false), 5000)
+            }
+            return updated.is_pro ?? prevIsPro
+          })
+
+          if (typeof updated.orders_created_count === 'number') {
+            setOrdersCreatedCount(updated.orders_created_count)
+          }
+        }
+      )
+      .subscribe()
+
+    return () => {
+      supabase.removeChannel(channel)
+    }
+  }, [user?.id])
 
   useEffect(() => {
     let filtered = orders
@@ -1595,6 +1662,19 @@ export default function DashboardPage() {
                 <HomeIcon size={18} />
               </button>
               <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '18px', fontWeight: '600' }}>Siparişler</span>
+              {/* Pro rozeti — sadece mobil header */}
+              {isPro && (
+                <span style={{
+                  background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%)',
+                  color: '#667eea',
+                  fontSize: '10px',
+                  padding: '3px 8px',
+                  borderRadius: '10px',
+                  fontWeight: '700',
+                  letterSpacing: '0.5px',
+                  border: '1px solid rgba(102, 126, 234, 0.3)'
+                }}>✨ PRO</span>
+              )}
               <span style={{
                 background: isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(102, 126, 234, 0.15)',
                 color: '#667eea',
@@ -1633,6 +1713,7 @@ export default function DashboardPage() {
             onClose={() => setShowProfilePopup(false)}
             onLogout={handleLogout}
             ordersCreatedCount={ordersCreatedCount}
+            isPro={isPro}
             theme={theme}
             toggleTheme={toggleTheme}
           />
@@ -1781,6 +1862,8 @@ export default function DashboardPage() {
 
         {/* Success Toast */}
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />
+        {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik */}
+        <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
 
         <style jsx global>{`
           @keyframes fadeIn {
@@ -1814,7 +1897,7 @@ export default function DashboardPage() {
       overflowX: 'hidden',
       boxSizing: 'border-box'
     }}>
-      <Header user={user} ordersCreatedCount={ordersCreatedCount} theme={theme} toggleTheme={toggleTheme} handleLogout={handleLogout} />
+      <Header user={user} ordersCreatedCount={ordersCreatedCount} isPro={isPro} theme={theme} toggleTheme={toggleTheme} handleLogout={handleLogout} />
 
       <div style={{ flex: 1, width: '100%', padding: '20px 24px', boxSizing: 'border-box' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '15px', marginBottom: '20px' }}>
@@ -1843,6 +1926,10 @@ export default function DashboardPage() {
 
       <EditModal editingId={editingId} editingData={editingData} setEditingData={setEditingData} saveEdit={saveEdit} cancelEdit={cancelEdit} deleteOrder={deleteOrder} theme={theme} />
       <UpgradeModal isOpen={showUpgradeModal} onClose={() => setShowUpgradeModal(false)} theme={theme} />
+
+      {/* Pro Upgrade Toast — webhook is_pro=true yaptığında otomatik (desktop) */}
+      <SuccessToast show={showProUpgradeToast} message="🎉 Pro üyeliğiniz aktif edildi! Artık sınırsız sipariş oluşturabilirsiniz." />
+
       <Footer theme={theme} />
     </div>
   )

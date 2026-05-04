@@ -37,7 +37,7 @@ function HomeIcon({ size = 24 }) {
   )
 }
 
-export default function Header({ user, ordersCreatedCount, theme, toggleTheme, handleLogout }) {
+export default function Header({ user, ordersCreatedCount, isPro = false, theme, toggleTheme, handleLogout }) {
   const c = colors[theme]
   const router = useRouter()
   const pathname = usePathname()
@@ -170,12 +170,45 @@ export default function Header({ user, ordersCreatedCount, theme, toggleTheme, h
         </nav>
 
         <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
-          <div style={{ textAlign: 'right' }}>
-            <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
-            <div style={{ width: '100px', height: '6px', background: c.bgSecondary, borderRadius: '3px', overflow: 'hidden' }}>
-              <div style={{ width: `${(ordersCreatedCount / 50) * 100}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : 'linear-gradient(90deg, #667eea, #764ba2)', transition: 'width 0.3s' }} />
+          {/* Sipariş Sayacı — Pro / Free durumu */}
+          {isPro ? (
+            // PRO görünümü: rozet + sayı, /50 yok
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '8px 14px',
+              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
+              border: '1px solid rgba(102, 126, 234, 0.4)',
+              borderRadius: '20px',
+              boxShadow: '0 2px 8px rgba(102, 126, 234, 0.15)'
+            }}>
+              <span style={{
+                fontSize: '13px',
+                fontWeight: '700',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+                backgroundClip: 'text',
+                letterSpacing: '0.5px'
+              }}>
+                ✨ PRO
+              </span>
+              <span style={{ width: '1px', height: '14px', background: c.border }} />
+              <span style={{ fontSize: '13px', color: c.textSecondary }}>
+                Siparişler: <strong style={{ color: c.text }}>{ordersCreatedCount}</strong>
+              </span>
             </div>
-          </div>
+          ) : (
+            // FREE görünümü: orijinal /50 progress bar
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
+              <div style={{ width: '100px', height: '6px', background: c.bgSecondary, borderRadius: '3px', overflow: 'hidden' }}>
+                <div style={{ width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : 'linear-gradient(90deg, #667eea, #764ba2)', transition: 'width 0.3s' }} />
+              </div>
+            </div>
+          )}
+
           <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
           
           {/* Theme Toggle Button */}
