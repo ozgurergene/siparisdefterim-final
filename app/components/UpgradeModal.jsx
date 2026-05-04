@@ -1,6 +1,7 @@
 'use client'
 
 import { colors } from '../../lib/theme'
+import { useRouter } from 'next/navigation'
 
 // Lemon Squeezy Checkout URLs (Test Mode)
 const CHECKOUT_URLS = {
@@ -12,6 +13,7 @@ const SUPPORT_EMAIL = 'destek@deftertut.com'
 
 export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
   const c = colors[theme]
+  const router = useRouter()
 
   if (!isOpen) return null
 
@@ -21,6 +23,11 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
 
   const handleYearly = () => {
     window.open(CHECKOUT_URLS.yearly, '_blank')
+  }
+
+  const handleViewAllPlans = () => {
+    onClose()
+    router.push('/pricing')
   }
 
   return (
@@ -86,8 +93,8 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
         </div>
 
         {/* Pricing Cards - Now Clickable */}
-        <div style={{ display: 'flex', gap: '10px', marginBottom: '20px' }}>
-          {/* Monthly - Clickable */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
+          {/* Monthly */}
           <button
             onClick={handleMonthly}
             style={{
@@ -117,7 +124,7 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
             </p>
           </button>
 
-          {/* Yearly - Clickable, highlighted */}
+          {/* Yearly - highlighted */}
           <button
             onClick={handleYearly}
             style={{
@@ -166,9 +173,27 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
         </div>
 
         {/* Hint Text */}
-        <p style={{ margin: '0 0 18px 0', fontSize: '11px', color: c.textSecondary }}>
+        <p style={{ margin: '0 0 12px 0', fontSize: '11px', color: c.textSecondary }}>
           💡 Yukarıdaki plana tıklayarak ödeme yapabilirsiniz
         </p>
+
+        {/* Tüm Planları Gör — Detay sayfasına link */}
+        <button
+          onClick={handleViewAllPlans}
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#667eea',
+            fontSize: '13px',
+            fontWeight: '600',
+            cursor: 'pointer',
+            marginBottom: '18px',
+            padding: '4px 8px',
+            textDecoration: 'underline'
+          }}
+        >
+          Tüm planları ve detayları gör →
+        </button>
 
         {/* Close Button */}
         <button
@@ -189,7 +214,7 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
 
         {/* Footer - Support Email */}
         <p style={{
-          margin: 0,
+          margin: '16px 0 0 0',
           fontSize: '12px',
           color: c.textSecondary,
           paddingTop: '16px',
