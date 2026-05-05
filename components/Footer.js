@@ -32,6 +32,8 @@ export default function Footer({ theme }) {
           >
             ⭐ Pro Üyelik
           </a>
+          <a href="/manage-subscription" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Aboneliği Yönet</a>
+          <a href="/refund-policy" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>İade Politikası</a>
           <a href="/privacy-policy" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Gizlilik Politikası</a>
           <a href="/terms-of-use" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>Kullanım Koşulları</a>
           <a href="/gdpr-disclosure" style={{ color: c.textSecondary, textDecoration: 'none', fontSize: '13px' }}>KVKK Aydınlatma</a>
