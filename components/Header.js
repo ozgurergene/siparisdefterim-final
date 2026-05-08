@@ -243,7 +243,34 @@ export default function Header({ user, ordersCreatedCount, isPro = false, theme,
             </button>
           )}
 
-          <span style={{ color: c.textSecondary, fontSize: '14px' }}>{user.email}</span>
+          {/* Email — Tıklanabilir, /manage-subscription'a gider */}
+          <a
+            href="/manage-subscription"
+            title="Hesabım — Aboneliği Yönet"
+            style={{
+              color: c.textSecondary,
+              fontSize: '14px',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = c.bgSecondary
+              e.currentTarget.style.color = '#667eea'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = c.textSecondary
+            }}
+          >
+            <span style={{ fontSize: '14px' }}>👤</span>
+            {user.email}
+          </a>
           
           {/* Theme Toggle Button */}
           <button

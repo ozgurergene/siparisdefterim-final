@@ -17,19 +17,35 @@ const SUPPORT_EMAIL = 'destek@deftertut.com'
 const FAQS = [
   {
     q: 'İptal edebilir miyim?',
-    a: 'Evet, istediğiniz zaman iptal edebilirsiniz. İptal sonrasında mevcut dönem sonuna kadar Pro özelliklerini kullanmaya devam edersiniz.'
+    a: 'Evet, istediğiniz zaman iptal edebilirsiniz. "Aboneliği Yönet" sayfasından kendiniz iptal edebilir veya destek@deftertut.com adresine yazabilirsiniz. İptal sonrasında ödediğiniz dönemin sonuna kadar Pro özelliklerini kullanmaya devam edersiniz.'
   },
   {
     q: 'Para iadesi var mı?',
-    a: '14 gün içinde memnun kalmazsanız tam iade alırsınız. destek@deftertut.com adresine yazın, hemen iade işlemi başlatılır.'
+    a: '14 gün içinde koşulsuz iade hakkınız vardır (TKHK 6502 cayma hakkı). destek@deftertut.com adresine yazın, iade işlemi 5-14 iş günü içinde tamamlanır. Detaylı bilgi için İade ve İptal Politikası sayfasına bakabilirsiniz.'
   },
   {
     q: 'Hangi ödeme yöntemleri kabul ediliyor?',
-    a: 'Tüm kredi kartları (Visa, Mastercard, American Express), Apple Pay ve Google Pay kabul ediyoruz. Ödeme altyapısı uluslararası standartlara uygun ve güvenlidir.'
+    a: 'Tüm kredi kartları (Visa, Mastercard, American Express), Apple Pay ve Google Pay kabul ediyoruz. Ödemeler güvenli ödeme sağlayıcımız Lemon Squeezy üzerinden, uluslararası PCI-DSS standartlarına uygun olarak işlenir.'
   },
   {
     q: 'Faturamı nasıl alırım?',
-    a: 'Ödemenin ardından otomatik olarak e-posta adresinize fatura gönderilir.'
+    a: 'Ödemenin ardından otomatik olarak e-posta adresinize fatura gönderilir. Tüm faturalarınıza istediğiniz zaman "Aboneliği Yönet" sayfasından erişebilirsiniz.'
+  },
+  {
+    q: 'Aylıktan yıllığa geçebilir miyim?',
+    a: 'Evet. "Aboneliği Yönet" sayfasından plan değişikliği yapabilirsiniz. Yıllık plana geçişte kalan aylık dönem orantılı olarak hesaplanır ve farkı ödenir; böylece kayıp olmaz.'
+  },
+  {
+    q: 'Pro üyelik bitince siparişlerim ve müşterilerim ne olur?',
+    a: 'Verileriniz silinmez. Tüm sipariş ve müşteri kayıtlarınız Ücretsiz plana döndüğünüzde de görüntülenebilir kalır. Sadece sınırsız sipariş oluşturma ve Pro özelliklerine erişim sona erer.'
+  },
+  {
+    q: 'Mobil uygulama var mı?',
+    a: 'Şu an SiparişDefterim mobil tarayıcıdan tam olarak kullanılabilir, ayrı uygulama gerektirmez. Telefonunuzdan deftertut.com\'a giriş yapın, ana ekrana ekleyin (PWA), tek dokunuşla açılsın.'
+  },
+  {
+    q: 'Verilerim güvenli mi?',
+    a: 'Evet. Tüm veriler SSL şifreleme ile aktarılır, şifreler bcrypt ile saklanır. Veritabanımız KVKK ve GDPR uyumludur. Detaylar için Gizlilik Politikası sayfasına bakabilirsiniz.'
   }
 ]
 

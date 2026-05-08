@@ -53,17 +53,29 @@ export async function POST(request) {
   }
 
   // 5. Event'e göre is_pro değerini belirle
+  // ÖNEMLİ AYRIM:
+  // - cancelled = "iptal etti AMA dönem sonuna kadar Pro hakkı devam eder" → SADECE LOGLA
+  // - expired = "dönem bitti, gerçekten Pro değil" → is_pro=false
+  // - paused = "abonelik askıya alındı" → is_pro=false (bu farklı, hemen durdur)
+  
   const PRO_EVENTS = [
-    'subscription_created',
-    'subscription_resumed',
-    'subscription_unpaused',
-    'subscription_payment_success',
+    'subscription_created',          // İlk kayıt
+    'subscription_resumed',          // İptal sonrası "vazgeçtim" deyince
+    'subscription_unpaused',         // Pause kaldırıldı
+    'subscription_payment_success',  // Aylık yenileme başarılı
   ]
 
   const NOT_PRO_EVENTS = [
-    'subscription_cancelled',
-    'subscription_expired',
-    'subscription_paused',
+    'subscription_expired',  // Dönem bitti, yenileme yok → ARTIK Pro değil
+    'subscription_paused',   // Lemon tarafında askıya alındı → hemen durdur
+  ]
+
+  const LOG_ONLY_EVENTS = [
+    'subscription_cancelled',         // İptal etti AMA dönem sonuna kadar Pro
+    'subscription_payment_failed',    // Ödeme başarısız (kart limiti vs.)
+    'subscription_payment_refunded',  // İade yapıldı (Lemon iade verdi)
+    'subscription_plan_changed',      // Plan değişimi (aylık → yıllık)
+    'subscription_updated',           // Genel güncelleme
   ]
 
   let newIsProValue = null
@@ -71,6 +83,29 @@ export async function POST(request) {
     newIsProValue = true
   } else if (NOT_PRO_EVENTS.includes(eventName)) {
     newIsProValue = false
+  }
+
+  // LOG_ONLY events: sadece logla, is_pro değiştirme
+  if (LOG_ONLY_EVENTS.includes(eventName)) {
+    console.log(`📝 Log-only event: ${eventName} for ${customerEmail}`)
+    
+    // Özel durumlar için ek log:
+    if (eventName === 'subscription_cancelled') {
+      console.log(`ℹ️  ${customerEmail} aboneliği iptal etti. Dönem sonuna kadar Pro hakkı devam ediyor.`)
+    }
+    if (eventName === 'subscription_payment_failed') {
+      console.log(`⚠️  ${customerEmail} ödeme başarısız. Müşteriye email gönderilebilir.`)
+    }
+    if (eventName === 'subscription_payment_refunded') {
+      console.log(`💰 ${customerEmail} iade yapıldı. Pro durumu expired event'inde düşecek.`)
+    }
+    
+    return NextResponse.json({ 
+      received: true, 
+      logged: true,
+      event: eventName,
+      email: customerEmail
+    })
   }
 
   // İlgilenmediğimiz event ise sessizce 200 dön (Lemon retry yapmasın)
@@ -113,7 +148,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'DB update failed' }, { status: 500 })
   }
 
-  console.log(`✅ ${customerEmail} → is_pro: ${newIsProValue}`)
+  console.log(`✅ ${customerEmail} → is_pro: ${newIsProValue} (${eventName})`)
 
   return NextResponse.json({
     received: true,

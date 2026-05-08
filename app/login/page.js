@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 
@@ -13,6 +13,16 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [focusedField, setFocusedField] = useState(null)
   const [agreedToTerms, setAgreedToTerms] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
+
+  // localStorage'dan kayıtlı email'i yükle (sadece login modunda)
+  useEffect(() => {
+    const savedEmail = localStorage.getItem('siparisdefterim-remembered-email')
+    if (savedEmail) {
+      setEmail(savedEmail)
+      setRememberMe(true)
+    }
+  }, [])
 
   const handleEmailAuth = async (e) => {
     e.preventDefault()
@@ -24,6 +34,14 @@ export default function LoginPage() {
       if (isLogin) {
         const { error } = await supabase.auth.signInWithPassword({ email, password })
         if (error) throw error
+        
+        // "Beni Hatırla" işaretliyse email'i kaydet, değilse sil
+        if (rememberMe) {
+          localStorage.setItem('siparisdefterim-remembered-email', email)
+        } else {
+          localStorage.removeItem('siparisdefterim-remembered-email')
+        }
+        
         router.push('/home')
       } else {
         if (!agreedToTerms) {
@@ -176,6 +194,21 @@ export default function LoginPage() {
               style={inputStyle('password')}
             />
           </div>
+
+          {/* Beni Hatırla — sadece login modunda göster */}
+          {isLogin && (
+            <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 16, cursor: 'pointer', userSelect: 'none' }}>
+              <input 
+                type="checkbox" 
+                checked={rememberMe} 
+                onChange={(e) => setRememberMe(e.target.checked)}
+                style={{ width: 16, height: 16, accentColor: '#667eea', cursor: 'pointer' }} 
+              />
+              <span style={{ fontSize: 13, color: '#94a3b8' }}>
+                Beni Hatırla
+              </span>
+            </label>
+          )}
 
           {/* Terms for signup - TEK CHECKBOX, TIKLANABILIR LİNKLER */}
           {!isLogin && (

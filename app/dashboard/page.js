@@ -226,7 +226,7 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
 
           {/* Pro'ya Yükselt — sadece Free'de göster */}
           {!isPro && (
-            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
+            <a href="/pricing" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', textDecoration: 'none' }}>
               <span style={{ fontSize: '16px' }}>⭐</span>
               <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
               <span style={{
@@ -238,7 +238,7 @@ function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isP
                 borderRadius: '4px',
                 fontWeight: '600'
               }}>YENİ</span>
-            </div>
+            </a>
           )}
 
           <div style={{ height: '1px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', margin: '6px 0' }} />
