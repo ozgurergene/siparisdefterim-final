@@ -27,7 +27,7 @@ export default function RefundPolicyPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: c.bg,
+      background: c.bgGradient,
       fontFamily: 'Arial, sans-serif',
       color: c.text,
       display: 'flex',
@@ -36,15 +36,25 @@ export default function RefundPolicyPage() {
       {/* Basit Header */}
       <div style={{
         background: c.header,
+        backdropFilter: c.backdropFilter,
+        WebkitBackdropFilter: c.backdropFilter,
         borderBottom: `1px solid ${c.border}`,
         padding: '15px 20px'
       }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <a href="/" style={{ color: c.text, textDecoration: 'none', fontSize: '18px', fontWeight: 'bold' }}>
-            📋 SiparişDefterim
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '26px' }}>📱</span>
+            <span style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>SiparişDefterim</span>
           </a>
           <a 
-            href={user ? '/dashboard' : '/'} 
+            href={user ? '/dashboard' : '/login'} 
             style={{ 
               color: '#667eea', 
               textDecoration: 'none', 
@@ -61,108 +71,145 @@ export default function RefundPolicyPage() {
       <div style={{ flex: 1, padding: '40px 20px', maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
         <h1 style={{ fontSize: '32px', marginBottom: '10px', color: c.text }}>İade ve İptal Politikası</h1>
         <p style={{ color: c.textSecondary, fontSize: '13px', marginBottom: '30px' }}>
-          Son güncelleme: 4 Mayıs 2026
+          Son güncelleme: 12 Mayıs 2026
         </p>
 
+        {/* === GUNCEL: Üst özet kutusu - "Iade yok" net mesaj === */}
         <div style={{
-          background: 'rgba(102, 126, 234, 0.1)',
-          border: '1px solid rgba(102, 126, 234, 0.3)',
+          background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
+          border: `1px solid ${theme === 'dark' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(245, 158, 11, 0.25)'}`,
           borderRadius: '8px',
           padding: '15px 20px',
           marginBottom: '30px'
         }}>
           <p style={{ margin: 0, fontSize: '14px', color: c.text, lineHeight: '1.6' }}>
-            <strong>💡 Kısa Özet:</strong> Pro üyeliğinizden 14 gün içinde herhangi bir sebep göstermeden cayma hakkınız vardır. 
-            İptal etmek için <a href="/manage-subscription" style={{ color: '#667eea', fontWeight: '600' }}>Aboneliği Yönet</a> sayfasından 
-            kendiniz iptal edebilir veya <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> 
-            adresine yazabilirsiniz.
+            <strong>⚠️ Önemli Özet:</strong> Pro üyelik dijital bir hizmet olduğu için <strong>cayma hakkı kapsamı dışındadır</strong> ve 
+            ödenen ücretler iade edilmez. Ancak <strong>dilediğiniz zaman iptal edebilirsiniz</strong>; iptal 
+            sonrasında ödediğiniz dönemin sonuna kadar Pro özelliklerini kullanmaya devam edersiniz. 
+            İptal için <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine yazabilirsiniz.
           </p>
         </div>
 
-        {/* Bölüm 1 */}
+        {/* === GUNCEL Bölüm 1: Cayma Hakkı YOK + TKHK Madde 15/g === */}
         <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>1. Cayma Hakkı (14 Gün İade Garantisi)</h2>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>1. Cayma Hakkı ve İade Politikası</h2>
+          
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
-            6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği uyarınca, 
-            Pro üyelik aboneliğinizi satın aldığınız tarihten itibaren <strong>14 gün içinde</strong> herhangi bir 
-            sebep göstermeden ve cezai şart ödemeden sözleşmeden cayma hakkınız bulunmaktadır.
+            Pro üyelik aboneliği, 6502 sayılı <strong>Tüketicinin Korunması Hakkında Kanun (TKHK)</strong> ve 
+            <strong> Mesafeli Sözleşmeler Yönetmeliği'nin 15. maddesinin 1. fıkrasının (ğ) bendi</strong> uyarınca 
+            <strong> "elektronik ortamda anında ifa edilen hizmetler"</strong> kapsamındadır.
           </p>
+          
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik ödemesi onaylandığı anda hizmetin ifasına başlanır ve Pro özellikler hesabınızda aktive edilir. 
+            Bu sebeple <strong>cayma hakkı kullanılamaz</strong> ve <strong>ödenen ücretler iade edilmez</strong>.
+          </p>
+
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
-            Cayma hakkını kullandığınız takdirde, ödediğiniz tutar 14 gün içinde ödeme yaptığınız yönteme iade edilir.
+            Pro üyelik satın alma sürecinde, sözleşmeyi kabul ederek bu hizmetin cayma hakkı kapsamı dışında 
+            olduğunu ve cayma hakkından feragat ettiğinizi açıkça beyan etmiş olursunuz.
           </p>
         </section>
 
-        {/* Bölüm 2 */}
+        {/* === GUNCEL Bölüm 2: İptal Nasıl Yapılır - sadece email === */}
         <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>2. İptal Nasıl Yapılır?</h2>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>2. İptal Hakkı ve İptal Nasıl Yapılır?</h2>
+          
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
-            Aboneliğinizi iki şekilde iptal edebilirsiniz:
+            İade yapılmamakla birlikte, <strong>aboneliğinizi dilediğiniz zaman iptal edebilirsiniz</strong>. 
+            İptal sonrasında:
           </p>
+
+          <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px', marginBottom: '12px' }}>
+            <li style={{ marginBottom: '8px' }}>Ödediğiniz dönemin (aylık/yıllık) <strong>sonuna kadar</strong> Pro özelliklerini kullanmaya devam edersiniz.</li>
+            <li style={{ marginBottom: '8px' }}>Dönem sonunda hesabınız otomatik olarak <strong>Ücretsiz plana</strong> geçer.</li>
+            <li style={{ marginBottom: '8px' }}>Bir sonraki dönem için sizden <strong>ücret tahsil edilmez</strong>.</li>
+            <li style={{ marginBottom: '8px' }}>Tüm siparişleriniz, müşterileriniz ve verileriniz <strong>kaybolmaz</strong>, görüntülemeye devam edebilirsiniz.</li>
+          </ul>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            İptal talebinizi göndermek için:
+          </p>
+
           <div style={{ paddingLeft: '20px', marginBottom: '12px' }}>
             <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '8px' }}>
-              <strong>A) Self-Service (Önerilen):</strong> <a href="/manage-subscription" style={{ color: '#667eea' }}>Aboneliği Yönet</a> sayfasından 
-              "Aboneliği Yönet" butonuna tıklayarak Lemon Squeezy müşteri portalına ulaşın ve oradan iptal işlemini gerçekleştirin.
+              📧 <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine 
+              "İptal Talebi" konulu bir e-posta gönderin.
             </p>
             <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
-              <strong>B) E-posta ile:</strong> <a href="mailto:destek@deftertut.com" style={{ color: '#667eea' }}>destek@deftertut.com</a> adresine 
-              "İptal Talebi" konulu bir e-posta gönderebilirsiniz. Talebiniz 1-2 iş günü içinde işleme alınır.
+              Veya doğrudan <a href="/manage-subscription" style={{ color: '#667eea', fontWeight: '600' }}>Aboneliği Yönet</a> sayfasından 
+              "İptal Talebi Gönder" butonunu kullanın.
             </p>
           </div>
-        </section>
 
-        {/* Bölüm 3 */}
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>3. İade Şartları</h2>
-          <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px' }}>
-            <li style={{ marginBottom: '8px' }}>İade talebi, satın alma tarihinden itibaren <strong>14 gün içinde</strong> yapılmalıdır.</li>
-            <li style={{ marginBottom: '8px' }}>İade tutarı, ödeme yöntemine bağlı olarak <strong>5-14 iş günü</strong> içinde hesabınıza yansır.</li>
-            <li style={{ marginBottom: '8px' }}>Kredi kartı iadeleri, kart sağlayıcınızın işlem sürelerine göre değişebilir.</li>
-            <li style={{ marginBottom: '8px' }}>İade işlemi sonrası Pro üyeliğiniz sonlandırılır ve hesabınız Ücretsiz plana geçirilir.</li>
-            <li style={{ marginBottom: '8px' }}>Önceden oluşturduğunuz tüm siparişler ve veriler kaybolmaz, görüntülemeye devam edebilirsiniz.</li>
-          </ul>
-        </section>
-
-        {/* Bölüm 4 */}
-        <section style={{ marginBottom: '30px' }}>
-          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>4. Cayma Hakkının İstisnaları</h2>
-          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
-            Mesafeli Sözleşmeler Yönetmeliği'nin 15. maddesi uyarınca, aşağıdaki durumlarda cayma hakkı kullanılamaz:
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+            Talebiniz <strong>1-2 iş günü içinde</strong> işleme alınır ve onay e-postası gönderilir.
           </p>
+        </section>
+
+        {/* === GUNCEL Bölüm 3: İade Politikası - İade YOK === */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>3. İade Politikası</h2>
+          
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik abonelikleri için <strong>iade yapılmamaktadır</strong>. Bu durum aşağıdaki sebeplere dayanmaktadır:
+          </p>
+
           <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px' }}>
-            <li style={{ marginBottom: '8px' }}>14 günlük cayma süresi geçtikten sonra yapılan talepler.</li>
-            <li style={{ marginBottom: '8px' }}>Yıllık abonelik döneminin ortasında, ilk 14 gün haricinde, kullanılmamış aylar için iade talebi (yıllık üyelikte cayma hakkı yalnızca ilk 14 gün için geçerlidir).</li>
+            <li style={{ marginBottom: '8px' }}>Pro üyelik, ödeme onayıyla birlikte <strong>anında aktive edilen dijital bir hizmettir</strong>.</li>
+            <li style={{ marginBottom: '8px' }}>TKHK Madde 15/ğ uyarınca elektronik ortamda anında ifa edilen hizmetler cayma hakkı kapsamı dışındadır.</li>
+            <li style={{ marginBottom: '8px' }}>Pro özellikler aktive edildiği anda kullanıma sunulur ve geri alınamaz nitelikte bir hizmettir.</li>
+            <li style={{ marginBottom: '8px' }}>Bu sebeple <strong>kullanılmamış süre veya kısmi iade talepleri kabul edilmez</strong>.</li>
           </ul>
         </section>
 
-        {/* Bölüm 5 */}
+        {/* === GUNCEL Bölüm 4: Ücretsiz Deneme Önerisi === */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>4. Satın Almadan Önce Deneyin</h2>
+          
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik için iade yapılmadığından, satın almadan önce hizmeti ücretsiz olarak deneyebilirsiniz:
+          </p>
+
+          <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px' }}>
+            <li style={{ marginBottom: '8px' }}><strong>Ücretsiz Plan:</strong> 50 siparişe kadar tüm temel özellikler ücretsizdir.</li>
+            <li style={{ marginBottom: '8px' }}>Hizmetin size uygun olduğundan emin olduktan sonra Pro'ya yükseltebilirsiniz.</li>
+            <li style={{ marginBottom: '8px' }}>Sorularınız için satın almadan önce <a href="mailto:destek@deftertut.com" style={{ color: '#667eea' }}>destek@deftertut.com</a> adresine yazabilirsiniz.</li>
+          </ul>
+        </section>
+
+        {/* === GUNCEL Bölüm 5: Yenileme ve Otomatik Tahsilat === */}
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>5. Yenileme ve Otomatik Tahsilat</h2>
+          
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
-            Aboneliğiniz, seçtiğiniz dönem (aylık veya yıllık) sonunda otomatik olarak yenilenir. Otomatik yenilemeyi 
-            durdurmak istiyorsanız, yenileme tarihinden önce aboneliğinizi iptal etmeniz yeterlidir.
+            Aboneliğiniz, seçtiğiniz dönem (aylık veya yıllık) sonunda otomatik olarak yenilenir. 
+            Otomatik yenilemeyi durdurmak istiyorsanız, <strong>yenileme tarihinden önce</strong> aboneliğinizi iptal etmeniz yeterlidir.
           </p>
+          
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
-            İptal ettiğinizde, ödediğiniz dönemin sonuna kadar Pro özelliklerini kullanmaya devam edersiniz; 
-            dönem bitiminde otomatik olarak Ücretsiz plana geçirilirsiniz.
+            Yenileme gerçekleştikten sonra yapılan iptal taleplerinde, mevcut dönem için ödenen ücret iade edilmez 
+            (madde 3 uyarınca); ancak bir sonraki yenileme yapılmaz.
           </p>
         </section>
 
-        {/* Bölüm 6 */}
+        {/* Bölüm 6: Veri Saklama (Aynen kaldi) */}
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>6. Veri Saklama</h2>
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
-            İptal veya iade durumunda, sipariş ve müşteri verileriniz silinmez; sadece Pro özelliklerine erişiminiz 
+            İptal durumunda, sipariş ve müşteri verileriniz silinmez; sadece Pro özelliklerine erişiminiz 
             sınırlandırılır. Verilerinizin tamamen silinmesini istiyorsanız, KVKK kapsamındaki haklarınız doğrultusunda 
             <a href="mailto:destek@deftertut.com" style={{ color: '#667eea' }}> destek@deftertut.com</a> adresine yazabilirsiniz.
           </p>
         </section>
 
-        {/* Bölüm 7 */}
+        {/* === GUNCEL Bölüm 7: Ödeme Sağlayıcısı === */}
         <section style={{ marginBottom: '30px' }}>
           <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>7. Ödeme Sağlayıcısı</h2>
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
-            Tüm ödeme işlemleri Merchant of Record (Yetkili Satıcı) olarak Lemon Squeezy Inc. tarafından gerçekleştirilir. 
-            İade işlemleri de aynı kanal üzerinden yapılır. Lemon Squeezy'nin kendi <a href="https://www.lemonsqueezy.com/legal/refund-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#667eea' }}>iade politikası</a> da geçerlidir.
+            Tüm ödeme işlemleri Merchant of Record (Yetkili Satıcı) olarak <strong>Lemon Squeezy Inc.</strong> tarafından 
+            gerçekleştirilir. Ödeme süreciyle ilgili sorularınız için bizimle iletişime geçmeniz yeterlidir; 
+            tüm talepler tarafımızdan koordine edilir.
           </p>
         </section>
 
@@ -176,7 +223,7 @@ export default function RefundPolicyPage() {
         }}>
           <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>📞 İletişim</h2>
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '8px' }}>
-            İade veya iptal süreciyle ilgili her türlü sorunuz için bize ulaşabilirsiniz:
+            İptal veya bu politikayla ilgili her türlü sorunuz için bize ulaşabilirsiniz:
           </p>
           <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', margin: '4px 0' }}>
             📧 E-posta: <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a>
@@ -193,7 +240,7 @@ export default function RefundPolicyPage() {
         <section style={{ borderTop: `1px solid ${c.border}`, paddingTop: '20px', marginTop: '30px' }}>
           <p style={{ color: c.textSecondary, fontSize: '12px', lineHeight: '1.6', textAlign: 'center', margin: 0 }}>
             Bu politika, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve 27.11.2014 tarihli Mesafeli Sözleşmeler 
-            Yönetmeliği hükümleri çerçevesinde hazırlanmıştır.
+            Yönetmeliği'nin 15/1-ğ maddesi hükümleri çerçevesinde hazırlanmıştır.
           </p>
         </section>
       </div>

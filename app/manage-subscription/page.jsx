@@ -6,8 +6,9 @@ import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
 
-// Lemon Squeezy Customer Portal URL
-const CUSTOMER_PORTAL_URL = 'https://siparisdefterim-final.lemonsqueezy.com/billing'
+// NOT: Lemon Squeezy Customer Portal su an aktif degil.
+// Magaza aktive olunca asagidaki satiri ve "Self-Service" bloğunu geri ac.
+// const CUSTOMER_PORTAL_URL = 'https://siparisdefterim-final.lemonsqueezy.com/billing'
 
 export default function ManageSubscriptionPage() {
   const router = useRouter()
@@ -48,6 +49,15 @@ export default function ManageSubscriptionPage() {
     checkUser()
   }, [router])
 
+  // === YENI: Email ile iptal talebi - mailto link ===
+  const handleEmailCancellation = () => {
+    const subject = encodeURIComponent('Pro Üyelik İptal Talebi')
+    const body = encodeURIComponent(
+      `Merhaba,\n\nPro üyeliğimi iptal etmek istiyorum.\n\nHesap E-posta: ${user?.email || '(otomatik doldurulamadi)'}\n\nTeşekkürler.`
+    )
+    window.location.href = `mailto:destek@deftertut.com?subject=${subject}&body=${body}`
+  }
+
   if (loading) {
     return (
       <div style={{ minHeight: '100vh', background: c.bg, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -59,7 +69,7 @@ export default function ManageSubscriptionPage() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: c.bg,
+      background: c.bgGradient,
       fontFamily: 'Arial, sans-serif',
       color: c.text,
       display: 'flex',
@@ -68,12 +78,22 @@ export default function ManageSubscriptionPage() {
       {/* Basit Header */}
       <div style={{
         background: c.header,
+        backdropFilter: c.backdropFilter,
+        WebkitBackdropFilter: c.backdropFilter,
         borderBottom: `1px solid ${c.border}`,
         padding: '15px 20px'
       }}>
         <div style={{ maxWidth: '900px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <a href="/" style={{ color: c.text, textDecoration: 'none', fontSize: '18px', fontWeight: 'bold' }}>
-            📋 SiparişDefterim
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '26px' }}>📱</span>
+            <span style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>SiparişDefterim</span>
           </a>
           <a 
             href="/dashboard" 
@@ -135,7 +155,7 @@ export default function ManageSubscriptionPage() {
           </p>
         </div>
 
-        {/* Pro Kullanıcılar İçin: Aboneliği Yönet */}
+        {/* === GUNCEL: Pro Kullanicilar Icin - Email ile Iptal === */}
         {isPro && (
           <div style={{
             background: c.header,
@@ -145,40 +165,52 @@ export default function ManageSubscriptionPage() {
             marginBottom: '20px'
           }}>
             <h3 style={{ fontSize: '18px', marginTop: 0, marginBottom: '12px', color: c.text }}>
-              🔧 Aboneliğinizi Yönetin
+              📧 Aboneliği İptal Et
             </h3>
             <p style={{ color: c.text, fontSize: '14px', lineHeight: '1.7', marginBottom: '16px' }}>
-              Aşağıdaki butona tıklayarak güvenli müşteri portalına ulaşabilirsiniz. Bu portalda yapabilecekleriniz:
+              Pro aboneliğinizi iptal etmek için aşağıdaki butona tıklayarak destek ekibimize e-posta gönderebilirsiniz. 
+              Talebiniz 1-2 iş günü içinde işleme alınır.
             </p>
-            <ul style={{ color: c.text, fontSize: '14px', lineHeight: '1.8', paddingLeft: '20px', marginBottom: '20px' }}>
-              <li>Aboneliği iptal et</li>
-              <li>Faturaları ve ödeme geçmişini görüntüle</li>
-              <li>Kart bilgilerini güncelle</li>
-              <li>Plan değiştir (Aylık ↔ Yıllık)</li>
-              <li>Adres ve fatura bilgilerini düzenle</li>
-            </ul>
+            
+            {/* İade Politikası Notu */}
+            <div style={{
+              background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
+              border: `1px solid ${theme === 'dark' ? 'rgba(245, 158, 11, 0.25)' : 'rgba(245, 158, 11, 0.2)'}`,
+              borderRadius: '8px',
+              padding: '14px',
+              marginBottom: '16px'
+            }}>
+              <p style={{ color: c.text, fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
+                <strong>⚠️ Önemli Bilgi:</strong> İptal sonrasında <strong>ödediğiniz dönemin (aylık/yıllık) sonuna kadar</strong> Pro 
+                özelliklerini kullanmaya devam edersiniz. Dönem sonunda otomatik olarak ücretsiz pakete geçersiniz. 
+                <strong> Yapılan ödemeler iade edilmez.</strong>
+              </p>
+            </div>
 
-            <a 
-              href={CUSTOMER_PORTAL_URL}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button 
+              onClick={handleEmailCancellation}
               style={{
-                display: 'inline-block',
+                display: 'inline-flex',
+                alignItems: 'center',
+                gap: '8px',
                 padding: '12px 24px',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 color: '#fff',
-                textDecoration: 'none',
+                border: 'none',
                 borderRadius: '8px',
                 fontSize: '14px',
                 fontWeight: '600',
+                cursor: 'pointer',
                 boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
               }}
             >
-              🔗 Aboneliği Yönet (Müşteri Portalı)
-            </a>
+              📧 İptal Talebi Gönder
+            </button>
 
             <p style={{ color: c.textSecondary, fontSize: '12px', marginTop: '12px', marginBottom: 0 }}>
-              💡 Müşteri portalına giriş yapmak için size e-posta adresinize bir doğrulama linki gönderilecektir.
+              💡 Butona tıkladığınızda e-posta uygulamanız otomatik olarak açılır. 
+              Açılmazsa <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine 
+              direkt yazabilirsiniz.
             </p>
           </div>
         )}
@@ -218,7 +250,7 @@ export default function ManageSubscriptionPage() {
           </div>
         )}
 
-        {/* Yardım Kartı */}
+        {/* === GUNCEL: Yardim Karti - sadece email === */}
         <div style={{
           background: 'rgba(102, 126, 234, 0.05)',
           border: '1px solid rgba(102, 126, 234, 0.2)',
@@ -230,7 +262,7 @@ export default function ManageSubscriptionPage() {
             🤝 Yardıma mı ihtiyacınız var?
           </h3>
           <p style={{ color: c.text, fontSize: '14px', lineHeight: '1.7', marginBottom: '8px' }}>
-            Müşteri portalında sorun yaşıyorsanız veya tercih ederseniz, e-posta yoluyla da iptal/iade talebinde bulunabilirsiniz:
+            Üyelik, fatura veya hesabınızla ilgili her türlü sorunuzda bize ulaşabilirsiniz:
           </p>
           <p style={{ margin: '8px 0' }}>
             📧 <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a>

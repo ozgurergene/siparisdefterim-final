@@ -248,7 +248,7 @@ export default function LoginPage() {
         {/* Divider */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 16, margin: '24px 0' }}>
           <div style={{ flex: 1, height: 1, background: '#2a2a3e' }} />
-          <span style={{ fontSize: 12, color: '#64748b' }}>veya</span>
+          <span style={{ fontSize: 12, color: '#94a3b8' }}>veya</span>
           <div style={{ flex: 1, height: 1, background: '#2a2a3e' }} />
         </div>
 
@@ -268,10 +268,10 @@ export default function LoginPage() {
         </button>
 
         {/* Footer Links */}
-        <div style={{ marginTop: 28, textAlign: 'center', fontSize: 12, color: '#64748b' }}>
-          <a href="/privacy-policy" style={{ color: '#64748b', marginRight: 16 }}>Gizlilik</a>
-          <a href="/terms-of-use" style={{ color: '#64748b', marginRight: 16 }}>Kullanım</a>
-          <a href="/gdpr-disclosure" style={{ color: '#64748b' }}>KVKK</a>
+        <div style={{ marginTop: 28, textAlign: 'center', fontSize: 12, color: '#94a3b8' }}>
+          <a href="/privacy-policy" style={{ color: '#94a3b8', marginRight: 16 }}>Gizlilik</a>
+          <a href="/terms-of-use" style={{ color: '#94a3b8', marginRight: 16 }}>Kullanım</a>
+          <a href="/gdpr-disclosure" style={{ color: '#94a3b8' }}>KVKK</a>
         </div>
       </div>
     </div>

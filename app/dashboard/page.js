@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+
+import ProfilePopup from '../../components/ProfilePopup'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, getAvatarGradient, getInitials } from '../../lib/theme'
 import { calculateGrandTotal } from '../../lib/calculations'
@@ -13,7 +15,21 @@ import OrderTable from '../../components/OrderTable'
 import SearchBox from '../../components/SearchBox'
 import EditModal from '../../components/EditModal'
 import UpgradeModal from '../components/UpgradeModal'
+import OrderDetailModal from '../../components/OrderDetailModal'
 import { StatsCardsSkeleton, SearchBoxSkeleton, TableSkeleton } from '../../components/Loading'
+
+// === YENI: Kargo firmalari listesi ===
+const cargoCompanyList = [
+  'Yurtiçi Kargo',
+  'Aras Kargo',
+  'MNG Kargo',
+  'PTT Kargo',
+  'Sürat Kargo',
+  'Sendeo',
+  'HepsiJet',
+  'Trendyol Express',
+  'Diğer'
+]
 
 // Gradient Home Icon SVG Component
 function HomeIcon({ size = 18 }) {
@@ -79,180 +95,6 @@ function SuccessToast({ show, message }) {
   )
 }
 
-// Profile Popup Component
-function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isPro, theme, toggleTheme }) {
-  if (!isOpen) return null
-
-  const isDark = theme === 'dark'
-
-  return (
-    <>
-      <div 
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.3)',
-          zIndex: 998
-        }}
-      />
-      <div style={{
-        position: 'absolute',
-        top: '60px',
-        right: '16px',
-        width: '220px',
-        background: isDark ? '#1a1a2e' : '#ffffff',
-        borderRadius: '14px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-        border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0,0,0,0.1)'}`,
-        zIndex: 999,
-        overflow: 'hidden',
-        animation: 'fadeIn 0.2s ease'
-      }}>
-        {/* Profile Header */}
-        <div style={{
-          padding: '16px',
-          background: isDark 
-            ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)'
-            : 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              background: getAvatarGradient(user.email),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '15px',
-              fontWeight: '600'
-            }}>
-              {getInitials(user.email)}
-            </div>
-            <div>
-              <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>
-                {user.email.split('@')[0]}
-              </p>
-              <p style={{ color: '#64748b', fontSize: '11px', margin: '2px 0 0 0' }}>
-                {user.email}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Order Quota — Pro / Free durumu */}
-        <div style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
-          {isPro ? (
-            <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '0.5px'
-                }}>✨ PRO ÜYELİK</span>
-                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} sipariş</span>
-              </div>
-              <div style={{ height: '4px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }} />
-              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Sınırsız sipariş hakkı aktif</p>
-            </>
-          ) : (
-            <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
-                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
-              </div>
-              <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                <div style={{
-                  width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                  borderRadius: '2px'
-                }} />
-              </div>
-              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
-            </>
-          )}
-        </div>
-
-        {/* Menu Items */}
-        <div style={{ padding: '8px' }}>
-          {/* Theme Toggle */}
-          <div 
-            onClick={toggleTheme}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'
-            }}
-          >
-            <span style={{ fontSize: '16px' }}>{isDark ? '🌙' : '☀️'}</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Tema: {isDark ? 'Koyu' : 'Açık'}</span>
-            <div style={{
-              marginLeft: 'auto',
-              width: '36px',
-              height: '20px',
-              background: isDark ? '#667eea' : '#cbd5e1',
-              borderRadius: '10px',
-              position: 'relative',
-              transition: 'background 0.2s ease'
-            }}>
-              <div style={{
-                position: 'absolute',
-                left: isDark ? '18px' : '2px',
-                top: '2px',
-                width: '16px',
-                height: '16px',
-                background: '#fff',
-                borderRadius: '50%',
-                transition: 'left 0.2s ease',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-              }} />
-            </div>
-          </div>
-
-          {/* Pro'ya Yükselt — sadece Free'de göster */}
-          {!isPro && (
-            <a href="/pricing" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', textDecoration: 'none' }}>
-              <span style={{ fontSize: '16px' }}>⭐</span>
-              <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
-              <span style={{
-                marginLeft: 'auto',
-                background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
-                color: '#fff',
-                fontSize: '8px',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontWeight: '600'
-              }}>YENİ</span>
-            </a>
-          )}
-
-          <div style={{ height: '1px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', margin: '6px 0' }} />
-
-          <div onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>🚪</span>
-            <span style={{ color: '#ef4444', fontSize: '13px', fontWeight: '500' }}>Çıkış Yap</span>
-          </div>
-        </div>
-      </div>
-    </>
-  )
-}
-
 // Highlight matching text
 function HighlightText({ text, searchTerm, color = '#fff' }) {
   if (!searchTerm || !searchTerm.trim()) {
@@ -288,14 +130,17 @@ function HighlightText({ text, searchTerm, color = '#fff' }) {
   )
 }
 
-// Mobile Order Card Component with Swipe
-function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isDark = true, searchTerm = '' }) {
+// === GUNCEL: Mobile Order Card - Siparis no rozeti + tiklayinca modal ===
+function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, onOpenDetail, statusColor, isDark = true, searchTerm = '', theme }) {
+  const c = colors[theme]
   const [touchStart, setTouchStart] = useState(null)
   const [touchEnd, setTouchEnd] = useState(null)
   const [swiped, setSwiped] = useState(false)
   const cardRef = useRef(null)
 
   const minSwipeDistance = 50
+  // === YENI: Siparis no ===
+  const orderNo = order.id ? order.id.slice(0, 8) : ''
 
   const onTouchStart = (e) => {
     setTouchEnd(null)
@@ -353,6 +198,12 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
     }
   }
 
+  // === YENI: Karta tiklayinca modal aç (swipe durumunda hariç) ===
+  const handleCardClick = () => {
+    if (swiped) return
+    onOpenDetail && onOpenDetail(order)
+  }
+
   return (
     <div ref={cardRef} style={{ position: 'relative', overflow: 'hidden', marginBottom: '8px', borderRadius: '12px' }}>
       {/* Swipe Delete Button */}
@@ -379,13 +230,14 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
         </div>
       </div>
 
-      {/* Card Content */}
+      {/* Card Content - GUNCEL: onClick eklendi */}
       <div
         onTouchStart={onTouchStart}
         onTouchMove={onTouchMove}
         onTouchEnd={onTouchEnd}
+        onClick={handleCardClick}
         style={{
-          background: isDark ? 'rgba(26, 26, 46, 0.85)' : 'rgba(255, 255, 255, 0.95)',
+          background: c.bgCard,
           borderRadius: '12px',
           padding: '12px 14px',
           borderLeft: `3px solid ${statusColor}`,
@@ -393,11 +245,12 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
           zIndex: 2,
           transform: swiped ? 'translateX(-70px)' : 'translateX(0)',
           transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)',
-          boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.08)'
+          boxShadow: isDark ? 'none' : '0 2px 10px rgba(0,0,0,0.08)',
+          cursor: 'pointer'
         }}
       >
         {/* Row 1: Name + Status + Price */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '3px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600' }}>
               <HighlightText text={order.customer_name} searchTerm={searchTerm} />
@@ -416,25 +269,42 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
           <span style={{ color: '#22c55e', fontSize: '16px', fontWeight: '700' }}>₺{order.price}</span>
         </div>
 
+        {/* === YENI: Siparis No Rozeti (musteri altinda, kompakt) === */}
+        {orderNo && (
+          <div style={{
+            fontSize: '10px',
+            color: '#667eea',
+            fontFamily: 'monospace',
+            fontWeight: '600',
+            marginBottom: '6px',
+            display: 'inline-block',
+            background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.1)',
+            padding: '1px 6px',
+            borderRadius: '4px'
+          }}>
+            #{orderNo}
+          </div>
+        )}
+
         {/* Row 2: Product + Location */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
           <span style={{ color: isDark ? '#cbd5e1' : '#4a5568', fontSize: '12px' }}>
             <HighlightText text={order.product} searchTerm={searchTerm} />
           </span>
           {order.customer_city && order.customer_district && (
-            <span style={{ color: '#6b7280', fontSize: '11px' }}>📍 {order.customer_city}/{order.customer_district}</span>
+            <span style={{ color: c.textSecondary, fontSize: '11px' }}>📍 {order.customer_city}/{order.customer_district}</span>
           )}
         </div>
 
         {/* Row 3: Phone + Buttons */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: '8px', borderTop: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.06)'}` }}>
-          <span style={{ color: '#64748b', fontSize: '11px' }}>
+          <span style={{ color: c.textSecondary, fontSize: '11px' }}>
             📱 <HighlightText text={order.customer_phone} searchTerm={searchTerm} />
           </span>
           <div style={{ display: 'flex', gap: '8px' }}>
-            {/* WhatsApp Button - 35x35 */}
+            {/* WhatsApp Button - 35x35 - GUNCEL: stopPropagation */}
             <button
-              onClick={() => onWhatsApp(order)}
+              onClick={(e) => { e.stopPropagation(); onWhatsApp(order) }}
               style={{
                 width: '35px',
                 height: '35px',
@@ -449,9 +319,9 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
             >
               <WhatsAppIcon />
             </button>
-            {/* Edit Button - 35x35 */}
+            {/* Edit Button - 35x35 - GUNCEL: stopPropagation */}
             <button
-              onClick={() => onEdit(order)}
+              onClick={(e) => { e.stopPropagation(); onEdit(order) }}
               style={{
                 width: '35px',
                 height: '35px',
@@ -473,13 +343,16 @@ function MobileOrderCard({ order, onEdit, onDelete, onWhatsApp, statusColor, isD
   )
 }
 
-// Mobile Add Order Modal - Same design as Edit Modal
-function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true }) {
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true, isPro = false, userProducts = [], theme }) {
+  const c = colors[theme]
+  // === YENI: Kargo custom mode state ===
+  const [cargoCustomMode, setCargoCustomMode] = useState(false)
+
   if (!isOpen) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
-  const districts = newOrder.customer_city && turkeyData 
-    ? (turkeyData[newOrder.customer_city] || []).slice().sort((a, b) => a.localeCompare(b, 'tr')) 
+  const districts = newOrder.customer_city && turkeyData
+    ? (turkeyData[newOrder.customer_city] || []).slice().sort((a, b) => a.localeCompare(b, 'tr'))
     : []
 
   // Calculate totals
@@ -496,10 +369,31 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
   const { tutar, kdv, toplam } = calculateTotals()
 
+  // Submit handler - basariliysa modal kapat
+  const handleSubmit = async () => {
+    const ok = await handleAddOrder()
+    if (ok !== false) {
+      setCargoCustomMode(false) // Modal kapanirken kargo modunu sifirla
+      onClose()
+    }
+  }
+
+  // === YENI: Kargo firmasi secimi (mobile) ===
+  const handleCargoSelect = (e) => {
+    const value = e.target.value
+    if (value === 'Diğer') {
+      setCargoCustomMode(true)
+      setNewOrder({ ...newOrder, cargo_company: '' })
+    } else {
+      setCargoCustomMode(false)
+      setNewOrder({ ...newOrder, cargo_company: value })
+    }
+  }
+
   const inputStyle = {
     width: '100%',
     padding: '12px',
-    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    background: c.bgCard,
     border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
     borderRadius: '10px',
     color: isDark ? '#fff' : '#1a1a2e',
@@ -511,7 +405,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     width: '100%',
     padding: '12px',
     paddingRight: '32px',
-    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    background: c.bgCard,
     border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
     borderRadius: '10px',
     color: isDark ? '#fff' : '#1a1a2e',
@@ -526,8 +420,19 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     backgroundPosition: 'right 12px center'
   }
 
-  // For native mobile select dropdowns
   const optionStyle = { color: '#000', backgroundColor: '#fff' }
+
+  // Urun secince fiyat ve KDV otomatik dolar
+  const handleProductSelect = (p) => {
+    const updatedProducts = [...newOrder.products]
+    updatedProducts[0] = {
+      ...updatedProducts[0],
+      product: p.name,
+      unit_price: p.unit_price?.toString() || '',
+      kdv_rate: p.kdv_rate?.toString() || ''
+    }
+    setNewOrder({ ...newOrder, products: updatedProducts })
+  }
 
   return (
     <div style={{
@@ -554,6 +459,16 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
           <h2 style={{ color: isDark ? '#fff' : '#1a1a2e', margin: 0, fontSize: '20px', display: 'flex', alignItems: 'center', gap: '8px' }}>
             ✏️ Yeni Sipariş
+            {isPro && userProducts.length > 0 && (
+              <span style={{
+                fontSize: '10px',
+                color: '#667eea',
+                fontWeight: '600',
+                padding: '2px 8px',
+                background: 'rgba(102, 126, 234, 0.15)',
+                borderRadius: '8px'
+              }}>✨ otomatik tanıma</span>
+            )}
           </h2>
           <button
             onClick={onClose}
@@ -578,21 +493,25 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         {/* Müşteri Adı Soyadı ve Telefon */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
             <input
               type="text"
               value={newOrder.customer_name}
               onChange={(e) => setNewOrder({ ...newOrder, customer_name: e.target.value })}
+              autoComplete="name"
+              name="customer-name"
               style={inputStyle}
               placeholder="Adı Soyadı"
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
             <input
               type="tel"
               value={newOrder.customer_phone}
               onChange={(e) => setNewOrder({ ...newOrder, customer_phone: e.target.value.replace(/\D/g, '') })}
+              autoComplete="tel"
+              name="customer-phone"
               style={inputStyle}
               placeholder="5XX XXX XX XX"
               maxLength="10"
@@ -602,11 +521,13 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         {/* Adres */}
         <div style={{ marginBottom: '12px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Adres</label>
           <input
             type="text"
             value={newOrder.customer_address}
             onChange={(e) => setNewOrder({ ...newOrder, customer_address: e.target.value })}
+            autoComplete="street-address"
+            name="customer-address"
             style={inputStyle}
             placeholder="Mahalle, sokak, bina no..."
           />
@@ -615,7 +536,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         {/* İl ve İlçe */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>İl</label>
             <select
               value={newOrder.customer_city}
               onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
@@ -628,7 +549,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             </select>
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
             <select
               value={newOrder.customer_district}
               onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
@@ -643,24 +564,85 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
           </div>
         </div>
 
-        {/* Ürün Bilgileri */}
-        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ flex: 2 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
+        {/* === YENI: Kargo Firması ve Takip No (mobile) === */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Kargo Firması</label>
+            {cargoCustomMode ? (
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input
+                  type="text"
+                  value={newOrder.cargo_company || ''}
+                  onChange={(e) => setNewOrder({ ...newOrder, cargo_company: e.target.value })}
+                  style={inputStyle}
+                  placeholder="Kargo firması..."
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCargoCustomMode(false)
+                    setNewOrder({ ...newOrder, cargo_company: '' })
+                  }}
+                  style={{
+                    padding: '0 10px',
+                    background: 'transparent',
+                    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+                    borderRadius: '10px',
+                    color: c.textSecondary,
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                  title="Listeden seç"
+                >
+                  ↩
+                </button>
+              </div>
+            ) : (
+              <select
+                value={newOrder.cargo_company || ''}
+                onChange={handleCargoSelect}
+                style={selectStyle}
+              >
+                <option value="" style={optionStyle}>Seçiniz (Opsiyonel)</option>
+                {cargoCompanyList.map(cargo => (
+                  <option key={cargo} value={cargo} style={optionStyle}>{cargo}</option>
+                ))}
+              </select>
+            )}
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Takip No</label>
             <input
               type="text"
+              value={newOrder.tracking_number || ''}
+              onChange={(e) => setNewOrder({ ...newOrder, tracking_number: e.target.value })}
+              style={inputStyle}
+              placeholder="Takip numarası..."
+            />
+          </div>
+        </div>
+
+        {/* Ürün Bilgileri (Combobox + Adet) */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
+          <div style={{ flex: 2 }}>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
+            <MobileProductCombobox
               value={newOrder.products[0]?.product || ''}
-              onChange={(e) => {
+              onChange={(val) => {
                 const updatedProducts = [...newOrder.products]
-                updatedProducts[0] = { ...updatedProducts[0], product: e.target.value }
+                updatedProducts[0] = { ...updatedProducts[0], product: val }
                 setNewOrder({ ...newOrder, products: updatedProducts })
               }}
-              style={inputStyle}
-              placeholder="Ürün adı"
+              onSelect={handleProductSelect}
+              products={userProducts}
+              isPro={isPro}
+              isDark={isDark}
+              inputStyle={inputStyle}
+          theme={theme}
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adet</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Adet</label>
             <input
               type="number"
               value={newOrder.products[0]?.quantity || 1}
@@ -678,7 +660,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         {/* Birim Fiyat ve KDV */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
             <input
               type="number"
               value={newOrder.products[0]?.unit_price || ''}
@@ -692,7 +674,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
             <input
               type="number"
               value={newOrder.products[0]?.kdv_rate || ''}
@@ -726,12 +708,12 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         {/* Tutar Özeti */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
+          <div style={{ flex: 1, background: c.bgCard, borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: c.textSecondary, fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
             <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
           </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
+          <div style={{ flex: 1, background: c.bgCard, borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: c.textSecondary, fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
             <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
           </div>
           <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
@@ -742,7 +724,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         {/* Not */}
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
           <textarea
             value={newOrder.note}
             onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
@@ -757,7 +739,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         {/* Sipariş Oluştur Button */}
         <button
-          onClick={() => { handleAddOrder(); onClose() }}
+          onClick={handleSubmit}
           style={{
             width: '100%',
             padding: '14px',
@@ -778,8 +760,128 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   )
 }
 
+// === MobileProductCombobox: Mobil-friendly autocomplete ===
+function MobileProductCombobox({ value, onChange, onSelect, products, isPro, isDark, inputStyle, theme }) {
+  const c = colors[theme]
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef(null)
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', handler)
+    document.addEventListener('touchstart', handler)
+    return () => {
+      document.removeEventListener('mousedown', handler)
+      document.removeEventListener('touchstart', handler)
+    }
+  }, [])
+
+  const filtered = (() => {
+    if (!isPro || !products || products.length === 0) return []
+    if (!value || value.trim() === '') return products.slice(0, 8)
+    const q = value.toLowerCase().trim()
+    return products
+      .filter(p => (p.name || '').toLowerCase().includes(q))
+      .slice(0, 8)
+  })()
+
+  const showDropdown = isPro && isOpen && filtered.length > 0
+
+  return (
+    <div ref={containerRef} style={{ position: 'relative' }}>
+      <input
+        type="text"
+        value={value}
+        onChange={(e) => {
+          onChange(e.target.value)
+          if (isPro) setIsOpen(true)
+        }}
+        onFocus={() => isPro && setIsOpen(true)}
+        autoComplete="off"
+        name="order-product-name"
+        style={inputStyle}
+        placeholder={isPro && products.length > 0 ? 'Ürün adı (öneri için yaz)' : 'Ürün adı'}
+      />
+
+      {showDropdown && (
+        <div style={{
+          position: 'absolute',
+          top: '100%',
+          left: 0,
+          right: 0,
+          background: isDark ? '#1a1a2e' : '#ffffff',
+          border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.4)' : 'rgba(102, 126, 234, 0.3)'}`,
+          borderRadius: '10px',
+          marginTop: '4px',
+          maxHeight: '220px',
+          overflowY: 'auto',
+          zIndex: 2100,
+          boxShadow: '0 4px 20px rgba(0,0,0,0.3)'
+        }}>
+          {filtered.map((p) => (
+            <div
+              key={p.id}
+              onMouseDown={(e) => {
+                e.preventDefault()
+                onSelect(p)
+                setIsOpen(false)
+              }}
+              onTouchStart={(e) => {
+                e.preventDefault()
+                onSelect(p)
+                setIsOpen(false)
+              }}
+              style={{
+                padding: '10px 12px',
+                cursor: 'pointer',
+                borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`,
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                gap: '8px',
+                fontSize: '13px'
+              }}
+            >
+              <div style={{ flex: 1, minWidth: 0, color: isDark ? '#fff' : '#1a1a2e', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                {(p.times_sold || 0) >= 5 && <span style={{ marginRight: '4px' }}>🔥</span>}
+                <span style={{ fontWeight: '500' }}>{p.name}</span>
+              </div>
+              <div style={{ display: 'flex', gap: '6px', flexShrink: 0, alignItems: 'center' }}>
+                <span style={{ color: '#22c55e', fontWeight: '700', fontSize: '12px' }}>
+                  ₺{parseFloat(p.unit_price || 0).toLocaleString('tr-TR', { maximumFractionDigits: 0 })}
+                </span>
+                {parseFloat(p.kdv_rate) > 0 && (
+                  <span style={{ color: c.textSecondary, fontSize: '10px' }}>%{p.kdv_rate}</span>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+
 // Mobile Edit Modal with Status Dropdown
-function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancelEdit, deleteOrder, editingId, turkeyData, isDark = true }) {
+function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancelEdit, deleteOrder, editingId, turkeyData, isDark = true, theme }) {
+  const c = colors[theme]
+  // === YENI: Kargo custom mode state ===
+  const [cargoCustomMode, setCargoCustomMode] = useState(false)
+
+  // === YENI: Modal acildiginda mevcut kargo bilgisi listede yoksa custom moda gec ===
+  useEffect(() => {
+    if (editingData?.cargo_company && !cargoCompanyList.includes(editingData.cargo_company)) {
+      setCargoCustomMode(true)
+    } else {
+      setCargoCustomMode(false)
+    }
+  }, [editingId])
+
   if (!isOpen || !editingData) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
@@ -814,12 +916,43 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
   const inputStyle = {
     width: '100%',
     padding: '12px',
-    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    background: c.bgCard,
     border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
     borderRadius: '10px',
     color: isDark ? '#fff' : '#1a1a2e',
     fontSize: '14px',
     boxSizing: 'border-box'
+  }
+
+  const selectStyleEdit = {
+    width: '100%',
+    padding: '12px',
+    paddingRight: '32px',
+    background: c.bgCard,
+    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+    borderRadius: '10px',
+    color: isDark ? '#fff' : '#1a1a2e',
+    fontSize: '14px',
+    boxSizing: 'border-box',
+    cursor: 'pointer',
+    appearance: 'none',
+    WebkitAppearance: 'none',
+    MozAppearance: 'none',
+    backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='${isDark ? '%2394a3b8' : '%236b7280'}' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+    backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'right 12px center'
+  }
+
+  // === YENI: Kargo firmasi secimi (mobile edit) ===
+  const handleCargoSelectEdit = (e) => {
+    const value = e.target.value
+    if (value === 'Diğer') {
+      setCargoCustomMode(true)
+      setEditingData({ ...editingData, cargo_company: '' })
+    } else {
+      setCargoCustomMode(false)
+      setEditingData({ ...editingData, cargo_company: value })
+    }
   }
 
   return (
@@ -871,7 +1004,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
         {/* Müşteri Adı Soyadı ve Telefon */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
             <input
               type="text"
               value={editingData.customer_name}
@@ -880,7 +1013,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
             <input
               type="tel"
               value={editingData.customer_phone}
@@ -893,7 +1026,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 
         {/* Adres */}
         <div style={{ marginBottom: '12px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Adres</label>
           <input
             type="text"
             value={editingData.customer_address}
@@ -905,7 +1038,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
         {/* İl ve İlçe */}
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>İl</label>
             <select
               value={editingData.customer_city}
               onChange={(e) => setEditingData({ ...editingData, customer_city: e.target.value, customer_district: '' })}
@@ -913,7 +1046,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 width: '100%',
                 padding: '12px',
                 paddingRight: '32px',
-                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+                background: c.bgCard,
                 border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
                 borderRadius: '10px',
                 color: isDark ? '#fff' : '#1a1a2e',
@@ -935,7 +1068,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             </select>
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
             <select
               value={editingData.customer_district}
               onChange={(e) => setEditingData({ ...editingData, customer_district: e.target.value })}
@@ -943,7 +1076,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
                 width: '100%',
                 padding: '12px',
                 paddingRight: '32px',
-                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+                background: c.bgCard,
                 border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
                 borderRadius: '10px',
                 color: isDark ? '#fff' : '#1a1a2e',
@@ -967,10 +1100,68 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
           </div>
         </div>
 
+        {/* === YENI: Kargo Firması ve Takip No (mobile edit) === */}
+        <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Kargo Firması</label>
+            {cargoCustomMode ? (
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input
+                  type="text"
+                  value={editingData.cargo_company || ''}
+                  onChange={(e) => setEditingData({ ...editingData, cargo_company: e.target.value })}
+                  style={inputStyle}
+                  placeholder="Kargo firması..."
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCargoCustomMode(false)
+                    setEditingData({ ...editingData, cargo_company: '' })
+                  }}
+                  style={{
+                    padding: '0 10px',
+                    background: 'transparent',
+                    border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
+                    borderRadius: '10px',
+                    color: c.textSecondary,
+                    cursor: 'pointer',
+                    fontSize: '14px'
+                  }}
+                  title="Listeden seç"
+                >
+                  ↩
+                </button>
+              </div>
+            ) : (
+              <select
+                value={editingData.cargo_company || ''}
+                onChange={handleCargoSelectEdit}
+                style={selectStyleEdit}
+              >
+                <option value="" style={{ color: '#000', backgroundColor: '#fff' }}>Seçiniz (Opsiyonel)</option>
+                {cargoCompanyList.map(cargo => (
+                  <option key={cargo} value={cargo} style={{ color: '#000', backgroundColor: '#fff' }}>{cargo}</option>
+                ))}
+              </select>
+            )}
+          </div>
+          <div style={{ flex: 1 }}>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Takip No</label>
+            <input
+              type="text"
+              value={editingData.tracking_number || ''}
+              onChange={(e) => setEditingData({ ...editingData, tracking_number: e.target.value })}
+              style={inputStyle}
+              placeholder="Takip numarası..."
+            />
+          </div>
+        </div>
+
         {/* Ürün Bilgileri */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 2 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
             <input
               type="text"
               value={editingData.products[0]?.product || ''}
@@ -983,7 +1174,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adet</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Adet</label>
             <input
               type="number"
               value={editingData.products[0]?.quantity || 1}
@@ -1001,7 +1192,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
         {/* Birim Fiyat ve KDV */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
             <input
               type="number"
               value={editingData.products[0]?.unit_price || ''}
@@ -1015,7 +1206,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
             <input
               type="number"
               value={editingData.products[0]?.kdv_rate || ''}
@@ -1049,12 +1240,12 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 
         {/* Tutar Özeti */}
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
+          <div style={{ flex: 1, background: c.bgCard, borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: c.textSecondary, fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
             <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
           </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
+          <div style={{ flex: 1, background: c.bgCard, borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: c.textSecondary, fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
             <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
           </div>
           <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
@@ -1065,7 +1256,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 
         {/* Sipariş Durumu */}
         <div style={{ marginBottom: '12px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Sipariş Durumu</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Sipariş Durumu</label>
           <select
             value={editingData.status}
             onChange={(e) => setEditingData({ ...editingData, status: e.target.value })}
@@ -1091,7 +1282,7 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 
         {/* Not */}
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
           <textarea
             value={editingData.note}
             onChange={(e) => setEditingData({ ...editingData, note: e.target.value })}
@@ -1146,13 +1337,13 @@ function MobileEditModal({ isOpen, editingData, setEditingData, saveEdit, cancel
 }
 
 // Bottom Tab Bar Component — Pro tier yoksa Müşteri/Rapor kilitli
-function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true }) {
+function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true, isPro = false }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
-    { id: 'customers', icon: '👥', label: 'Müşteri', locked: true },
-    { id: 'reports', icon: '📊', label: 'Rapor', locked: true }
+    { id: 'customers', icon: '👥', label: 'Müşteri', locked: !isPro },
+    { id: 'reports', icon: '📊', label: 'Rapor', locked: !isPro }
   ]
 
   return (
@@ -1161,7 +1352,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDar
       bottom: 0,
       left: 0,
       right: 0,
-      background: isDark ? 'rgba(13, 13, 26, 0.98)' : 'rgba(255, 255, 255, 0.98)',
+      background: isDark ? 'rgba(13, 13, 26, 0.85)' : 'rgba(248, 232, 250, 0.75)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       padding: '8px 0 24px 0',
@@ -1270,6 +1461,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDar
 
 export default function DashboardPage() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([])
@@ -1277,8 +1469,10 @@ export default function DashboardPage() {
   const [theme, setTheme] = useState('light')
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [isPro, setIsPro] = useState(false)
+  const [userProducts, setUserProducts] = useState([])
   const [isMobile, setIsMobile] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
+
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
   const [showSuccessToast, setShowSuccessToast] = useState(false)
@@ -1288,8 +1482,14 @@ export default function DashboardPage() {
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
+  // === YENI: Siparis no arama state ===
+  const [searchOrderNo, setSearchOrderNo] = useState('')
   const [statusFilter, setStatusFilter] = useState('all')
+
+  // === YENI: Mobile siparis detay modal state ===
+  const [detailOrder, setDetailOrder] = useState(null)
   
+  // === GUNCEL: newOrder state'ine cargo_company ve tracking_number eklendi ===
   const [newOrder, setNewOrder] = useState({
     customer_name: '',
     customer_phone: '',
@@ -1297,13 +1497,59 @@ export default function DashboardPage() {
     customer_city: '',
     customer_district: '',
     products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
-    note: ''
+    note: '',
+    cargo_company: '',
+    tracking_number: ''
   })
   
   const [editingId, setEditingId] = useState(null)
   const [editingData, setEditingData] = useState(null)
 
   const c = colors[theme]
+
+  // URL'de ?add=1 varsa MobileAddOrderModal'i otomatik ac
+  // URL'de ?repeat=1 varsa sessionStorage'dan repeat verisini al ve formu doldur
+  useEffect(() => {
+    if (searchParams?.get('add') === '1') {
+      setShowAddModal(true)
+      const url = new URL(window.location.href)
+      url.searchParams.delete('add')
+      window.history.replaceState({}, '', url.toString())
+    }
+
+    // === YENI: Tekrarla destekligi ===
+    if (searchParams?.get('repeat') === '1') {
+      try {
+        const repeatRaw = typeof window !== 'undefined' ? sessionStorage.getItem('repeat_order_data') : null
+        if (repeatRaw) {
+          const repeatData = JSON.parse(repeatRaw)
+          setNewOrder({
+            customer_name: repeatData.customer_name || '',
+            customer_phone: repeatData.customer_phone || '',
+            customer_address: repeatData.customer_address || '',
+            customer_city: repeatData.customer_city || '',
+            customer_district: repeatData.customer_district || '',
+            products: Array.isArray(repeatData.products) && repeatData.products.length > 0
+              ? repeatData.products
+              : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
+            note: '',
+            cargo_company: '',
+            tracking_number: ''
+          })
+          sessionStorage.removeItem('repeat_order_data')
+          // Mobile'da modali ac, desktop'ta OrderForm zaten yukarida
+          if (typeof window !== 'undefined' && window.innerWidth < 768) {
+            setShowAddModal(true)
+          }
+        }
+      } catch (e) {
+        console.error('Repeat order parse error:', e)
+      }
+      const url = new URL(window.location.href)
+      url.searchParams.delete('repeat')
+      window.history.replaceState({}, '', url.toString())
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const checkMobile = () => setIsMobile(window.innerWidth < 768)
@@ -1372,13 +1618,14 @@ export default function DashboardPage() {
     }
   }, [user?.id])
 
-  // ========== SEARCH FILTER (DESKTOP: 3 ayrı input AND mantığı, MOBILE: tek input OR) ==========
+  // ========== SEARCH FILTER (DESKTOP: AND mantığı, MOBILE: tek input OR) ==========
+  // === GUNCEL: Siparis no filtresi eklendi ===
   useEffect(() => {
     let filtered = orders
 
-    // searchPhone veya searchProduct doluysa Desktop modu (3 ayrı input AND)
-    // Aksi halde Mobile modu (tek input OR — isim/telefon/ürün hepsinde)
-    const isMultiInputMode = searchPhone.trim() || searchProduct.trim()
+    // searchPhone, searchProduct veya searchOrderNo doluysa Desktop modu (AND)
+    // Aksi halde Mobile modu (tek input OR — isim/telefon/ürün/siparis no hepsinde)
+    const isMultiInputMode = searchPhone.trim() || searchProduct.trim() || searchOrderNo.trim()
 
     // Müşteri Adı filtresi
     if (searchName.trim()) {
@@ -1390,11 +1637,12 @@ export default function DashboardPage() {
           order.customer_name.toLowerCase().includes(nameTerm)
         )
       } else {
-        // Mobile: isim/telefon/ürün hepsinde ara (OR)
+        // Mobile: isim/telefon/ürün/siparis no hepsinde ara (OR)
         filtered = filtered.filter(order =>
           order.customer_name.toLowerCase().includes(nameTerm) ||
           order.customer_phone.includes(nameTerm) ||
-          order.product.toLowerCase().includes(nameTerm)
+          order.product.toLowerCase().includes(nameTerm) ||
+          (order.id && order.id.toLowerCase().includes(nameTerm.replace(/^#/, '')))
         )
       }
     }
@@ -1413,13 +1661,21 @@ export default function DashboardPage() {
       )
     }
 
+    // === YENI: Siparis No filtresi (sadece Desktop'ta dolu olur, AND mantığı) ===
+    if (searchOrderNo.trim()) {
+      const orderNoTerm = searchOrderNo.toLowerCase().trim().replace(/^#/, '')
+      filtered = filtered.filter(order =>
+        order.id && order.id.toLowerCase().includes(orderNoTerm)
+      )
+    }
+
     // Status filter
     if (statusFilter !== 'all') {
       filtered = filtered.filter(order => order.status === statusFilter)
     }
 
     setFilteredOrders(filtered)
-  }, [searchName, searchPhone, searchProduct, statusFilter, orders])
+  }, [searchName, searchPhone, searchProduct, searchOrderNo, statusFilter, orders])
 
   const fetchUserData = async (userId) => {
     try {
@@ -1433,6 +1689,16 @@ export default function DashboardPage() {
       const { data: freshUserData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
       setOrdersCreatedCount(freshUserData?.orders_created_count || 0)
       setIsPro(freshUserData?.is_pro || false)
+
+      // Pro kullanicilar icin kayitli urunleri yukle (otomatik tanima)
+      if (freshUserData?.is_pro === true) {
+        const { data: productsData } = await supabase
+          .from('products')
+          .select('*')
+          .eq('user_id', userId)
+          .order('times_sold', { ascending: false })
+        if (productsData) setUserProducts(productsData)
+      }
     } catch (error) {
       console.error('fetchUserData error:', error)
     }
@@ -1442,6 +1708,7 @@ export default function DashboardPage() {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     localStorage.setItem('siparisdefterim-theme', newTheme)
+    if (typeof window !== 'undefined') document.documentElement.setAttribute('data-theme', newTheme)
   }
 
   const handleLogout = async () => {
@@ -1452,20 +1719,26 @@ export default function DashboardPage() {
   const handleAddOrder = async () => {
     if (!isPro && ordersCreatedCount >= 50) {
       setShowUpgradeModal(true)
-      return
+      return false
     }
     
     if (!newOrder.customer_name || !newOrder.customer_phone) {
       alert('Lütfen müşteri adı ve telefon numarası girin.')
-      return
+      return false
+    }
+
+    if (!newOrder.customer_address || !newOrder.customer_city || !newOrder.customer_district) {
+      alert('Lütfen adres, il ve ilçe bilgilerini girin.')
+      return false
     }
     const hasValidProduct = newOrder.products.some(p => p.product && p.unit_price)
     if (!hasValidProduct) {
       alert('Lütfen en az bir ürün ve fiyat girin.')
-      return
+      return false
     }
     const productString = newOrder.products.filter(p => p.product).map(p => `${p.product} x${p.quantity}`).join(', ')
     const totalPrice = calculateGrandTotal(newOrder.products)
+    // === GUNCEL: orderData'ya cargo_company ve tracking_number eklendi ===
     const orderData = {
       user_id: user.id,
       customer_name: newOrder.customer_name,
@@ -1477,17 +1750,50 @@ export default function DashboardPage() {
       price: totalPrice,
       status: 'payment_pending',
       note: newOrder.note,
-      products_detail: newOrder.products
+      products_detail: newOrder.products,
+      cargo_company: newOrder.cargo_company?.trim() || null,
+      tracking_number: newOrder.tracking_number?.trim() || null
     }
     const { data, error } = await supabase.from('orders').insert([orderData]).select()
     if (error) {
       console.error('Order error:', error)
       alert('Sipariş oluşturulamadı.')
-      return
+      return false
     }
     await supabase.from('users').update({ orders_created_count: ordersCreatedCount + 1 }).eq('id', user.id)
     setOrders([data[0], ...orders])
+
+    // Pro kullanicilar icin: yeni urunleri otomatik products tablosuna kaydet
+    if (isPro) {
+      const newProductsToSave = []
+      for (const p of newOrder.products) {
+        if (!p.product || !p.unit_price) continue
+        const productName = p.product.trim()
+        // Mevcut userProducts'ta var mi (case-insensitive)?
+        const exists = userProducts.some(up =>
+          (up.name || '').toLowerCase().trim() === productName.toLowerCase()
+        )
+        if (!exists) {
+          newProductsToSave.push({
+            user_id: user.id,
+            name: productName,
+            unit_price: parseFloat(p.unit_price) || 0,
+            kdv_rate: parseFloat(p.kdv_rate) || 0
+          })
+        }
+      }
+      if (newProductsToSave.length > 0) {
+        const { data: insertedProducts } = await supabase
+          .from('products')
+          .insert(newProductsToSave)
+          .select()
+        if (insertedProducts) {
+          setUserProducts([...userProducts, ...insertedProducts])
+        }
+      }
+    }
     setOrdersCreatedCount(ordersCreatedCount + 1)
+    // === GUNCEL: reset'e cargo_company ve tracking_number eklendi ===
     setNewOrder({
       customer_name: '',
       customer_phone: '',
@@ -1495,13 +1801,17 @@ export default function DashboardPage() {
       customer_city: '',
       customer_district: '',
       products: [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
-      note: ''
+      note: '',
+      cargo_company: '',
+      tracking_number: ''
     })
     
     setShowSuccessToast(true)
     setTimeout(() => setShowSuccessToast(false), 3000)
+    return true
   }
-  const deleteOrder = async (orderId) => {
+
+    const deleteOrder = async (orderId) => {
     if (!confirm('Siparişi silmek istediğinize emin misiniz?')) return
     
     const orderToDelete = orders.find(o => o.id === orderId)
@@ -1515,7 +1825,7 @@ export default function DashboardPage() {
       const now = new Date()
       const hoursDiff = (now - createdAt) / (1000 * 60 * 60)
       
-      if (hoursDiff < 12) {
+      if (hoursDiff < 16) {
         const newCount = Math.max(0, ordersCreatedCount - 1)
         await supabase.from('users').update({ orders_created_count: newCount }).eq('id', user.id)
         setOrdersCreatedCount(newCount)
@@ -1530,6 +1840,7 @@ export default function DashboardPage() {
     else setOrders(orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o))
   }
 
+  // === GUNCEL: startEditing'e cargo_company ve tracking_number eklendi ===
   const startEditing = (order) => {
     if (order.products_detail && Array.isArray(order.products_detail) && order.products_detail.length > 0) {
       setEditingId(order.id)
@@ -1541,7 +1852,9 @@ export default function DashboardPage() {
         customer_district: order.customer_district || '',
         products: order.products_detail,
         note: order.note || '',
-        status: order.status
+        status: order.status,
+        cargo_company: order.cargo_company || '',
+        tracking_number: order.tracking_number || ''
       })
       return
     }
@@ -1568,10 +1881,13 @@ export default function DashboardPage() {
       customer_district: order.customer_district || '',
       products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '0' }],
       note: order.note || '',
-      status: order.status
+      status: order.status,
+      cargo_company: order.cargo_company || '',
+      tracking_number: order.tracking_number || ''
     })
   }
 
+  // === GUNCEL: saveEdit'e cargo_company ve tracking_number eklendi ===
   const saveEdit = async () => {
     const productString = editingData.products.filter(p => p.product).map(p => `${p.product} x${p.quantity}`).join(', ')
     const totalPrice = calculateGrandTotal(editingData.products)
@@ -1585,7 +1901,9 @@ export default function DashboardPage() {
       price: totalPrice,
       note: editingData.note,
       status: editingData.status,
-      products_detail: editingData.products
+      products_detail: editingData.products,
+      cargo_company: editingData.cargo_company?.trim() || null,
+      tracking_number: editingData.tracking_number?.trim() || null
     }
     const { error } = await supabase.from('orders').update(updateData).eq('id', editingId)
     if (error) { alert('Sipariş güncellenemedi.'); return }
@@ -1600,15 +1918,22 @@ export default function DashboardPage() {
 
   const cancelEdit = () => { setEditingId(null); setEditingData(null) }
 
+  // === GUNCEL: WhatsApp mesajına sipariş no eklendi ===
   const handleWhatsApp = (order) => {
     const phone = order.customer_phone.startsWith('0') ? order.customer_phone.slice(1) : order.customer_phone
-    const message = `Merhaba ${order.customer_name}, siparişiniz hakkında bilgi vermek istiyorum.`
+    const orderNo = order.id ? order.id.slice(0, 8) : ''
+    const orderNoPrefix = orderNo ? `#${orderNo} numaralı ` : ''
+    const message = `Merhaba ${order.customer_name}, ${orderNoPrefix}siparişiniz hakkında bilgi vermek istiyorum.`
     window.open(`https://wa.me/90${phone}?text=${encodeURIComponent(message)}`, '_blank')
   }
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)
     if (tabId === 'completed') router.push('/completed')
+    if (tabId === 'orders') router.push('/dashboard')
+    if (tabId === 'home') router.push('/home')
+    if (tabId === 'customers') router.push('/customers')
+    if (tabId === 'reports') router.push('/reports')
   }
 
   const getStatusColor = (status) => {
@@ -1628,7 +1953,7 @@ export default function DashboardPage() {
 
   if (loading || !user) {
     return (
-      <div style={{ minHeight: '100vh', background: c.bg, fontFamily: 'Arial', overflowX: 'hidden' }}>
+      <div style={{ minHeight: '100vh', background: c.bgGradient, fontFamily: 'Arial', overflowX: 'hidden' }}>
         <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <div style={{ width: 180, height: 28, background: c.bgSecondary, borderRadius: 4 }} />
@@ -1653,9 +1978,7 @@ export default function DashboardPage() {
     return (
       <div style={{
         height: '100vh',
-        background: isDark 
-          ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
-          : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: c.bgGradient,
         fontFamily: 'Arial, sans-serif',
         color: isDark ? '#fff' : '#1a1a2e',
         display: 'flex',
@@ -1665,9 +1988,7 @@ export default function DashboardPage() {
         {/* STICKY HEADER SECTION */}
         <div style={{
           flexShrink: 0,
-          background: isDark 
-            ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
-            : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)'
+          background: c.bgGradient
         }}>
           {/* Mobile Header */}
           <div style={{
@@ -1681,7 +2002,7 @@ export default function DashboardPage() {
                 onClick={() => router.push('/home')}
                 style={{
                   padding: '8px',
-                  background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                  background: c.bgCard,
                   border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
                   borderRadius: '10px',
                   cursor: 'pointer',
@@ -1751,26 +2072,26 @@ export default function DashboardPage() {
           <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '6px' }}>
             <div style={{ flex: 1, background: isDark ? 'rgba(34, 197, 94, 0.12)' : 'rgba(34, 197, 94, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#22c55e', fontSize: '17px', fontWeight: '700', margin: 0 }}>{activeOrders}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Aktif</span>
+              <span style={{ color: c.textSecondary, fontSize: '8px', textTransform: 'uppercase' }}>Aktif</span>
             </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(251, 191, 36, 0.12)' : 'rgba(251, 191, 36, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#fbbf24', fontSize: '17px', fontWeight: '700', margin: 0 }}>{pendingPayments}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Ödeme Bekleniyor</span>
+              <span style={{ color: c.textSecondary, fontSize: '8px', textTransform: 'uppercase' }}>Ödeme Bekleniyor</span>
             </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(102, 126, 234, 0.12)' : 'rgba(102, 126, 234, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#667eea', fontSize: '17px', fontWeight: '700', margin: 0 }}>{toShipOrders}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargoya Verilecek</span>
+              <span style={{ color: c.textSecondary, fontSize: '8px', textTransform: 'uppercase' }}>Kargoya Verilecek</span>
             </div>
             <div style={{ flex: 1, background: isDark ? 'rgba(139, 92, 246, 0.12)' : 'rgba(139, 92, 246, 0.15)', borderRadius: '8px', padding: '8px 6px', textAlign: 'center' }}>
               <p style={{ color: '#8b5cf6', fontSize: '17px', fontWeight: '700', margin: 0 }}>{shippedOrders}</p>
-              <span style={{ color: '#6b7280', fontSize: '8px', textTransform: 'uppercase' }}>Kargoda</span>
+              <span style={{ color: c.textSecondary, fontSize: '8px', textTransform: 'uppercase' }}>Kargoda</span>
             </div>
           </div>
 
           <div style={{ padding: '0 16px 10px 16px', display: 'flex', gap: '8px' }}>
             <div style={{
               flex: 1,
-              background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+              background: c.bgCard,
               borderRadius: '10px',
               padding: '10px 12px',
               display: 'flex',
@@ -1782,11 +2103,14 @@ export default function DashboardPage() {
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#64748b" strokeWidth="2">
                 <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
               </svg>
+              {/* === GUNCEL: Placeholder - siparis no destegi === */}
               <input
-                type="text"
-                placeholder="İsim, telefon veya ürün ara..."
+                type="search"
+                placeholder="İsim, telefon, ürün veya #sipariş no..."
                 value={searchName}
                 onChange={(e) => setSearchName(e.target.value)}
+                autoComplete="off"
+                name="search-orders"
                 style={{
                   flex: 1,
                   background: 'transparent',
@@ -1798,7 +2122,7 @@ export default function DashboardPage() {
               />
             </div>
             <div style={{
-              background: isDark ? 'rgba(26, 26, 46, 0.7)' : 'rgba(255, 255, 255, 0.9)',
+              background: c.bgCard,
               borderRadius: '10px',
               padding: '10px 12px',
               display: 'flex',
@@ -1822,9 +2146,9 @@ export default function DashboardPage() {
           {filteredOrders.length === 0 ? (
             <div style={{ 
               textAlign: 'center', 
-              color: '#64748b', 
+              color: c.textSecondary, 
               padding: '60px 20px',
-              background: isDark ? 'rgba(26, 26, 46, 0.4)' : 'rgba(255, 255, 255, 0.8)',
+              background: c.bgCard,
               borderRadius: '20px',
               boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
             }}>
@@ -1840,9 +2164,10 @@ export default function DashboardPage() {
                 onEdit={startEditing}
                 onDelete={deleteOrder}
                 onWhatsApp={handleWhatsApp}
+                onOpenDetail={setDetailOrder}
                 statusColor={getStatusColor(order.status)}
                 isDark={isDark}
-                searchTerm={searchName}
+                searchTerm={searchName} theme={theme}
               />
             ))
           )}
@@ -1855,6 +2180,7 @@ export default function DashboardPage() {
           onAddClick={() => setShowAddModal(true)}
           onLockedClick={() => setShowUpgradeModal(true)}
           isDark={isDark}
+              isPro={isPro}
         />
 
         <MobileAddOrderModal
@@ -1865,6 +2191,9 @@ export default function DashboardPage() {
           handleAddOrder={handleAddOrder}
           turkeyData={turkeyData}
           isDark={isDark}
+              isPro={isPro}
+              userProducts={userProducts}
+          theme={theme}
         />
 
         <MobileEditModal
@@ -1876,12 +2205,20 @@ export default function DashboardPage() {
           deleteOrder={deleteOrder}
           editingId={editingId}
           turkeyData={turkeyData}
-          isDark={isDark}
+          isDark={isDark} theme={theme}
         />
 
         <UpgradeModal
           isOpen={showUpgradeModal}
           onClose={() => setShowUpgradeModal(false)}
+          theme={theme}
+        />
+
+        {/* === YENI: Mobile Siparis Detay Modal === */}
+        <OrderDetailModal
+          order={detailOrder}
+          isOpen={detailOrder !== null}
+          onClose={() => setDetailOrder(null)}
           theme={theme}
         />
 
@@ -1910,7 +2247,7 @@ export default function DashboardPage() {
   return (
     <div style={{ 
       minHeight: '100vh', 
-      background: c.bg, 
+      background: c.bgGradient, 
       fontFamily: 'Arial', 
       color: c.text, 
       margin: 0, 
@@ -1942,8 +2279,9 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <OrderForm newOrder={newOrder} setNewOrder={setNewOrder} ordersCreatedCount={ordersCreatedCount} handleAddOrder={handleAddOrder} theme={theme} />
-        <SearchBox searchName={searchName} setSearchName={setSearchName} searchPhone={searchPhone} setSearchPhone={setSearchPhone} searchProduct={searchProduct} setSearchProduct={setSearchProduct} filteredCount={filteredOrders.length} theme={theme} />
+        <OrderForm newOrder={newOrder} setNewOrder={setNewOrder} ordersCreatedCount={ordersCreatedCount} handleAddOrder={handleAddOrder} theme={theme} isPro={isPro} userProducts={userProducts} />
+        {/* === GUNCEL: SearchBox'a searchOrderNo + setSearchOrderNo eklendi === */}
+        <SearchBox searchName={searchName} setSearchName={setSearchName} searchPhone={searchPhone} setSearchPhone={setSearchPhone} searchProduct={searchProduct} setSearchProduct={setSearchProduct} searchOrderNo={searchOrderNo} setSearchOrderNo={setSearchOrderNo} filteredCount={filteredOrders.length} theme={theme} />
         <OrderTable filteredOrders={filteredOrders} user={user} theme={theme} startEditing={startEditing} deleteOrder={deleteOrder} updateOrderStatus={updateOrderStatus} statusFilter={statusFilter} setStatusFilter={setStatusFilter} />
       </div>
 

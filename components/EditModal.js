@@ -5,6 +5,19 @@ import { colors } from '../lib/theme'
 import { cities, getDistricts } from '../lib/turkeyData'
 import { calculateSubtotal, calculateKDVAmount, calculateLineTotal, calculateGrandTotal, calculateTotalKDV, calculateTotalSubtotal } from '../lib/calculations'
 
+// === YENI: Kargo firmalari listesi (mobile ile ayni tutalim) ===
+const KARGO_FIRMALARI = [
+  'Aras Kargo',
+  'Yurtiçi Kargo',
+  'MNG Kargo',
+  'PTT Kargo',
+  'Sürat Kargo',
+  'HepsiJET',
+  'Sendeo',
+  'Trendyol Express',
+  'Diğer'
+]
+
 export default function EditModal({ editingId, editingData, setEditingData, saveEdit, cancelEdit, theme }) {
   const c = colors[theme]
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false)
@@ -13,6 +26,9 @@ export default function EditModal({ editingId, editingData, setEditingData, save
   const [districtSearch, setDistrictSearch] = useState('')
   const cityDropdownRef = useRef(null)
   const districtDropdownRef = useRef(null)
+
+  // === YENI: Kargo custom mode (Diger secilince acilir) ===
+  const [cargoCustomMode, setCargoCustomMode] = useState(false)
 
   // Close dropdowns when clicking outside
   useEffect(() => {
@@ -29,6 +45,15 @@ export default function EditModal({ editingId, editingData, setEditingData, save
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  // === YENI: Modal acildiginda mevcut kargo bilgisi listede yoksa custom moda gec ===
+  useEffect(() => {
+    if (editingData?.cargo_company && !KARGO_FIRMALARI.includes(editingData.cargo_company)) {
+      setCargoCustomMode(true)
+    } else {
+      setCargoCustomMode(false)
+    }
+  }, [editingId])
 
   if (!editingId) return null
 
@@ -71,6 +96,18 @@ export default function EditModal({ editingId, editingData, setEditingData, save
   const removeProductLine = (index) => {
     const updatedProducts = editingData.products.filter((_, i) => i !== index)
     setEditingData({ ...editingData, products: updatedProducts })
+  }
+
+  // === YENI: Kargo firmasi secimi ===
+  const handleCargoSelect = (e) => {
+    const value = e.target.value
+    if (value === 'Diğer') {
+      setCargoCustomMode(true)
+      setEditingData({ ...editingData, cargo_company: '' })
+    } else {
+      setCargoCustomMode(false)
+      setEditingData({ ...editingData, cargo_company: value })
+    }
   }
 
   return (
@@ -321,6 +358,99 @@ export default function EditModal({ editingId, editingData, setEditingData, save
                 ))}
               </div>
             )}
+          </div>
+        </div>
+
+        {/* === YENI: Kargo Firmasi ve Takip No (Il ve Ilce altinda) === */}
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px', marginBottom: '15px' }}>
+          {/* Kargo Firmasi */}
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>
+              🚚 Kargo Firması
+            </label>
+            {cargoCustomMode ? (
+              <div style={{ display: 'flex', gap: '4px' }}>
+                <input
+                  type="text"
+                  value={editingData.cargo_company || ''}
+                  onChange={(e) => setEditingData({ ...editingData, cargo_company: e.target.value })}
+                  placeholder="Kargo firması adı..."
+                  style={{ flex: 1, padding: '8px 12px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCargoCustomMode(false)
+                    setEditingData({ ...editingData, cargo_company: '' })
+                  }}
+                  title="Listeden seç"
+                  style={{
+                    padding: '0 12px',
+                    background: 'transparent',
+                    border: `1px solid ${c.inputBorder}`,
+                    borderRadius: '4px',
+                    color: c.textSecondary,
+                    cursor: 'pointer',
+                    fontSize: '14px',
+                    fontWeight: '600'
+                  }}
+                >
+                  ↩
+                </button>
+              </div>
+            ) : (
+              <select
+                value={editingData.cargo_company || ''}
+                onChange={handleCargoSelect}
+                style={{
+                  width: '100%',
+                  padding: '8px 12px',
+                  border: `1px solid ${c.inputBorder}`,
+                  borderRadius: '4px',
+                  fontSize: '14px',
+                  boxSizing: 'border-box',
+                  background: c.input,
+                  color: editingData.cargo_company ? c.text : c.textSecondary,
+                  cursor: 'pointer',
+                  appearance: 'none',
+                  WebkitAppearance: 'none',
+                  MozAppearance: 'none',
+                  backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23999' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E")`,
+                  backgroundRepeat: 'no-repeat',
+                  backgroundPosition: 'right 12px center',
+                  paddingRight: '32px'
+                }}
+              >
+                <option value="" style={{ color: '#000', backgroundColor: '#fff' }}>Seçiniz (Opsiyonel)</option>
+                {KARGO_FIRMALARI.map(cargo => (
+                  <option key={cargo} value={cargo} style={{ color: '#000', backgroundColor: '#fff' }}>{cargo}</option>
+                ))}
+              </select>
+            )}
+          </div>
+
+          {/* Takip No */}
+          <div>
+            <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>
+              📦 Takip No
+            </label>
+            <input
+              type="text"
+              value={editingData.tracking_number || ''}
+              onChange={(e) => setEditingData({ ...editingData, tracking_number: e.target.value })}
+              placeholder="Takip numarası..."
+              style={{
+                width: '100%',
+                padding: '8px 12px',
+                border: `1px solid ${c.inputBorder}`,
+                borderRadius: '4px',
+                fontSize: '14px',
+                boxSizing: 'border-box',
+                background: c.input,
+                color: c.text,
+                fontFamily: 'monospace'
+              }}
+            />
           </div>
         </div>
 

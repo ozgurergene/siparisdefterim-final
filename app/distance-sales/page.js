@@ -36,14 +36,54 @@ export default function DistanceSales() {
           <p>Kredi kartı ile güvenli ödeme altyapısı üzerinden tahsil edilir.</p>
 
           <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>5. Teslimat</h2>
-          <p>Dijital hizmet olup, ödeme onayından sonra 24 saat içinde hesabınız aktif edilir.</p>
+          <p>Dijital hizmet olup, ödeme onayından sonra anında hesabınız aktif edilir. Hizmetin ifasına ödeme onayıyla birlikte başlanmış sayılır.</p>
 
+          {/* === GUNCEL: Cayma Hakki - Feragat ve TKHK Madde 15/g === */}
           <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>6. Cayma Hakkı</h2>
-          <p>Tüketici, sözleşmenin kurulduğu tarihten itibaren 14 (on dört) gün içinde herhangi bir gerekçe göstermeksizin ve cezai şart ödemeksizin sözleşmeden cayma hakkına sahiptir.</p>
-          <p style={{ marginTop: '10px' }}>Cayma hakkını kullanmak için <strong>support@siparisdefterim.com</strong> adresine e-posta gönderebilirsiniz.</p>
+          
+          <div style={{
+            background: theme === 'dark' ? 'rgba(239, 68, 68, 0.08)' : 'rgba(239, 68, 68, 0.05)',
+            border: `1px solid ${theme === 'dark' ? 'rgba(239, 68, 68, 0.3)' : 'rgba(239, 68, 68, 0.2)'}`,
+            borderRadius: '8px',
+            padding: '16px',
+            marginBottom: '15px'
+          }}>
+            <p style={{ marginTop: 0, fontWeight: '600' }}>
+              ⚠️ Önemli: Bu hizmet, cayma hakkı kapsamı dışındadır.
+            </p>
+          </div>
+
+          <p>
+            <strong>6.1.</strong> Satın aldığınız Pro üyelik, 6502 sayılı Tüketicinin Korunması Hakkında Kanun (TKHK) 
+            ve Mesafeli Sözleşmeler Yönetmeliği'nin 15. maddesinin 1. fıkrasının (ğ) bendi uyarınca 
+            <strong> "elektronik ortamda anında ifa edilen hizmetler"</strong> kapsamında değerlendirilmektedir.
+          </p>
+
+          <p style={{ marginTop: '12px' }}>
+            <strong>6.2.</strong> Pro üyelik ödemesinin onaylanması ve hizmetin aktive edilmesiyle birlikte 
+            hizmetin ifasına başlanmış sayılır. Bu nedenle <strong>cayma hakkı bulunmamaktadır</strong>.
+          </p>
+
+          <p style={{ marginTop: '12px' }}>
+            <strong>6.3.</strong> Alıcı, bu sözleşmeyi kabul ederek hizmetin satın alma anında ifasına 
+            başlanmasını ve cayma hakkından feragat ettiğini açıkça beyan ve kabul eder.
+          </p>
+
+          <p style={{ marginTop: '12px' }}>
+            <strong>6.4.</strong> Alıcı, dilediği zaman aboneliğini iptal edebilir. İptal sonrasında 
+            ödediği dönemin (aylık/yıllık) sonuna kadar Pro özelliklerini kullanmaya devam eder ve 
+            dönem sonunda otomatik olarak ücretsiz pakete geçer. <strong>Yapılan ödemeler iade edilmez.</strong>
+          </p>
+
+          <p style={{ marginTop: '12px' }}>
+            İptal talepleri için <strong>destek@deftertut.com</strong> adresine e-posta gönderebilirsiniz.
+          </p>
 
           <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>7. Uyuşmazlık Çözümü</h2>
           <p>Bu sözleşmeden doğan uyuşmazlıklarda Türkiye Cumhuriyeti mahkemeleri ve icra daireleri yetkilidir.</p>
+
+          <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>8. İletişim</h2>
+          <p>Sözleşme ile ilgili tüm sorular için: <strong>destek@deftertut.com</strong></p>
         </div>
 
         <a href="/login" style={{ display: 'inline-block', marginTop: '30px', color: '#007bff', textDecoration: 'underline' }}>← Geri Dön</a>

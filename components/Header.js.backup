@@ -6,11 +6,11 @@ import { colors } from '../lib/theme'
 // Gradient Home Icon SVG Component
 function HomeIcon({ size = 24 }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
+    <svg 
+      width={size} 
+      height={size} 
+      viewBox="0 0 24 24" 
+      fill="none" 
       xmlns="http://www.w3.org/2000/svg"
     >
       <defs>
@@ -19,64 +19,33 @@ function HomeIcon({ size = 24 }) {
           <stop offset="100%" stopColor="#764ba2" />
         </linearGradient>
       </defs>
-      <path
-        d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z"
-        stroke="url(#homeGradient)"
-        strokeWidth="2"
-        strokeLinecap="round"
+      <path 
+        d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" 
+        stroke="url(#homeGradient)" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
         strokeLinejoin="round"
       />
-      <path
-        d="M9 22V12H15V22"
-        stroke="url(#homeGradient)"
-        strokeWidth="2"
-        strokeLinecap="round"
+      <path 
+        d="M9 22V12H15V22" 
+        stroke="url(#homeGradient)" 
+        strokeWidth="2" 
+        strokeLinecap="round" 
         strokeLinejoin="round"
       />
     </svg>
   )
 }
 
-export default function Header({ user, ordersCreatedCount = 0, isPro = false, theme, toggleTheme, handleLogout }) {
+export default function Header({ user, ordersCreatedCount, isPro = false, theme, toggleTheme, handleLogout }) {
   const c = colors[theme]
   const router = useRouter()
   const pathname = usePathname()
 
-  // Yeni Pro tab'ları (renk + path tanımları)
-  const proTabs = [
-    {
-      path: '/customers',
-      label: 'Müşteriler',
-      icon: '👥',
-      gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-      bgColor: 'rgba(240, 147, 251, 0.1)',
-      bgHover: 'rgba(240, 147, 251, 0.2)',
-      shadow: '0 4px 15px rgba(240, 147, 251, 0.4)'
-    },
-    {
-      path: '/products',
-      label: 'Ürünler',
-      icon: '📦',
-      gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-      bgColor: 'rgba(79, 172, 254, 0.1)',
-      bgHover: 'rgba(79, 172, 254, 0.2)',
-      shadow: '0 4px 15px rgba(79, 172, 254, 0.4)'
-    },
-    {
-      path: '/reports',
-      label: 'Raporlar',
-      icon: '📊',
-      gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-      bgColor: 'rgba(250, 112, 154, 0.1)',
-      bgHover: 'rgba(250, 112, 154, 0.2)',
-      shadow: '0 4px 15px rgba(250, 112, 154, 0.4)'
-    }
-  ]
-
   return (
-    <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 30px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
-      <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap', gap: '10px' }}>
-
+    <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 20px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+      <div style={{ maxWidth: '1400px', margin: '0 auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '10px' }}>
+        
         {/* Logo + Home Icon */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
@@ -104,15 +73,15 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           >
             <HomeIcon size={22} />
           </button>
-
+          
           {/* Logo with gradient text */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <span style={{ fontSize: '20px' }}>📱</span>
-            <h1
+            <h1 
               onClick={() => router.push('/home')}
-              style={{
-                margin: 0,
-                fontSize: '24px',
+              style={{ 
+                margin: 0, 
+                fontSize: '24px', 
                 fontWeight: '600',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                 WebkitBackgroundClip: 'text',
@@ -128,10 +97,9 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             </h1>
           </div>
         </div>
-
+        
         {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', gap: '8px', marginLeft: '20px', flexWrap: 'nowrap' }}>
-          {/* Siparişler */}
+        <nav style={{ display: 'flex', gap: '8px', marginLeft: '20px' }}>
           <button
             onClick={() => router.push('/dashboard')}
             style={{
@@ -145,16 +113,20 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               alignItems: 'center',
               gap: '8px',
               transition: 'all 0.3s ease',
-              background: pathname === '/dashboard' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(118, 75, 162, 0.25) 100%)',
+              background: pathname === '/dashboard' 
+                ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                : 'rgba(102, 126, 234, 0.1)',
               color: pathname === '/dashboard' ? 'white' : c.text,
               boxShadow: pathname === '/dashboard' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
             }}
             onMouseEnter={(e) => {
-              if (pathname !== '/dashboard') { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(118, 75, 162, 0.4) 100%)'
+              if (pathname !== '/dashboard') {
+                e.currentTarget.style.background = 'rgba(102, 126, 234, 0.2)'
               }
             }}
             onMouseLeave={(e) => {
-              if (pathname !== '/dashboard') { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(118, 75, 162, 0.25) 100%)'
+              if (pathname !== '/dashboard') {
+                e.currentTarget.style.background = 'rgba(102, 126, 234, 0.1)'
               }
             }}
           >
@@ -162,7 +134,6 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             Siparişler
           </button>
 
-          {/* Tamamlananlar */}
           <button
             onClick={() => router.push('/completed')}
             style={{
@@ -176,82 +147,29 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               alignItems: 'center',
               gap: '8px',
               transition: 'all 0.3s ease',
-              background: pathname === '/completed' ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' : 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(118, 75, 162, 0.25) 100%)',
+              background: pathname === '/completed' 
+                ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' 
+                : 'rgba(67, 233, 123, 0.1)',
               color: pathname === '/completed' ? 'white' : c.text,
               boxShadow: pathname === '/completed' ? '0 4px 15px rgba(67, 233, 123, 0.4)' : 'none',
             }}
             onMouseEnter={(e) => {
-              if (pathname !== '/completed') { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(118, 75, 162, 0.4) 100%)'
+              if (pathname !== '/completed') {
+                e.currentTarget.style.background = 'rgba(67, 233, 123, 0.2)'
               }
             }}
             onMouseLeave={(e) => {
-              if (pathname !== '/completed') { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(118, 75, 162, 0.25) 100%)'
+              if (pathname !== '/completed') {
+                e.currentTarget.style.background = 'rgba(67, 233, 123, 0.1)'
               }
             }}
           >
             <span>✅</span>
             Tamamlananlar
           </button>
-
-          {/* PRO TAB'LARI: Müşteriler, Ürünler, Raporlar */}
-          {proTabs.map((tab) => {
-            const isActive = pathname === tab.path || pathname?.startsWith(tab.path + '/')
-            const locked = !isPro
-
-            return (
-              <button
-                key={tab.path}
-                onClick={() => router.push(tab.path)}
-                style={{
-                  padding: '10px 20px',
-                  borderRadius: '10px',
-                  border: 'none',
-                  cursor: 'pointer',
-                  fontSize: '14px',
-                  fontWeight: '500',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '8px',
-                  transition: 'all 0.3s ease',
-                  background: isActive ? tab.gradient : tab.bgColor,
-                  color: isActive ? 'white' : c.text,
-                  boxShadow: isActive ? tab.shadow : 'none',
-                  position: 'relative',
-                  opacity: locked ? 0.85 : 1
-                }}
-                onMouseEnter={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = tab.bgHover
-                  }
-                }}
-                onMouseLeave={(e) => {
-                  if (!isActive) {
-                    e.currentTarget.style.background = tab.bgColor
-                  }
-                }}
-              >
-                <span>{tab.icon}</span>
-                {tab.label}
-                {locked && (
-                  <span style={{
-                    fontSize: '9px',
-                    padding: '2px 6px',
-                    background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
-                    color: '#fff',
-                    borderRadius: '5px',
-                    fontWeight: '700',
-                    marginLeft: '2px',
-                    letterSpacing: '0.5px'
-                  }}>
-                    PRO
-                  </span>
-                )}
-              </button>
-            )
-          })}
         </nav>
 
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'nowrap' }}>
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'wrap' }}>
           {/* Sipariş Sayacı — Pro / Free durumu */}
           {isPro ? (
             // PRO görünümü: rozet + sayı, /50 yok
@@ -283,18 +201,9 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             </div>
           ) : (
             // FREE görünümü: orijinal /50 progress bar
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              gap: '4px',
-              padding: '8px 14px',
-              background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
-              border: '1px solid rgba(102, 126, 234, 0.4)',
-              borderRadius: '14px',
-              boxShadow: '0 2px 8px rgba(102, 126, 234, 0.15)'
-            }}>
-              <p style={{ margin: 0, fontSize: '12px', color: c.textSecondary, whiteSpace: 'nowrap' }}>Siparişler: {ordersCreatedCount}/50</p>
-              <div style={{ width: '100%', height: '5px', background: c.bgSecondary, borderRadius: '3px', overflow: 'hidden' }}>
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ margin: '0 0 5px 0', fontSize: '14px', color: c.textSecondary }}>Siparişler: {ordersCreatedCount}/50</p>
+              <div style={{ width: '100px', height: '6px', background: c.bgSecondary, borderRadius: '3px', overflow: 'hidden' }}>
                 <div style={{ width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : 'linear-gradient(90deg, #667eea, #764ba2)', transition: 'width 0.3s' }} />
               </div>
             </div>
@@ -330,41 +239,39 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               }}
             >
               <span>⭐</span>
-              Pro&apos;ya Geç
+              Pro'ya Geç
             </button>
           )}
 
           {/* Email — Tıklanabilir, /manage-subscription'a gider */}
-          {user?.email && (
-            <a
-              href="/manage-subscription"
-              title="Hesabım — Aboneliği Yönet"
-              style={{
-                color: c.textSecondary,
-                fontSize: '14px',
-                textDecoration: 'none',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                padding: '6px 10px',
-                borderRadius: '6px',
-                transition: 'all 0.2s ease',
-                cursor: 'pointer'
-              }}
-              onMouseOver={(e) => {
-                e.currentTarget.style.background = c.bgSecondary
-                e.currentTarget.style.color = '#667eea'
-              }}
-              onMouseOut={(e) => {
-                e.currentTarget.style.background = 'transparent'
-                e.currentTarget.style.color = c.textSecondary
-              }}
-            >
-              <span style={{ fontSize: '14px' }}>👤</span>
-              {user.email}
-            </a>
-          )}
-
+          <a
+            href="/manage-subscription"
+            title="Hesabım — Aboneliği Yönet"
+            style={{
+              color: c.textSecondary,
+              fontSize: '14px',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '6px',
+              padding: '6px 10px',
+              borderRadius: '6px',
+              transition: 'all 0.2s ease',
+              cursor: 'pointer'
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.background = c.bgSecondary
+              e.currentTarget.style.color = '#667eea'
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.background = 'transparent'
+              e.currentTarget.style.color = c.textSecondary
+            }}
+          >
+            <span style={{ fontSize: '14px' }}>👤</span>
+            {user.email}
+          </a>
+          
           {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
@@ -388,7 +295,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           >
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
-
+          
           {/* Logout Button */}
           <button
             onClick={handleLogout}

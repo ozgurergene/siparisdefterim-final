@@ -1,5 +1,7 @@
 'use client'
 import { useState, useEffect } from 'react'
+
+import ProfilePopup from '../../components/ProfilePopup'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors, metricGradients, glowEffects, buttonGradients, keyframesCSS, getAvatarGradient, getInitials } from '../../lib/theme'
@@ -22,178 +24,6 @@ function HomeIcon({ size = 18 }) {
       <path d="M3 9.5L12 3L21 9.5V20C21 20.5304 20.7893 21.0391 20.4142 21.4142C20.0391 21.7893 19.5304 22 19 22H5C4.46957 22 3.96086 21.7893 3.58579 21.4142C3.21071 21.0391 3 20.5304 3 20V9.5Z" stroke="url(#homeGradientHome)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
       <path d="M9 22V12H15V22" stroke="url(#homeGradientHome)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
     </svg>
-  )
-}
-
-// Profile Popup Component
-function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCreatedCount, isPro, theme, toggleTheme }) {
-  if (!isOpen) return null
-
-  const isDark = theme === 'dark'
-
-  return (
-    <>
-      <div 
-        onClick={onClose}
-        style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          background: 'rgba(0,0,0,0.3)',
-          zIndex: 998
-        }}
-      />
-      <div style={{
-        position: 'absolute',
-        top: '60px',
-        right: '16px',
-        width: '220px',
-        background: isDark ? '#1a1a2e' : '#ffffff',
-        borderRadius: '14px',
-        boxShadow: '0 10px 40px rgba(0,0,0,0.5)',
-        border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.2)' : 'rgba(0,0,0,0.1)'}`,
-        zIndex: 999,
-        overflow: 'hidden',
-        animation: 'fadeIn 0.2s ease'
-      }}>
-        <div style={{
-          padding: '16px',
-          background: isDark 
-            ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)'
-            : 'linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%)',
-          borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}`
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <div style={{
-              width: '44px',
-              height: '44px',
-              borderRadius: '50%',
-              background: getAvatarGradient(user.email),
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#fff',
-              fontSize: '15px',
-              fontWeight: '600'
-            }}>
-              {getInitials(user.email)}
-            </div>
-            <div>
-              <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>
-                {user.email.split('@')[0]}
-              </p>
-              <p style={{ color: '#64748b', fontSize: '11px', margin: '2px 0 0 0' }}>
-                {user.email}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Order Quota — Pro / Free durumu */}
-        <div style={{ padding: '12px 16px', borderBottom: `1px solid ${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)'}` }}>
-          {isPro ? (
-            <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                <span style={{
-                  fontSize: '11px',
-                  fontWeight: '700',
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '0.5px'
-                }}>✨ PRO ÜYELİK</span>
-                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} sipariş</span>
-              </div>
-              <div style={{ height: '4px', background: 'linear-gradient(90deg, #667eea, #764ba2)', borderRadius: '2px' }} />
-              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Sınırsız sipariş hakkı aktif</p>
-            </>
-          ) : (
-            <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
-                <span style={{ color: '#94a3b8', fontSize: '11px' }}>Toplam Sipariş</span>
-                <span style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '11px', fontWeight: '600' }}>{ordersCreatedCount} / 50</span>
-              </div>
-              <div style={{ height: '4px', background: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)', borderRadius: '2px', overflow: 'hidden' }}>
-                <div style={{
-                  width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`,
-                  height: '100%',
-                  background: 'linear-gradient(90deg, #667eea, #764ba2)',
-                  borderRadius: '2px'
-                }} />
-              </div>
-              <p style={{ color: '#64748b', fontSize: '9px', margin: '6px 0 0 0' }}>Ücretsiz plan - 50 sipariş hakkı</p>
-            </>
-          )}
-        </div>
-
-        <div style={{ padding: '8px' }}>
-          {/* Theme Toggle */}
-          <div 
-            onClick={toggleTheme}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              padding: '10px 12px',
-              borderRadius: '8px',
-              cursor: 'pointer',
-              background: isDark ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.03)'
-            }}
-          >
-            <span style={{ fontSize: '16px' }}>{isDark ? '🌙' : '☀️'}</span>
-            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Tema: {isDark ? 'Koyu' : 'Açık'}</span>
-            <div style={{
-              marginLeft: 'auto',
-              width: '36px',
-              height: '20px',
-              background: isDark ? '#667eea' : '#cbd5e1',
-              borderRadius: '10px',
-              position: 'relative',
-              transition: 'background 0.2s ease'
-            }}>
-              <div style={{
-                position: 'absolute',
-                left: isDark ? '18px' : '2px',
-                top: '2px',
-                width: '16px',
-                height: '16px',
-                background: '#fff',
-                borderRadius: '50%',
-                transition: 'left 0.2s ease',
-                boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
-              }} />
-            </div>
-          </div>
-
-          {/* Pro'ya Yükselt — sadece Free'de göster */}
-          {!isPro && (
-            <a href="/pricing" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', textDecoration: 'none' }}>
-              <span style={{ fontSize: '16px' }}>⭐</span>
-              <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>Pro'ya Yükselt</span>
-              <span style={{
-                marginLeft: 'auto',
-                background: 'linear-gradient(135deg, #f59e0b, #ef4444)',
-                color: '#fff',
-                fontSize: '8px',
-                padding: '2px 6px',
-                borderRadius: '4px',
-                fontWeight: '600'
-              }}>YENİ</span>
-            </a>
-          )}
-
-          <div style={{ height: '1px', background: isDark ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)', margin: '6px 0' }} />
-
-          <div onClick={onLogout} style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer' }}>
-            <span style={{ fontSize: '16px' }}>🚪</span>
-            <span style={{ color: '#ef4444', fontSize: '13px', fontWeight: '500' }}>Çıkış Yap</span>
-          </div>
-        </div>
-      </div>
-    </>
   )
 }
 
@@ -227,7 +57,8 @@ function SuccessToast({ show, message }) {
 }
 
 // Mobile Add Order Modal
-function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true }) {
+function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAddOrder, turkeyData, isDark = true, theme }) {
+  const c = colors[theme]
   if (!isOpen) return null
 
   const cities = turkeyData ? Object.keys(turkeyData).sort((a, b) => a.localeCompare(b, 'tr')) : []
@@ -251,7 +82,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
   const inputStyle = {
     width: '100%',
     padding: '12px',
-    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    background: c.bgCard,
     border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
     borderRadius: '10px',
     color: isDark ? '#fff' : '#1a1a2e',
@@ -263,7 +94,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
     width: '100%',
     padding: '12px',
     paddingRight: '32px',
-    background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(248, 250, 252, 1)',
+    background: c.bgCard,
     border: `1px solid ${isDark ? '#2a2a3e' : 'rgba(0,0,0,0.1)'}`,
     borderRadius: '10px',
     color: isDark ? '#fff' : '#1a1a2e',
@@ -327,7 +158,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Müşteri Adı Soyadı</label>
             <input
               type="text"
               value={newOrder.customer_name}
@@ -337,7 +168,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Telefon</label>
             <input
               type="tel"
               value={newOrder.customer_phone}
@@ -350,7 +181,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         </div>
 
         <div style={{ marginBottom: '12px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adres</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Adres</label>
           <input
             type="text"
             value={newOrder.customer_address}
@@ -362,7 +193,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         <div style={{ display: 'flex', gap: '10px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İl</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>İl</label>
             <select
               value={newOrder.customer_city}
               onChange={(e) => setNewOrder({ ...newOrder, customer_city: e.target.value, customer_district: '' })}
@@ -375,7 +206,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             </select>
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>İlçe</label>
             <select
               value={newOrder.customer_district}
               onChange={(e) => setNewOrder({ ...newOrder, customer_district: e.target.value })}
@@ -392,7 +223,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 2 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Ürün</label>
             <input
               type="text"
               value={newOrder.products[0]?.product || ''}
@@ -406,7 +237,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Adet</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Adet</label>
             <input
               type="number"
               value={newOrder.products[0]?.quantity || 1}
@@ -423,7 +254,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Birim Fiyat</label>
             <input
               type="number"
               value={newOrder.products[0]?.unit_price || ''}
@@ -437,7 +268,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
             />
           </div>
           <div style={{ flex: 1 }}>
-            <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
+            <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>KDV %</label>
             <input
               type="number"
               value={newOrder.products[0]?.kdv_rate || ''}
@@ -470,12 +301,12 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         </div>
 
         <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
-          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
+          <div style={{ flex: 1, background: c.bgCard, borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: c.textSecondary, fontSize: '10px', margin: '0 0 4px 0' }}>Tutar</p>
             <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{tutar.toFixed(2)}</p>
           </div>
-          <div style={{ flex: 1, background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(248, 250, 252, 1)', borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
-            <p style={{ color: '#64748b', fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
+          <div style={{ flex: 1, background: c.bgCard, borderRadius: '10px', padding: '10px', textAlign: 'center', border: isDark ? 'none' : '1px solid rgba(0,0,0,0.08)' }}>
+            <p style={{ color: c.textSecondary, fontSize: '10px', margin: '0 0 4px 0' }}>KDV</p>
             <p style={{ color: isDark ? '#fff' : '#1a1a2e', fontSize: '14px', fontWeight: '600', margin: 0 }}>₺{kdv.toFixed(2)}</p>
           </div>
           <div style={{ flex: 1, background: 'rgba(34, 197, 94, 0.15)', borderRadius: '10px', padding: '10px', textAlign: 'center' }}>
@@ -485,7 +316,7 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
         </div>
 
         <div style={{ marginBottom: '16px' }}>
-          <label style={{ display: 'block', color: '#94a3b8', marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
+          <label style={{ display: 'block', color: c.textSecondary, marginBottom: '4px', fontSize: '12px' }}>Not (Opsiyonel)</label>
           <textarea
             value={newOrder.note}
             onChange={(e) => setNewOrder({ ...newOrder, note: e.target.value })}
@@ -521,13 +352,13 @@ function MobileAddOrderModal({ isOpen, onClose, newOrder, setNewOrder, handleAdd
 }
 
 // Bottom Tab Bar Component — Pro tier yoksa Müşteri/Rapor kilitli
-function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true }) {
+function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDark = true, isPro = false }) {
   const tabs = [
     { id: 'orders', icon: '📦', label: 'Sipariş' },
     { id: 'completed', icon: '✅', label: 'Tamamlanan' },
     { id: 'add', icon: '+', label: '', isMain: true },
-    { id: 'customers', icon: '👥', label: 'Müşteri', locked: true },
-    { id: 'reports', icon: '📊', label: 'Rapor', locked: true }
+    { id: 'customers', icon: '👥', label: 'Müşteri', locked: !isPro },
+    { id: 'reports', icon: '📊', label: 'Rapor', locked: !isPro }
   ]
 
   return (
@@ -536,7 +367,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDar
       bottom: 0,
       left: 0,
       right: 0,
-      background: isDark ? 'rgba(13, 13, 26, 0.98)' : 'rgba(255, 255, 255, 0.98)',
+      background: isDark ? 'rgba(13, 13, 26, 0.85)' : 'rgba(248, 232, 250, 0.75)',
       backdropFilter: 'blur(20px)',
       WebkitBackdropFilter: 'blur(20px)',
       padding: '8px 0 24px 0',
@@ -780,6 +611,7 @@ export default function HomePage() {
     const newTheme = theme === 'light' ? 'dark' : 'light'
     setTheme(newTheme)
     localStorage.setItem('siparisdefterim-theme', newTheme)
+    if (typeof window !== 'undefined') document.documentElement.setAttribute('data-theme', newTheme)
   }
 
   const handleLogout = async () => {
@@ -841,20 +673,17 @@ export default function HomePage() {
   const handleTabChange = (tabId) => {
     if (tabId === 'orders') router.push('/dashboard')
     else if (tabId === 'completed') router.push('/completed')
+    else if (tabId === 'customers') router.push('/customers')
+    else if (tabId === 'reports') router.push('/reports')
+    else if (tabId === 'home') router.push('/home')
   }
 
   if (loading) {
     return (
-      <div style={{
-        minHeight: '100vh',
-        background: 'linear-gradient(135deg, #0a0a0f 0%, #12121f 50%, #0a0a0f 100%)',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
+      <div className="theme-loading" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <div style={{ fontSize: 48, marginBottom: 20 }}>📱</div>
-          <p style={{ color: '#94a3b8', fontSize: 14 }}>Yükleniyor...</p>
+          <p style={{ fontSize: 14, fontWeight: 500 }}>Yükleniyor...</p>
         </div>
       </div>
     )
@@ -877,9 +706,7 @@ export default function HomePage() {
     return (
       <div style={{
         height: '100vh',
-        background: isDark 
-          ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)' 
-          : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
+        background: c.bgGradient,
         fontFamily: 'Arial, sans-serif',
         color: isDark ? '#fff' : '#1a1a2e',
         paddingBottom: '80px',
@@ -898,7 +725,7 @@ export default function HomePage() {
             <button
               style={{
                 padding: '8px',
-                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                background: c.bgCard,
                 border: `1px solid ${isDark ? 'rgba(102, 126, 234, 0.3)' : 'rgba(102, 126, 234, 0.2)'}`,
                 borderRadius: '10px',
                 cursor: 'pointer',
@@ -960,7 +787,7 @@ export default function HomePage() {
           <h2 style={{ fontSize: '26px', fontWeight: 'bold', margin: '0 0 6px 0', color: isDark ? '#fff' : '#1a1a2e' }}>
             Hoş Geldin! 👋
           </h2>
-          <p style={{ color: '#94a3b8', fontSize: '14px', margin: 0 }}>
+          <p style={{ color: c.textSecondary, fontSize: '14px', margin: 0 }}>
             İşte güncel sipariş durumun
           </p>
         </div>
@@ -977,7 +804,7 @@ export default function HomePage() {
               key={card.label}
               onClick={() => router.push('/dashboard')}
               style={{
-                background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+                background: c.bgCard,
                 borderRadius: '14px',
                 padding: '12px 14px',
                 borderTop: `3px solid transparent`,
@@ -986,7 +813,7 @@ export default function HomePage() {
                 boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
               }}
             >
-              <p style={{ fontSize: '11px', color: '#94a3b8', margin: '0 0 4px 0' }}>{card.label}</p>
+              <p style={{ fontSize: '11px', color: c.textSecondary, margin: '0 0 4px 0' }}>{card.label}</p>
               <p style={{ 
                 fontSize: '28px', 
                 fontWeight: 'bold', 
@@ -1009,7 +836,7 @@ export default function HomePage() {
           marginBottom: '14px'
         }}>
           <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+            background: c.bgCard,
             borderRadius: '14px',
             padding: '12px 14px',
             display: 'flex',
@@ -1030,7 +857,7 @@ export default function HomePage() {
               💵
             </div>
             <div>
-              <p style={{ fontSize: '10px', color: '#94a3b8', margin: 0 }}>Bugünün Geliri</p>
+              <p style={{ fontSize: '10px', color: c.textSecondary, margin: 0 }}>Bugünün Geliri</p>
               <p style={{ fontSize: '18px', fontWeight: 'bold', margin: 0, color: '#43e97b' }}>
                 ₺{stats.todayRevenue.toFixed(0)}
               </p>
@@ -1038,7 +865,7 @@ export default function HomePage() {
           </div>
 
           <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.8)' : 'rgba(255, 255, 255, 0.9)',
+            background: c.bgCard,
             borderRadius: '14px',
             padding: '12px 14px',
             display: 'flex',
@@ -1059,7 +886,7 @@ export default function HomePage() {
               📊
             </div>
             <div>
-              <p style={{ fontSize: '10px', color: '#94a3b8', margin: 0 }}>{currentMonth} Geliri</p>
+              <p style={{ fontSize: '10px', color: c.textSecondary, margin: 0 }}>{currentMonth} Geliri</p>
               <p style={{ 
                 fontSize: '18px', 
                 fontWeight: 'bold', 
@@ -1076,7 +903,7 @@ export default function HomePage() {
 
         <div style={{ padding: '0 20px', flex: 1 }}>
           <div style={{
-            background: isDark ? 'rgba(26, 26, 46, 0.6)' : 'rgba(255, 255, 255, 0.9)',
+            background: c.bgCard,
             borderRadius: '16px',
             padding: '14px 16px',
             boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)'
@@ -1164,9 +991,10 @@ export default function HomePage() {
             marginBottom: '8px',
             flexWrap: 'wrap'
           }}>
-            <a href="/privacy-policy" style={{ color: '#64748b', fontSize: '11px', textDecoration: 'none' }}>Gizlilik Politikası</a>
-            <a href="/terms-of-use" style={{ color: '#64748b', fontSize: '11px', textDecoration: 'none' }}>Kullanım Koşulları</a>
-            <a href="/gdpr-disclosure" style={{ color: '#64748b', fontSize: '11px', textDecoration: 'none' }}>KVKK Aydınlatma</a>
+            <a href="/refund-policy" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>İade Politikası</a>
+            <a href="/privacy-policy" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>Gizlilik Politikası</a>
+            <a href="/terms-of-use" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>Kullanım Koşulları</a>
+            <a href="/gdpr-disclosure" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>KVKK Aydınlatma</a>
           </div>
           <p style={{ color: '#4a5568', fontSize: '10px', margin: 0 }}>
             © 2026 Deftertut.com - Tüm hakları saklıdır.
@@ -1180,6 +1008,7 @@ export default function HomePage() {
           onAddClick={() => setShowAddModal(true)}
           onLockedClick={() => setShowUpgradeModal(true)}
           isDark={isDark}
+              isPro={isPro}
         />
 
         <MobileAddOrderModal
@@ -1190,6 +1019,7 @@ export default function HomePage() {
           handleAddOrder={handleAddOrder}
           turkeyData={turkeyData}
           isDark={isDark}
+          theme={theme}
         />
 
         <UpgradeModal

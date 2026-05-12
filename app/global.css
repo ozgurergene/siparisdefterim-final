@@ -22,3 +22,42 @@ td, th { padding: 8px 5px; }
 
 p { font-size: 13px; }
 a { font-size: 13px; }
+
+/* ===== Theme-aware loading screen ===== */
+/* layout.js'deki blocking script bunu render'dan once data-theme="light" veya "dark" yapar */
+html[data-theme="light"] .theme-loading {
+  background: linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #db2777 100%);
+  color: rgba(255, 255, 255, 0.95);
+}
+html[data-theme="dark"] .theme-loading {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%);
+  color: #94a3b8;
+}
+/* Default fallback (data-theme yoksa) */
+.theme-loading {
+  background: linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #db2777 100%);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* ===== Tema-aware arka plan (html + body) - beyaz flash onleyici ===== */
+html {
+  background: linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #db2777 100%);
+  min-height: 100vh;
+}
+html[data-theme="light"] {
+  background: linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #db2777 100%);
+}
+html[data-theme="dark"] {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%);
+}
+html[data-theme="light"] body {
+  background: linear-gradient(135deg, #9333ea 0%, #c026d3 50%, #db2777 100%);
+  min-height: 100vh;
+}
+html[data-theme="dark"] body {
+  background: linear-gradient(135deg, #0d0d1a 0%, #1a1a2e 20%, #2d1b4e 40%, #4a1942 50%, #2d1b4e 60%, #1a1a2e 80%, #0d0d1a 100%);
+  min-height: 100vh;
+}
+body {
+  min-height: 100vh;
+}

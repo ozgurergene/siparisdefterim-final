@@ -2,7 +2,7 @@
 
 import { colors } from '../lib/theme'
 
-export default function SearchBox({ searchName, setSearchName, searchPhone, setSearchPhone, searchProduct, setSearchProduct, filteredCount, theme }) {
+export default function SearchBox({ searchName, setSearchName, searchPhone, setSearchPhone, searchProduct, setSearchProduct, searchOrderNo, setSearchOrderNo, filteredCount, theme }) {
   const c = colors[theme]
 
   return (
@@ -43,12 +43,24 @@ export default function SearchBox({ searchName, setSearchName, searchPhone, setS
             style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text }}
           />
         </div>
+        {/* === YENI: Siparis No arama === */}
+        <div>
+          <label style={{ display: 'block', fontSize: '14px', marginBottom: '5px', fontWeight: 'bold', color: c.text }}>Sipariş No</label>
+          <input
+            type="text"
+            placeholder="#a59ca0fa..."
+            value={searchOrderNo || ''}
+            onChange={(e) => setSearchOrderNo && setSearchOrderNo(e.target.value.replace(/^#/, ''))}
+            style={{ width: '100%', padding: '8px', border: `1px solid ${c.inputBorder}`, borderRadius: '4px', fontSize: '14px', boxSizing: 'border-box', background: c.input, color: c.text, fontFamily: 'monospace' }}
+          />
+        </div>
         <div>
           <button
             onClick={() => {
               setSearchName('')
               setSearchPhone('')
               setSearchProduct('')
+              if (setSearchOrderNo) setSearchOrderNo('')
             }}
             style={{ 
               padding: '8px 15px', 
@@ -60,7 +72,8 @@ export default function SearchBox({ searchName, setSearchName, searchPhone, setS
               fontWeight: 'bold', 
               fontSize: '14px', 
               marginTop: '23px',
-              transition: 'transform 0.2s, box-shadow 0.2s'
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              width: '100%'
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.transform = 'scale(1.05)'

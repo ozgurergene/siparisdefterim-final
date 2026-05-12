@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { colors, statusColors } from '../lib/theme'
+import OrderDetailModal from './OrderDetailModal'
 
 const statusEmojis = {
   payment_pending: '💰',
@@ -14,16 +15,23 @@ const statusEmojis = {
 export default function OrderTable({ filteredOrders, user, theme, startEditing, deleteOrder, updateOrderStatus, statusFilter, setStatusFilter }) {
   const c = colors[theme]
   const [confirmModal, setConfirmModal] = useState({ show: false, orderId: null, customerName: '' })
+  // === YENI: Siparis detay modal state ===
+  const [detailOrder, setDetailOrder] = useState(null)
+  // === YENI: Siparis no kopyalama feedback ===
+  const [copiedOrderId, setCopiedOrderId] = useState(null)
 
   const getWhatsAppMessage = (order) => {
     const name = order.customer_name
     const product = order.product
     const price = order.price
-    
+    // === YENI: Siparis no
+    const orderNo = order.id ? order.id.slice(0, 8) : ''
+    const orderNoPrefix = orderNo ? `#${orderNo} numaralı ` : ''
+
     const messages = {
       payment_pending: `Merhaba ${name},
 
-Siparişiniz başarıyla oluşturuldu, teşekkür ederiz!
+${orderNoPrefix}siparişiniz başarıyla oluşturuldu, teşekkür ederiz!
 
 Sipariş Detayı:
 ${product}
@@ -36,7 +44,7 @@ Toplam Tutar: ${price} TL
       
       paid: `Merhaba ${name},
 
-Ödemeniz başarıyla alındı, teşekkür ederiz!
+${orderNoPrefix}siparişinizin ödemesi başarıyla alındı, teşekkür ederiz!
 
 Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size hemen bilgi vereceğiz.
 
@@ -44,7 +52,7 @@ Siparişinizi özenle hazırlamaya başlıyoruz. Kargoya verildiğinde size heme
       
       preparing: `Merhaba ${name},
 
-Siparişiniz paketlendi!
+${orderNoPrefix}siparişiniz paketlendi!
 
 Çok yakında kargoya teslim edeceğiz. Takip numarasını sizinle paylaşacağız.
 
@@ -52,7 +60,7 @@ Bizi tercih ettiğiniz için teşekkürler!`,
       
       shipped: `Merhaba ${name},
 
-Harika haber! Siparişiniz kargoya verildi!
+Harika haber! ${orderNoPrefix}siparişiniz kargoya verildi!
 
 Paketiniz yolda, çok yakında elinizde olacak.
 
@@ -60,7 +68,7 @@ Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler!`,
       
       completed: `Merhaba ${name},
 
-Siparişiniz teslim edildi!
+${orderNoPrefix}siparişiniz teslim edildi!
 
 Umarız ürünlerimizi beğenirsiniz. Memnuniyetiniz bizim için çok değerli!
 
@@ -85,6 +93,17 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
 
   const cancelComplete = () => {
     setConfirmModal({ show: false, orderId: null, customerName: '' })
+  }
+
+  // === YENI: Siparis no kopyalama (event propagation engelle, modal acilmasin) ===
+  const handleCopyOrderNo = (e, orderId) => {
+    e.stopPropagation()
+    const orderNo = '#' + orderId.slice(0, 8)
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(orderNo)
+      setCopiedOrderId(orderId)
+      setTimeout(() => setCopiedOrderId(null), 1500)
+    }
   }
 
   return (
@@ -175,9 +194,11 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
       )}
 
       <div style={{ background: c.header, borderRadius: '8px', overflow: 'auto', border: `1px solid ${c.border}` }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px', minWidth: '800px' }}>
+        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '16px', minWidth: '900px' }}>
           <thead>
             <tr style={{ background: c.bgSecondary, borderBottom: `2px solid ${c.border}` }}>
+              {/* === YENI: Siparis No sutunu === */}
+              <th style={{ padding: '12px 10px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text, width: '110px' }}>Sipariş No</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Müşteri</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Telefon</th>
               <th style={{ padding: '12px', textAlign: 'left', fontWeight: 'bold', borderRight: `1px solid ${c.border}`, color: c.text }}>Ürünler</th>
@@ -210,141 +231,188 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
             </tr>
           </thead>
           <tbody>
-            {filteredOrders.map((order, index) => (
-              <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
-                <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
-                  <div>{order.customer_name}</div>
-                  {order.customer_city && order.customer_district && (
-                    <div style={{ fontSize: '12px', color: '#667eea', marginTop: '4px' }}>
-                      📍 {order.customer_city} / {order.customer_district}
-                    </div>
-                  )}
-                </td>
-                <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '16px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
-                <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
-                  {order.product.split(', ').map((prod, idx) => (
-                    <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>{prod}</div>
-                  ))}
-                  {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
-                </td>
-                <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
-                <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
-                  <select
-                    value={order.status}
-                    onChange={(e) => handleStatusChange(order.id, e.target.value, order.customer_name)}
+            {filteredOrders.map((order, index) => {
+              const orderNo = order.id ? order.id.slice(0, 8) : '-'
+              const isCopied = copiedOrderId === order.id
+              return (
+                <tr key={order.id} style={{ borderBottom: `1px solid ${c.border}`, background: index % 2 === 0 ? c.header : c.bgSecondary }}>
+                  {/* === YENI: Siparis No - tiklanabilir hucre (modal acar) === */}
+                  <td
+                    onClick={() => setDetailOrder(order)}
                     style={{
-                      padding: '4px 6px',
-                      border: `2px solid ${statusColors[order.status]}`,
-                      background: statusColors[order.status],
-                      color: order.status === 'paid' || order.status === 'completed' ? '#333' : 'white',
-                      borderRadius: '4px',
+                      padding: '10px',
+                      borderRight: `1px solid ${c.border}`,
                       cursor: 'pointer',
-                      fontWeight: 'bold',
-                      fontSize: '11px',
-                      width: '100%'
+                      transition: 'background 0.15s ease'
                     }}
+                    onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(102, 126, 234, 0.08)' }}
+                    onMouseOut={(e) => { e.currentTarget.style.background = '' }}
+                    title="Sipariş detayını gör"
                   >
-                    <option value="payment_pending">{statusEmojis.payment_pending} Ödeme Bekleniyor</option>
-                    <option value="paid">{statusEmojis.paid} Ödeme Alındı</option>
-                    <option value="preparing">{statusEmojis.preparing} Paketlendi</option>
-                    <option value="shipped">{statusEmojis.shipped} Kargoda</option>
-                    <option value="completed">{statusEmojis.completed} Teslim Edildi</option>
-                  </select>
-                </td>
-                <td style={{ padding: '12px', textAlign: 'center' }}>
-                  <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
-                    {/* WhatsApp Button - Green Glow */}
-                    <button
-                      onClick={() => {
-                        if (order.customer_phone) {
-                          const message = getWhatsAppMessage(order)
-                          const url = 'https://wa.me/90' + order.customer_phone + '?text=' + encodeURIComponent(message)
-                          window.open(url, '_blank')
-                        }
-                      }}
-                      style={{ 
-                        padding: '6px 10px', 
-                        background: '#25d366', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px', 
-                        cursor: 'pointer', 
-                        fontWeight: 'bold', 
-                        fontSize: '12px', 
-                        display: 'flex', 
-                        alignItems: 'center', 
-                        justifyContent: 'center',
-                        transition: 'transform 0.2s, box-shadow 0.2s'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)'
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.5)'
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)'
-                        e.currentTarget.style.boxShadow = 'none'
-                      }}
-                    >
-                      <img 
-                        src="https://dcqdgklkrjvmfjzhliph.supabase.co/storage/v1/object/sign/wp%20logo/pngwing.com.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lNjA2YmZmMy04N2Q0LTRmMjAtYjRmMC01MGRiZDM3OWI1NGYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3cCBsb2dvL3BuZ3dpbmcuY29tLnBuZyIsImlhdCI6MTc3NDcyNTQxMSwiZXhwIjoxODA2MjYxNDExfQ.p5yP8eFZijbKeH4XwfggFNDvI6vpPPsU756s2t4vZKI"
-                        alt="WhatsApp"
-                        style={{ width: '20px', height: '20px' }}
-                      />
-                    </button>
-                    {/* Edit Button - Blue Glow */}
-                    <button
-                      onClick={() => startEditing(order)}
-                      style={{ 
-                        padding: '6px 10px', 
-                        background: '#007bff', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px', 
-                        cursor: 'pointer', 
-                        fontWeight: 'bold', 
-                        fontSize: '12px',
-                        transition: 'transform 0.2s, box-shadow 0.2s'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)'
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)'
-                        e.currentTarget.style.boxShadow = 'none'
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                      <span style={{
+                        fontFamily: 'monospace',
+                        fontSize: '13px',
+                        fontWeight: '700',
+                        color: '#667eea',
+                        background: 'rgba(102, 126, 234, 0.1)',
+                        padding: '3px 7px',
+                        borderRadius: '5px'
+                      }}>
+                        #{orderNo}
+                      </span>
+                      <button
+                        onClick={(e) => handleCopyOrderNo(e, order.id)}
+                        title="Kopyala"
+                        style={{
+                          background: isCopied ? 'rgba(34, 197, 94, 0.15)' : 'transparent',
+                          border: 'none',
+                          cursor: 'pointer',
+                          padding: '2px 4px',
+                          borderRadius: '4px',
+                          fontSize: '11px',
+                          color: isCopied ? '#22c55e' : c.textSecondary,
+                          transition: 'all 0.15s ease'
+                        }}
+                      >
+                        {isCopied ? '✓' : '📋'}
+                      </button>
+                    </div>
+                  </td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text }}>
+                    <div>{order.customer_name}</div>
+                    {order.customer_city && order.customer_district && (
+                      <div style={{ fontSize: '12px', color: '#667eea', marginTop: '4px' }}>
+                        📍 {order.customer_city} / {order.customer_district}
+                      </div>
+                    )}
+                  </td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, fontSize: '16px', color: c.textSecondary }}>📱 {order.customer_phone}</td>
+                  <td style={{ padding: '12px', borderRight: `1px solid ${c.border}`, color: c.text, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>
+                    {order.product.split(', ').map((prod, idx) => (
+                      <div key={idx} style={{ marginBottom: idx < order.product.split(', ').length - 1 ? '8px' : '0' }}>{prod}</div>
+                    ))}
+                    {order.note && <div style={{ fontSize: '12px', color: c.textSecondary, marginTop: '8px' }}>Not: {order.note}</div>}
+                  </td>
+                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}`, fontWeight: 'bold', color: c.text }}>₺{order.price}</td>
+                  <td style={{ padding: '12px', textAlign: 'center', borderRight: `1px solid ${c.border}` }}>
+                    <select
+                      value={order.status}
+                      onChange={(e) => handleStatusChange(order.id, e.target.value, order.customer_name)}
+                      style={{
+                        padding: '4px 6px',
+                        border: `2px solid ${statusColors[order.status]}`,
+                        background: statusColors[order.status],
+                        color: order.status === 'paid' || order.status === 'completed' ? '#333' : 'white',
+                        borderRadius: '4px',
+                        cursor: 'pointer',
+                        fontWeight: 'bold',
+                        fontSize: '11px',
+                        width: '100%'
                       }}
                     >
-                      ✎
-                    </button>
-                    {/* Delete Button - Red Glow */}
-                    <button
-                      onClick={() => deleteOrder(order.id)}
-                      style={{ 
-                        padding: '6px 10px', 
-                        background: '#dc3545', 
-                        color: 'white', 
-                        border: 'none', 
-                        borderRadius: '4px', 
-                        cursor: 'pointer', 
-                        fontWeight: 'bold', 
-                        fontSize: '12px',
-                        transition: 'transform 0.2s, box-shadow 0.2s'
-                      }}
-                      onMouseOver={(e) => {
-                        e.currentTarget.style.transform = 'scale(1.1)'
-                        e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.5)'
-                      }}
-                      onMouseOut={(e) => {
-                        e.currentTarget.style.transform = 'scale(1)'
-                        e.currentTarget.style.boxShadow = 'none'
-                      }}
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
+                      <option value="payment_pending">{statusEmojis.payment_pending} Ödeme Bekleniyor</option>
+                      <option value="paid">{statusEmojis.paid} Ödeme Alındı</option>
+                      <option value="preparing">{statusEmojis.preparing} Paketlendi</option>
+                      <option value="shipped">{statusEmojis.shipped} Kargoda</option>
+                      <option value="completed">{statusEmojis.completed} Teslim Edildi</option>
+                    </select>
+                  </td>
+                  <td style={{ padding: '12px', textAlign: 'center' }}>
+                    <div style={{ display: 'flex', gap: '5px', justifyContent: 'center' }}>
+                      {/* WhatsApp Button - Green Glow */}
+                      <button
+                        onClick={() => {
+                          if (order.customer_phone) {
+                            const message = getWhatsAppMessage(order)
+                            const url = 'https://wa.me/90' + order.customer_phone + '?text=' + encodeURIComponent(message)
+                            window.open(url, '_blank')
+                          }
+                        }}
+                        style={{ 
+                          padding: '6px 10px', 
+                          background: '#25d366', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '4px', 
+                          cursor: 'pointer', 
+                          fontWeight: 'bold', 
+                          fontSize: '12px', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          justifyContent: 'center',
+                          transition: 'transform 0.2s, box-shadow 0.2s'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.1)'
+                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(37, 211, 102, 0.5)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = 'none'
+                        }}
+                      >
+                        <img 
+                          src="https://dcqdgklkrjvmfjzhliph.supabase.co/storage/v1/object/sign/wp%20logo/pngwing.com.png?token=eyJraWQiOiJzdG9yYWdlLXVybC1zaWduaW5nLWtleV9lNjA2YmZmMy04N2Q0LTRmMjAtYjRmMC01MGRiZDM3OWI1NGYiLCJhbGciOiJIUzI1NiJ9.eyJ1cmwiOiJ3cCBsb2dvL3BuZ3dpbmcuY29tLnBuZyIsImlhdCI6MTc3NDcyNTQxMSwiZXhwIjoxODA2MjYxNDExfQ.p5yP8eFZijbKeH4XwfggFNDvI6vpPPsU756s2t4vZKI"
+                          alt="WhatsApp"
+                          style={{ width: '20px', height: '20px' }}
+                        />
+                      </button>
+                      {/* Edit Button - Blue Glow */}
+                      <button
+                        onClick={() => startEditing(order)}
+                        style={{ 
+                          padding: '6px 10px', 
+                          background: '#007bff', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '4px', 
+                          cursor: 'pointer', 
+                          fontWeight: 'bold', 
+                          fontSize: '12px',
+                          transition: 'transform 0.2s, box-shadow 0.2s'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.1)'
+                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(0, 123, 255, 0.5)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = 'none'
+                        }}
+                      >
+                        ✎
+                      </button>
+                      {/* Delete Button - Red Glow */}
+                      <button
+                        onClick={() => deleteOrder(order.id)}
+                        style={{ 
+                          padding: '6px 10px', 
+                          background: '#dc3545', 
+                          color: 'white', 
+                          border: 'none', 
+                          borderRadius: '4px', 
+                          cursor: 'pointer', 
+                          fontWeight: 'bold', 
+                          fontSize: '12px',
+                          transition: 'transform 0.2s, box-shadow 0.2s'
+                        }}
+                        onMouseOver={(e) => {
+                          e.currentTarget.style.transform = 'scale(1.1)'
+                          e.currentTarget.style.boxShadow = '0 4px 15px rgba(220, 53, 69, 0.5)'
+                        }}
+                        onMouseOut={(e) => {
+                          e.currentTarget.style.transform = 'scale(1)'
+                          e.currentTarget.style.boxShadow = 'none'
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              )
+            })}
           </tbody>
         </table>
         
@@ -354,6 +422,14 @@ Bizi tercih ettiğiniz için tekrar teşekkür ederiz. Görüşmek üzere!`
           </div>
         )}
       </div>
+
+      {/* === YENI: Siparis Detay Modal === */}
+      <OrderDetailModal
+        order={detailOrder}
+        isOpen={detailOrder !== null}
+        onClose={() => setDetailOrder(null)}
+        theme={theme}
+      />
     </>
   )
 }

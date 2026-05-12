@@ -17,11 +17,11 @@ const SUPPORT_EMAIL = 'destek@deftertut.com'
 const FAQS = [
   {
     q: 'İptal edebilir miyim?',
-    a: 'Evet, istediğiniz zaman iptal edebilirsiniz. "Aboneliği Yönet" sayfasından kendiniz iptal edebilir veya destek@deftertut.com adresine yazabilirsiniz. İptal sonrasında ödediğiniz dönemin sonuna kadar Pro özelliklerini kullanmaya devam edersiniz.'
+    a: 'Evet, dilediğiniz zaman iptal edebilirsiniz. İptal talebinizi destek@deftertut.com adresine e-posta ile veya "Aboneliği Yönet" sayfasındaki "İptal Talebi Gönder" butonuyla iletebilirsiniz. İptal sonrasında ödediğiniz dönemin (aylık/yıllık) sonuna kadar Pro özelliklerini kullanmaya devam edersiniz, dönem sonunda otomatik olarak Ücretsiz pakete geçersiniz.'
   },
   {
     q: 'Para iadesi var mı?',
-    a: '14 gün içinde koşulsuz iade hakkınız vardır (TKHK 6502 cayma hakkı). destek@deftertut.com adresine yazın, iade işlemi 5-14 iş günü içinde tamamlanır. Detaylı bilgi için İade ve İptal Politikası sayfasına bakabilirsiniz.'
+    a: 'Pro üyelik dijital bir hizmet olduğu için TKHK Madde 15/ğ uyarınca cayma hakkı kapsamı dışındadır ve ödenen ücretler iade edilmez. Ancak dilediğiniz zaman iptal edebilirsiniz; iptal sonrasında ödediğiniz dönemin sonuna kadar Pro özelliklerini kullanmaya devam edersiniz. Satın almadan önce 50 sipariş limitli Ücretsiz Plan ile hizmeti deneyebilirsiniz. Detaylı bilgi için İade ve İptal Politikası sayfasına bakabilirsiniz.'
   },
   {
     q: 'Hangi ödeme yöntemleri kabul ediliyor?',
@@ -29,11 +29,11 @@ const FAQS = [
   },
   {
     q: 'Faturamı nasıl alırım?',
-    a: 'Ödemenin ardından otomatik olarak e-posta adresinize fatura gönderilir. Tüm faturalarınıza istediğiniz zaman "Aboneliği Yönet" sayfasından erişebilirsiniz.'
+    a: 'Ödemenin ardından otomatik olarak e-posta adresinize fatura gönderilir. Geçmiş faturalarınıza veya ek belge taleplerinize ihtiyacınız olursa destek@deftertut.com adresine yazmanız yeterlidir; 1-2 iş günü içinde size iletilir.'
   },
   {
     q: 'Aylıktan yıllığa geçebilir miyim?',
-    a: 'Evet. "Aboneliği Yönet" sayfasından plan değişikliği yapabilirsiniz. Yıllık plana geçişte kalan aylık dönem orantılı olarak hesaplanır ve farkı ödenir; böylece kayıp olmaz.'
+    a: 'Evet. Plan değişikliği talebinizi destek@deftertut.com adresine yazmanız yeterlidir. Yıllık plana geçişte kalan aylık dönem orantılı olarak hesaplanır ve farkı tahsil edilir; böylece ödediğiniz ücret kayıp olmaz.'
   },
   {
     q: 'Pro üyelik bitince siparişlerim ve müşterilerim ne olur?',
@@ -139,7 +139,7 @@ function PricingContent() {
     return (
       <div style={{
         minHeight: '100vh',
-        background: c.bg,
+        background: c.bgGradient,
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center'
@@ -165,9 +165,7 @@ function PricingContent() {
   return (
     <div style={{
       minHeight: '100vh',
-      background: isDark
-        ? 'linear-gradient(180deg, #0d0d1a 0%, #0a0a12 100%)'
-        : 'linear-gradient(180deg, #f8fafc 0%, #e2e8f0 100%)',
+      background: c.bgGradient,
       fontFamily: 'Arial, sans-serif',
       color: c.text,
       padding: isMobile ? '20px 16px 60px 16px' : '40px 24px 80px 24px',
@@ -177,24 +175,38 @@ function PricingContent() {
         maxWidth: '1000px',
         margin: '0 auto'
       }}>
-        {/* Geri dön linki */}
-        <button
-          onClick={() => router.push(user ? '/home' : '/')}
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: c.textSecondary,
-            fontSize: '14px',
-            cursor: 'pointer',
-            padding: '8px 12px',
-            marginBottom: '20px',
-            display: 'flex',
-            alignItems: 'center',
-            gap: '6px'
-          }}
-        >
-          ← Geri Dön
-        </button>
+        {/* Standart Header */}
+        <div style={{
+          marginBottom: '24px',
+          paddingBottom: '20px',
+          borderBottom: `1px solid ${c.border}`,
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}>
+          <a href="/" style={{ display: 'flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}>
+            <span style={{ fontSize: '26px' }}>📱</span>
+            <span style={{
+              fontSize: '20px',
+              fontWeight: 'bold',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              WebkitBackgroundClip: 'text',
+              WebkitTextFillColor: 'transparent',
+              backgroundClip: 'text'
+            }}>SiparişDefterim</span>
+          </a>
+          <a
+            href={user ? '/dashboard' : '/login'}
+            style={{
+              color: '#a78bfa',
+              textDecoration: 'none',
+              fontSize: '14px',
+              fontWeight: '600'
+            }}
+          >
+            {user ? '← Panele Dön' : 'Giriş Yap'}
+          </a>
+        </div>
 
         {/* PRO Kullanıcı Görünümü */}
         {isPro ? (
@@ -221,7 +233,7 @@ function PricingContent() {
             </h1>
             <p style={{
               fontSize: '16px',
-              color: c.textSecondary,
+              color: '#94a3b8',
               margin: '0 0 30px 0',
               lineHeight: '1.6'
             }}>
@@ -266,7 +278,7 @@ function PricingContent() {
               </h1>
               <p style={{
                 fontSize: isMobile ? '15px' : '17px',
-                color: c.textSecondary,
+                color: '#94a3b8',
                 margin: 0,
                 lineHeight: '1.6',
                 maxWidth: '500px',
@@ -330,7 +342,7 @@ function PricingContent() {
                 <p style={{
                   margin: '0 0 8px 0',
                   fontSize: '12px',
-                  color: c.textSecondary,
+                  color: '#94a3b8',
                   textTransform: 'uppercase',
                   letterSpacing: '1px',
                   fontWeight: '600'
@@ -341,14 +353,14 @@ function PricingContent() {
                   <span style={{ fontSize: isMobile ? '36px' : '44px', fontWeight: '700', color: c.text }}>
                     ₺99
                   </span>
-                  <span style={{ fontSize: '14px', color: c.textSecondary }}>/ay</span>
+                  <span style={{ fontSize: '14px', color: '#94a3b8' }}>/ay</span>
                 </div>
 
                 <div style={{ marginBottom: '24px' }}>
-                  <FeatureLine isDark={isDark} text="Sınırsız sipariş oluşturma" />
-                  <FeatureLine isDark={isDark} text="Tüm raporlara erişim" />
-                  <FeatureLine isDark={isDark} text="Müşteri analizi" />
-                  <FeatureLine isDark={isDark} text="Öncelikli destek" />
+                  <FeatureLine isDark={isDark} text="Sınırsız sipariş oluşturma" theme={theme} />
+                  <FeatureLine isDark={isDark} text="Tüm raporlara erişim" theme={theme} />
+                  <FeatureLine isDark={isDark} text="Müşteri analizi" theme={theme} />
+                  <FeatureLine isDark={isDark} text="Öncelikli destek" theme={theme} />
                 </div>
 
                 <button
@@ -417,18 +429,18 @@ function PricingContent() {
                   <span style={{ fontSize: isMobile ? '36px' : '44px', fontWeight: '700', color: c.text }}>
                     ₺83
                   </span>
-                  <span style={{ fontSize: '14px', color: c.textSecondary }}>/ay</span>
+                  <span style={{ fontSize: '14px', color: '#94a3b8' }}>/ay</span>
                 </div>
-                <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: c.textSecondary }}>
+                <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
                   ₺999 yıllık tek ödeme
                 </p>
 
                 <div style={{ marginBottom: '24px' }}>
-                  <FeatureLine isDark={isDark} text="Sınırsız sipariş oluşturma" />
-                  <FeatureLine isDark={isDark} text="Tüm raporlara erişim" />
-                  <FeatureLine isDark={isDark} text="Müşteri analizi" />
-                  <FeatureLine isDark={isDark} text="Öncelikli destek" />
-                  <FeatureLine isDark={isDark} text="2 ay bedava 🎁" highlighted />
+                  <FeatureLine isDark={isDark} text="Sınırsız sipariş oluşturma" theme={theme} />
+                  <FeatureLine isDark={isDark} text="Tüm raporlara erişim" theme={theme} />
+                  <FeatureLine isDark={isDark} text="Müşteri analizi" theme={theme} />
+                  <FeatureLine isDark={isDark} text="Öncelikli destek" theme={theme} />
+                  <FeatureLine isDark={isDark} text="2 ay bedava 🎁" highlighted theme={theme} />
                 </div>
 
                 <button
@@ -481,7 +493,7 @@ function PricingContent() {
               }}>
                 🔒 Güvenli Ödeme
               </p>
-              <p style={{ margin: 0, fontSize: '12px', color: c.textSecondary, lineHeight: '1.6' }}>
+              <p style={{ margin: 0, fontSize: '12px', color: '#94a3b8', lineHeight: '1.6' }}>
                 Tüm ödemeler şifreli ve güvenlidir. Kart bilgileriniz tarafımızda saklanmaz.
               </p>
             </div>
@@ -542,7 +554,7 @@ function PricingContent() {
                       <div style={{
                         padding: '0 20px 16px 20px',
                         fontSize: '14px',
-                        color: c.textSecondary,
+                        color: '#94a3b8',
                         lineHeight: '1.7'
                       }}>
                         {faq.a}
@@ -569,7 +581,7 @@ function PricingContent() {
               }}>
                 Sorunuz mu var?
               </p>
-              <p style={{ margin: 0, fontSize: '13px', color: c.textSecondary }}>
+              <p style={{ margin: 0, fontSize: '13px', color: '#94a3b8' }}>
                 <a
                   href={`mailto:${SUPPORT_EMAIL}`}
                   style={{
@@ -591,7 +603,8 @@ function PricingContent() {
 }
 
 // Feature line component
-function FeatureLine({ text, highlighted, isDark }) {
+function FeatureLine({ text, highlighted, isDark , theme }) {
+  const c = colors[theme]
   return (
     <div style={{
       display: 'flex',
