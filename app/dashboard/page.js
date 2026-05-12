@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react'
 
+export const dynamic = 'force-dynamic'
+
 import ProfilePopup from '../../components/ProfilePopup'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
