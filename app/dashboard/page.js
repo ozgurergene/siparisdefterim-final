@@ -1,9 +1,8 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
-
 export const dynamic = 'force-dynamic'
 
+import { Suspense, useState, useEffect, useRef } from 'react'
 import ProfilePopup from '../../components/ProfilePopup'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
@@ -1461,7 +1460,7 @@ function BottomTabBar({ activeTab, onTabChange, onAddClick, onLockedClick, isDar
   )
 }
 
-export default function DashboardPage() {
+function DashboardContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const [user, setUser] = useState(null)
@@ -2294,5 +2293,26 @@ export default function DashboardPage() {
 
       <Footer theme={theme} />
     </div>
+  )
+}
+
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ 
+        minHeight: '100vh', 
+        background: '#0d0d1a', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        color: '#94a3b8',
+        fontFamily: 'Arial',
+        fontSize: '14px'
+      }}>
+        Yükleniyor...
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
   )
 }
