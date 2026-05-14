@@ -1,7 +1,9 @@
 'use client'
 
+import { useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
-import { colors } from '../lib/theme'
+import { colors, getAvatarGradient, getInitials } from '../lib/theme'
+import ProfilePopup from './ProfilePopup'
 
 // Gradient Home Icon SVG Component
 function HomeIcon({ size = 24 }) {
@@ -41,6 +43,9 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
   const c = colors[theme]
   const router = useRouter()
   const pathname = usePathname()
+  
+  // === YENI: Tablet icin ProfilePopup state ===
+  const [showProfilePopup, setShowProfilePopup] = useState(false)
 
   // Yeni Pro tab'ları (renk + path tanımları)
   const proTabs = [
@@ -74,12 +79,102 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
   ]
 
   return (
-    <div style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 30px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
+    <div className="sd-header" style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 30px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'relative' }}>
+      
+      {/* === YENI: Sadece tablet (768-1023px) icin Tasarim 3 override === */}
+      <style jsx>{`
+        /* Avatar varsayilan: gizli (web ve mobile'da gorunmesin) */
+        .sd-header-avatar {
+          display: none;
+        }
+        
+        @media (min-width: 768px) and (max-width: 1023px) {
+          .sd-header {
+            padding: 10px 16px !important;
+          }
+          .sd-header-logo-text {
+            font-size: 16px !important;
+          }
+          .sd-header-logo-emoji {
+            font-size: 16px !important;
+          }
+          .sd-header-home-btn {
+            padding: 6px !important;
+          }
+          .sd-header-nav {
+            margin-left: 8px !important;
+            gap: 3px !important;
+          }
+          .sd-nav-btn {
+            flex-direction: column !important;
+            align-items: center !important;
+            gap: 2px !important;
+            padding: 6px 8px !important;
+            font-size: 9px !important;
+            min-width: 56px !important;
+            line-height: 1.1 !important;
+          }
+          .sd-nav-icon {
+            font-size: 18px !important;
+          }
+          .sd-pro-badge {
+            position: absolute !important;
+            top: 2px !important;
+            right: 4px !important;
+            font-size: 7px !important;
+            padding: 1px 3px !important;
+            margin-left: 0 !important;
+            letter-spacing: 0 !important;
+          }
+          .sd-header-right {
+            gap: 8px !important;
+          }
+          .sd-header-counter {
+            padding: 5px 9px !important;
+          }
+          .sd-header-counter-text {
+            font-size: 11px !important;
+          }
+          .sd-header-pro-cta {
+            padding: 6px 10px !important;
+            font-size: 11px !important;
+            font-size: 0 !important;
+            gap: 2px !important;
+          }
+          .sd-header-pro-cta::after {
+            content: 'PRO →';
+            font-size: 11px !important;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+          }
+          .sd-header-pro-cta > span {
+            font-size: 13px !important;
+          }
+          
+          /* Tablette gizle: email, tema, cikis (popup'a tasindi) */
+          .sd-header-email {
+            display: none !important;
+          }
+          .sd-header-theme {
+            display: none !important;
+          }
+          .sd-header-logout {
+            display: none !important;
+          }
+          
+          /* Tablette goster: avatar */
+          .sd-header-avatar {
+            display: flex !important;
+          }
+        }
+      `}</style>
+      
       <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap', gap: '10px' }}>
 
         {/* Logo + Home Icon */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <button
+            className="sd-header-home-btn"
             onClick={() => router.push('/home')}
             style={{
               padding: '8px',
@@ -107,8 +202,9 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
 
           {/* Logo with gradient text */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span style={{ fontSize: '20px' }}>📱</span>
+            <span className="sd-header-logo-emoji" style={{ fontSize: '20px' }}>📱</span>
             <h1
+              className="sd-header-logo-text"
               onClick={() => router.push('/home')}
               style={{
                 margin: 0,
@@ -130,9 +226,10 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
         </div>
 
         {/* Navigation Tabs */}
-        <nav style={{ display: 'flex', gap: '8px', marginLeft: '20px', flexWrap: 'nowrap' }}>
+        <nav className="sd-header-nav" style={{ display: 'flex', gap: '8px', marginLeft: '20px', flexWrap: 'nowrap' }}>
           {/* Siparişler */}
           <button
+            className="sd-nav-btn"
             onClick={() => router.push('/dashboard')}
             style={{
               padding: '10px 20px',
@@ -148,6 +245,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               background: pathname === '/dashboard' ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' : 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(118, 75, 162, 0.25) 100%)',
               color: pathname === '/dashboard' ? 'white' : c.text,
               boxShadow: pathname === '/dashboard' ? '0 4px 15px rgba(102, 126, 234, 0.4)' : 'none',
+              position: 'relative'
             }}
             onMouseEnter={(e) => {
               if (pathname !== '/dashboard') { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(118, 75, 162, 0.4) 100%)'
@@ -158,12 +256,13 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               }
             }}
           >
-            <span>📦</span>
+            <span className="sd-nav-icon">📦</span>
             Siparişler
           </button>
 
           {/* Tamamlananlar */}
           <button
+            className="sd-nav-btn"
             onClick={() => router.push('/completed')}
             style={{
               padding: '10px 20px',
@@ -179,6 +278,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               background: pathname === '/completed' ? 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)' : 'linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(118, 75, 162, 0.25) 100%)',
               color: pathname === '/completed' ? 'white' : c.text,
               boxShadow: pathname === '/completed' ? '0 4px 15px rgba(67, 233, 123, 0.4)' : 'none',
+              position: 'relative'
             }}
             onMouseEnter={(e) => {
               if (pathname !== '/completed') { e.currentTarget.style.background = 'linear-gradient(135deg, rgba(240, 147, 251, 0.3) 0%, rgba(118, 75, 162, 0.4) 100%)'
@@ -189,7 +289,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               }
             }}
           >
-            <span>✅</span>
+            <span className="sd-nav-icon">✅</span>
             Tamamlananlar
           </button>
 
@@ -201,6 +301,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             return (
               <button
                 key={tab.path}
+                className="sd-nav-btn"
                 onClick={() => router.push(tab.path)}
                 style={{
                   padding: '10px 20px',
@@ -230,10 +331,10 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
                   }
                 }}
               >
-                <span>{tab.icon}</span>
+                <span className="sd-nav-icon">{tab.icon}</span>
                 {tab.label}
                 {locked && (
-                  <span style={{
+                  <span className="sd-pro-badge" style={{
                     fontSize: '9px',
                     padding: '2px 6px',
                     background: 'linear-gradient(135deg, #fbbf24, #f59e0b)',
@@ -251,11 +352,11 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           })}
         </nav>
 
-        <div style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'nowrap' }}>
+        <div className="sd-header-right" style={{ display: 'flex', gap: '15px', alignItems: 'center', flexWrap: 'nowrap', position: 'relative' }}>
           {/* Sipariş Sayacı — Pro / Free durumu */}
           {isPro ? (
             // PRO görünümü: rozet + sayı, /50 yok
-            <div style={{
+            <div className="sd-header-counter" style={{
               display: 'flex',
               alignItems: 'center',
               gap: '8px',
@@ -265,7 +366,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               borderRadius: '20px',
               boxShadow: '0 2px 8px rgba(102, 126, 234, 0.15)'
             }}>
-              <span style={{
+              <span className="sd-header-counter-text" style={{
                 fontSize: '13px',
                 fontWeight: '700',
                 background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -277,13 +378,13 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
                 ✨ PRO
               </span>
               <span style={{ width: '1px', height: '14px', background: c.border }} />
-              <span style={{ fontSize: '13px', color: c.textSecondary }}>
+              <span className="sd-header-counter-text" style={{ fontSize: '13px', color: c.textSecondary }}>
                 Siparişler: <strong style={{ color: c.text }}>{ordersCreatedCount}</strong>
               </span>
             </div>
           ) : (
             // FREE görünümü: orijinal /50 progress bar
-            <div style={{
+            <div className="sd-header-counter" style={{
               display: 'flex',
               flexDirection: 'column',
               gap: '4px',
@@ -293,7 +394,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               borderRadius: '14px',
               boxShadow: '0 2px 8px rgba(102, 126, 234, 0.15)'
             }}>
-              <p style={{ margin: 0, fontSize: '12px', color: c.textSecondary, whiteSpace: 'nowrap' }}>Siparişler: {ordersCreatedCount}/50</p>
+              <p className="sd-header-counter-text" style={{ margin: 0, fontSize: '12px', color: c.textSecondary, whiteSpace: 'nowrap' }}>Siparişler: {ordersCreatedCount}/50</p>
               <div style={{ width: '100%', height: '5px', background: c.bgSecondary, borderRadius: '3px', overflow: 'hidden' }}>
                 <div style={{ width: `${Math.min((ordersCreatedCount / 50) * 100, 100)}%`, height: '100%', background: ordersCreatedCount >= 50 ? '#ff6b6b' : 'linear-gradient(90deg, #667eea, #764ba2)', transition: 'width 0.3s' }} />
               </div>
@@ -303,6 +404,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           {/* Pro'ya Geç Butonu — sadece Free kullanıcılarda */}
           {!isPro && (
             <button
+              className="sd-header-pro-cta"
               onClick={() => router.push('/pricing')}
               style={{
                 padding: '8px 16px',
@@ -337,6 +439,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           {/* Email — Tıklanabilir, /manage-subscription'a gider */}
           {user?.email && (
             <a
+              className="sd-header-email"
               href="/manage-subscription"
               title="Hesabım — Aboneliği Yönet"
               style={{
@@ -367,6 +470,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
 
           {/* Theme Toggle Button */}
           <button
+            className="sd-header-theme"
             onClick={toggleTheme}
             style={{
               padding: '8px 12px',
@@ -391,6 +495,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
 
           {/* Logout Button */}
           <button
+            className="sd-header-logout"
             onClick={handleLogout}
             style={{
               padding: '8px 15px',
@@ -413,6 +518,43 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           >
             Çıkış
           </button>
+
+          {/* === YENI: Tablet icin Avatar Button (sadece tablette gorunur) === */}
+          {user?.email && (
+            <div
+              className="sd-header-avatar"
+              onClick={() => setShowProfilePopup(!showProfilePopup)}
+              style={{
+                width: '38px',
+                height: '38px',
+                borderRadius: '50%',
+                background: getAvatarGradient(user.email),
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '13px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                color: 'white',
+                boxShadow: showProfilePopup ? '0 0 0 3px rgba(34, 197, 94, 0.3)' : 'none',
+                transition: 'box-shadow 0.2s',
+                flexShrink: 0
+              }}
+            >
+              {getInitials(user.email)}
+            </div>
+          )}
+
+          {/* === YENI: ProfilePopup (sadece tablet'te kullanilir) === */}
+          <ProfilePopup
+            user={user}
+            isOpen={showProfilePopup}
+            onClose={() => setShowProfilePopup(false)}
+            onLogout={handleLogout}
+            ordersCreatedCount={ordersCreatedCount}
+            isPro={isPro}
+            theme={theme}
+            toggleTheme={toggleTheme}
+          />
         </div>
       </div>
     </div>
