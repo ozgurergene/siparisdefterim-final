@@ -1,5 +1,5 @@
 // app/api/checkout/polar/route.js
-import { polar, POLAR_PRODUCTS } from "@/lib/polar";
+import { polar, POLAR_PRODUCTS } from "../../../../lib/polar";
 import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
