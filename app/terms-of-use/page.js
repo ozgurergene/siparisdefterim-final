@@ -42,7 +42,6 @@ export default function TermsOfUse() {
       display: 'flex',
       flexDirection: 'column'
     }}>
-      {/* Basit Header */}
       <div style={{
         background: c.header,
         backdropFilter: c.backdropFilter,
@@ -76,7 +75,6 @@ export default function TermsOfUse() {
         </div>
       </div>
 
-      {/* Ana Icerik */}
       <div style={{ flex: 1, padding: '40px 20px' }}>
         <div style={{
           maxWidth: '800px',
@@ -103,18 +101,26 @@ export default function TermsOfUse() {
             <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Fiyatlandırma</h3>
             <ul style={{ paddingLeft: '20px' }}>
               <li><strong>Ücretsiz Plan:</strong> 50 siparişe kadar</li>
-              <li><strong>Pro Plan:</strong> 99 TL/ay veya 999 TL/yıl</li>
+              <li><strong>Pro Plan:</strong> 2.99 USD/ay veya 29.99 USD/yıl</li>
             </ul>
+            <p style={{ fontSize: '13px', color: colors.text, marginTop: '8px' }}>
+              Ödemeler ABD Doları (USD) olarak tahsil edilir. Kartınızdan çekilen tutar, bankanızın o günkü kur
+              ve komisyon politikasına göre Türk Lirasına çevrilir.
+            </p>
 
             <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Ödeme Yöntemi</h3>
-            <p>Kredi kartı, güvenli ödeme altyapısı üzerinden (Lemon Squeezy)</p>
+            <p>
+              Kredi kartı, Apple Pay ve Google Pay desteklenir. Tüm ödemeler Merchant of Record (Yetkili Satıcı) olarak{' '}
+              <strong>Polar Software (Polar.sh)</strong> ve onun kart işleme alt yapısı <strong>Stripe, Inc.</strong>{' '}
+              üzerinden, PCI-DSS standartlarına uygun olarak işlenir. KDV / sales tax hesaplama ve fatura düzenleme
+              süreçleri Polar Software tarafından yürütülür.
+            </p>
 
             <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Hizmet Aktivasyonu</h3>
             <p>Hizmet, üyelik onayı ve ödeme sonrası <strong>anında</strong> aktif edilir. Hizmetin ifasına ödeme onayıyla birlikte başlanmış sayılır.</p>
 
-            {/* === GUNCEL: Cayma Hakki - TKHK Madde 15/g feragati === */}
             <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Cayma Hakkı</h3>
-            
+
             <div style={{
               background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
               border: `1px solid ${theme === 'dark' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(245, 158, 11, 0.25)'}`,
@@ -129,19 +135,19 @@ export default function TermsOfUse() {
             </div>
 
             <p>
-              Pro üyelik, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği'nin 
-              <strong> 15. maddesinin 1. fıkrasının (ğ) bendi</strong> uyarınca "elektronik ortamda anında ifa edilen 
+              Pro üyelik, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği'nin
+              <strong> 15. maddesinin 1. fıkrasının (ğ) bendi</strong> uyarınca "elektronik ortamda anında ifa edilen
               hizmetler" kapsamında olup, <strong>cayma hakkı bulunmamaktadır</strong>.
             </p>
 
             <p style={{ marginTop: '10px' }}>
-              Üye, Pro üyelik satın alma işlemini onaylayarak hizmetin satın alma anında ifasına başlanmasına ve 
+              Üye, Pro üyelik satın alma işlemini onaylayarak hizmetin satın alma anında ifasına başlanmasına ve
               <strong> cayma hakkından feragat ettiğini açıkça beyan ve kabul</strong> eder.
             </p>
 
             <p style={{ marginTop: '10px' }}>
-              Üye, dilediği zaman aboneliğini iptal edebilir. İptal sonrasında ödediği dönemin sonuna kadar Pro 
-              özelliklerini kullanmaya devam eder ve dönem sonunda otomatik olarak ücretsiz pakete geçer. 
+              Üye, dilediği zaman aboneliğini iptal edebilir. İptal sonrasında ödediği dönemin sonuna kadar Pro
+              özelliklerini kullanmaya devam eder ve dönem sonunda otomatik olarak ücretsiz pakete geçer.
               <strong> Yapılan ödemeler iade edilmez.</strong>
             </p>
 
@@ -149,11 +155,10 @@ export default function TermsOfUse() {
               Detaylı bilgi için <a href="/refund-policy" style={{ color: '#a78bfa' }}>İade ve İptal Politikası</a> sayfamızı inceleyebilirsiniz.
             </p>
 
-            {/* === YENI: Iptal Yontemi === */}
             <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>İptal Yöntemi</h3>
             <p>
-              Aboneliğinizi iptal etmek için <strong>destek@deftertut.com</strong> adresine e-posta gönderebilir 
-              veya <a href="/manage-subscription" style={{ color: '#a78bfa' }}>Aboneliği Yönet</a> sayfasındaki butonu kullanabilirsiniz. 
+              Aboneliğinizi iptal etmek için <strong>destek@deftertut.com</strong> adresine e-posta gönderebilir
+              veya <a href="/manage-subscription" style={{ color: '#a78bfa' }}>Aboneliği Yönet</a> sayfasındaki butonu kullanabilirsiniz.
               Talepler 1-2 iş günü içinde işleme alınır.
             </p>
           </div>

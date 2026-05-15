@@ -1,34 +1,40 @@
 'use client'
 
+import { useState } from 'react'
 import { colors } from '../../lib/theme'
 import { useRouter } from 'next/navigation'
-
-// Lemon Squeezy Checkout URLs (Test Mode)
-const CHECKOUT_URLS = {
-  monthly: 'https://siparisdefterim-final.lemonsqueezy.com/checkout/buy/c2ec9f39-40ec-4f7a-a0eb-f6a6f5ce2461',
-  yearly: 'https://siparisdefterim-final.lemonsqueezy.com/checkout/buy/a4c6b3d5-dc9b-4375-babf-69ab15ca4999'
-}
+import { startPolarCheckout } from '../../lib/checkout-client'
 
 const SUPPORT_EMAIL = 'destek@deftertut.com'
 
 export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
   const c = colors[theme]
   const router = useRouter()
+  const [loadingPlan, setLoadingPlan] = useState(null)
+  const [error, setError] = useState(null)
 
   if (!isOpen) return null
 
-  const handleMonthly = () => {
-    window.open(CHECKOUT_URLS.monthly, '_blank')
-  }
-
-  const handleYearly = () => {
-    window.open(CHECKOUT_URLS.yearly, '_blank')
+  const handlePlanClick = async (plan) => {
+    if (loadingPlan) return
+    setError(null)
+    setLoadingPlan(plan)
+    try {
+      await startPolarCheckout(plan)
+    } catch (err) {
+      setError(err.message || 'Ödeme sayfası açılamadı, lütfen tekrar deneyin.')
+      setLoadingPlan(null)
+    }
   }
 
   const handleViewAllPlans = () => {
     onClose()
     router.push('/pricing')
   }
+
+  const isMonthlyLoading = loadingPlan === 'monthly'
+  const isYearlyLoading = loadingPlan === 'yearly'
+  const anyLoading = loadingPlan !== null
 
   return (
     <div style={{
@@ -55,22 +61,18 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
         border: `1px solid ${c.border}`,
         boxShadow: '0 20px 60px rgba(0,0,0,0.4)'
       }}>
-        {/* Icon */}
         <div style={{ fontSize: '64px', marginBottom: '15px' }}>🚀</div>
 
-        {/* Title */}
         <h2 style={{ margin: '0 0 10px 0', fontSize: '24px', color: c.text }}>
           Limit Doldu!
         </h2>
 
-        {/* Subtitle */}
         <p style={{ margin: '0 0 25px 0', fontSize: '15px', color: c.textSecondary, lineHeight: '1.6' }}>
           50 sipariş limitine ulaştınız. Pro'ya yükselterek{' '}
           <strong style={{ color: '#667eea' }}>sınırsız sipariş</strong>{' '}
           oluşturabilirsiniz.
         </p>
 
-        {/* Features */}
         <div style={{
           background: c.bgSecondary,
           padding: '18px',
@@ -92,22 +94,38 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
           </div>
         </div>
 
-        {/* Pricing Cards - Now Clickable */}
+        {error && (
+          <div style={{
+            background: 'rgba(239, 68, 68, 0.1)',
+            border: '1px solid rgba(239, 68, 68, 0.4)',
+            color: '#ef4444',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            fontSize: '13px',
+            marginBottom: '14px',
+            textAlign: 'left'
+          }}>
+            ⚠️ {error}
+          </div>
+        )}
+
         <div style={{ display: 'flex', gap: '10px', marginBottom: '16px' }}>
-          {/* Monthly */}
           <button
-            onClick={handleMonthly}
+            onClick={() => handlePlanClick('monthly')}
+            disabled={anyLoading}
             style={{
               flex: 1,
               background: c.bgSecondary,
               padding: '14px',
               borderRadius: '10px',
               border: `1px solid ${c.border}`,
-              cursor: 'pointer',
+              cursor: anyLoading ? 'wait' : 'pointer',
               textAlign: 'center',
-              transition: 'transform 0.2s, box-shadow 0.2s'
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              opacity: anyLoading && !isMonthlyLoading ? 0.5 : 1
             }}
             onMouseOver={(e) => {
+              if (anyLoading) return
               e.currentTarget.style.transform = 'translateY(-2px)'
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,0,0,0.15)'
             }}
@@ -120,13 +138,17 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
               Aylık
             </p>
             <p style={{ margin: 0, fontSize: '22px', fontWeight: 'bold', color: c.text }}>
-              ₺99<span style={{ fontSize: '12px', color: c.textSecondary, fontWeight: 'normal' }}>/ay</span>
+              {isMonthlyLoading ? (
+                <span style={{ fontSize: '14px' }}>Yönlendiriliyor...</span>
+              ) : (
+                <>$2.99<span style={{ fontSize: '12px', color: c.textSecondary, fontWeight: 'normal' }}>/ay</span></>
+              )}
             </p>
           </button>
 
-          {/* Yearly - highlighted */}
           <button
-            onClick={handleYearly}
+            onClick={() => handlePlanClick('yearly')}
+            disabled={anyLoading}
             style={{
               flex: 1,
               background: 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)',
@@ -134,11 +156,13 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
               borderRadius: '10px',
               border: '1px solid #667eea',
               position: 'relative',
-              cursor: 'pointer',
+              cursor: anyLoading ? 'wait' : 'pointer',
               textAlign: 'center',
-              transition: 'transform 0.2s, box-shadow 0.2s'
+              transition: 'transform 0.2s, box-shadow 0.2s',
+              opacity: anyLoading && !isYearlyLoading ? 0.5 : 1
             }}
             onMouseOver={(e) => {
+              if (anyLoading) return
               e.currentTarget.style.transform = 'translateY(-2px)'
               e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)'
             }}
@@ -164,55 +188,62 @@ export default function UpgradeModal({ isOpen, onClose, theme = 'light' }) {
               Yıllık
             </p>
             <p style={{ margin: 0, fontSize: '22px', fontWeight: 'bold', color: c.text }}>
-              ₺83<span style={{ fontSize: '12px', color: c.textSecondary, fontWeight: 'normal' }}>/ay</span>
+              {isYearlyLoading ? (
+                <span style={{ fontSize: '14px' }}>Yönlendiriliyor...</span>
+              ) : (
+                <>$2.50<span style={{ fontSize: '12px', color: c.textSecondary, fontWeight: 'normal' }}>/ay</span></>
+              )}
             </p>
-            <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: c.textSecondary }}>
-              ₺999 yıllık ödeme
-            </p>
+            {!isYearlyLoading && (
+              <p style={{ margin: '4px 0 0 0', fontSize: '10px', color: c.textSecondary }}>
+                $29.99 yıllık ödeme
+              </p>
+            )}
           </button>
         </div>
 
-        {/* Hint Text */}
         <p style={{ margin: '0 0 12px 0', fontSize: '11px', color: c.textSecondary }}>
           💡 Yukarıdaki plana tıklayarak ödeme yapabilirsiniz
         </p>
 
-        {/* Tüm Planları Gör — Detay sayfasına link */}
         <button
           onClick={handleViewAllPlans}
+          disabled={anyLoading}
           style={{
             background: 'transparent',
             border: 'none',
             color: '#667eea',
             fontSize: '13px',
             fontWeight: '600',
-            cursor: 'pointer',
+            cursor: anyLoading ? 'wait' : 'pointer',
             marginBottom: '18px',
             padding: '4px 8px',
-            textDecoration: 'underline'
+            textDecoration: 'underline',
+            opacity: anyLoading ? 0.5 : 1
           }}
         >
           Tüm planları ve detayları gör →
         </button>
 
-        {/* Close Button */}
         <button
-          onClick={onClose} style={{
-          width: '100%',
-          padding: '14px',
-          background: 'rgba(182, 126, 234, 0.15)',
-          border: '1px solid rgba(102, 126, 234, 0.4)',
-          borderRadius: '12px',
-          color: '#a5b4fc',
-          fontSize: '14px',
-          fontWeight: '600',
-          cursor: 'pointer'
+          onClick={onClose}
+          disabled={anyLoading}
+          style={{
+            width: '100%',
+            padding: '14px',
+            background: 'rgba(182, 126, 234, 0.15)',
+            border: '1px solid rgba(102, 126, 234, 0.4)',
+            borderRadius: '12px',
+            color: '#a5b4fc',
+            fontSize: '14px',
+            fontWeight: '600',
+            cursor: anyLoading ? 'not-allowed' : 'pointer',
+            opacity: anyLoading ? 0.5 : 1
           }}
         >
           Kapat
         </button>
 
-        {/* Footer - Support Email */}
         <p style={{
           margin: '16px 0 0 0',
           fontSize: '12px',

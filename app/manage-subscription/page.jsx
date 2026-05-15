@@ -6,9 +6,11 @@ import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
 
-// NOT: Lemon Squeezy Customer Portal su an aktif degil.
-// Magaza aktive olunca asagidaki satiri ve "Self-Service" bloğunu geri ac.
-// const CUSTOMER_PORTAL_URL = 'https://siparisdefterim-final.lemonsqueezy.com/billing'
+// NOT: Polar.sh Customer Portal su an aktif degil.
+// Ileride self-service iptal/fatura goruntuleme istenirse:
+// app/api/customer-portal/polar/route.js endpoint'i acilip
+// polar.customerSessions.create({ customerId }) ile session olusturulabilir.
+// Su anda iptal email ile destek@deftertut.com uzerinden yapiliyor.
 
 export default function ManageSubscriptionPage() {
   const router = useRouter()
@@ -49,7 +51,7 @@ export default function ManageSubscriptionPage() {
     checkUser()
   }, [router])
 
-  // === YENI: Email ile iptal talebi - mailto link ===
+  // === Email ile iptal talebi - mailto link ===
   const handleEmailCancellation = () => {
     const subject = encodeURIComponent('Pro Üyelik İptal Talebi')
     const body = encodeURIComponent(
@@ -95,11 +97,11 @@ export default function ManageSubscriptionPage() {
               backgroundClip: 'text'
             }}>SiparişDefterim</span>
           </a>
-          <a 
-            href="/dashboard" 
-            style={{ 
-              color: '#667eea', 
-              textDecoration: 'none', 
+          <a
+            href="/dashboard"
+            style={{
+              color: '#667eea',
+              textDecoration: 'none',
               fontSize: '14px',
               fontWeight: '600'
             }}
@@ -118,7 +120,7 @@ export default function ManageSubscriptionPage() {
 
         {/* Plan Durumu Kartı */}
         <div style={{
-          background: isPro 
+          background: isPro
             ? 'linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%)'
             : c.header,
           border: isPro ? '2px solid #667eea' : `1px solid ${c.border}`,
@@ -149,13 +151,13 @@ export default function ManageSubscriptionPage() {
           </div>
 
           <p style={{ color: c.text, fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
-            {isPro 
+            {isPro
               ? 'Sınırsız sipariş hakkınız aktif. Pro özelliklerin tamamından yararlanabilirsiniz.'
               : 'Ücretsiz plan ile 50 siparişe kadar oluşturabilirsiniz. Sınırsız kullanım için Pro üyeliğe geçin.'}
           </p>
         </div>
 
-        {/* === GUNCEL: Pro Kullanicilar Icin - Email ile Iptal === */}
+        {/* Pro Kullanicilar Icin - Email ile Iptal */}
         {isPro && (
           <div style={{
             background: c.header,
@@ -168,10 +170,10 @@ export default function ManageSubscriptionPage() {
               📧 Aboneliği İptal Et
             </h3>
             <p style={{ color: c.text, fontSize: '14px', lineHeight: '1.7', marginBottom: '16px' }}>
-              Pro aboneliğinizi iptal etmek için aşağıdaki butona tıklayarak destek ekibimize e-posta gönderebilirsiniz. 
+              Pro aboneliğinizi iptal etmek için aşağıdaki butona tıklayarak destek ekibimize e-posta gönderebilirsiniz.
               Talebiniz 1-2 iş günü içinde işleme alınır.
             </p>
-            
+
             {/* İade Politikası Notu */}
             <div style={{
               background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
@@ -181,13 +183,13 @@ export default function ManageSubscriptionPage() {
               marginBottom: '16px'
             }}>
               <p style={{ color: c.text, fontSize: '13px', lineHeight: '1.6', margin: 0 }}>
-                <strong>⚠️ Önemli Bilgi:</strong> İptal sonrasında <strong>ödediğiniz dönemin (aylık/yıllık) sonuna kadar</strong> Pro 
-                özelliklerini kullanmaya devam edersiniz. Dönem sonunda otomatik olarak ücretsiz pakete geçersiniz. 
+                <strong>⚠️ Önemli Bilgi:</strong> İptal sonrasında <strong>ödediğiniz dönemin (aylık/yıllık) sonuna kadar</strong> Pro
+                özelliklerini kullanmaya devam edersiniz. Dönem sonunda otomatik olarak ücretsiz pakete geçersiniz.
                 <strong> Yapılan ödemeler iade edilmez.</strong>
               </p>
             </div>
 
-            <button 
+            <button
               onClick={handleEmailCancellation}
               style={{
                 display: 'inline-flex',
@@ -208,8 +210,8 @@ export default function ManageSubscriptionPage() {
             </button>
 
             <p style={{ color: c.textSecondary, fontSize: '12px', marginTop: '12px', marginBottom: 0 }}>
-              💡 Butona tıkladığınızda e-posta uygulamanız otomatik olarak açılır. 
-              Açılmazsa <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine 
+              💡 Butona tıkladığınızda e-posta uygulamanız otomatik olarak açılır.
+              Açılmazsa <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine
               direkt yazabilirsiniz.
             </p>
           </div>
@@ -231,7 +233,7 @@ export default function ManageSubscriptionPage() {
               Pro üyelik ile sınırsız sipariş oluşturabilir, gelecek özelliklerden ilk siz yararlanabilirsiniz.
             </p>
 
-            <a 
+            <a
               href="/pricing"
               style={{
                 display: 'inline-block',
@@ -250,7 +252,7 @@ export default function ManageSubscriptionPage() {
           </div>
         )}
 
-        {/* === GUNCEL: Yardim Karti - sadece email === */}
+        {/* Yardim Karti */}
         <div style={{
           background: 'rgba(102, 126, 234, 0.05)',
           border: '1px solid rgba(102, 126, 234, 0.2)',
@@ -274,11 +276,11 @@ export default function ManageSubscriptionPage() {
 
         {/* İlgili Sayfalar */}
         <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '30px' }}>
-          <a 
-            href="/refund-policy" 
-            style={{ 
-              color: c.textSecondary, 
-              textDecoration: 'none', 
+          <a
+            href="/refund-policy"
+            style={{
+              color: c.textSecondary,
+              textDecoration: 'none',
               fontSize: '13px',
               padding: '8px 16px',
               border: `1px solid ${c.border}`,
@@ -287,11 +289,11 @@ export default function ManageSubscriptionPage() {
           >
             📄 İade ve İptal Politikası
           </a>
-          <a 
-            href="/pricing" 
-            style={{ 
-              color: c.textSecondary, 
-              textDecoration: 'none', 
+          <a
+            href="/pricing"
+            style={{
+              color: c.textSecondary,
+              textDecoration: 'none',
               fontSize: '13px',
               padding: '8px 16px',
               border: `1px solid ${c.border}`,
@@ -300,11 +302,11 @@ export default function ManageSubscriptionPage() {
           >
             💰 Fiyatlandırma
           </a>
-          <a 
-            href="/terms-of-use" 
-            style={{ 
-              color: c.textSecondary, 
-              textDecoration: 'none', 
+          <a
+            href="/terms-of-use"
+            style={{
+              color: c.textSecondary,
+              textDecoration: 'none',
               fontSize: '13px',
               padding: '8px 16px',
               border: `1px solid ${c.border}`,

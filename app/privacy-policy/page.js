@@ -90,7 +90,7 @@ export default function PrivacyPolicy() {
         }}>
           <h1 style={{ color: c.text, marginBottom: '10px', fontSize: '28px' }}>Gizlilik ve Çerez Politikası</h1>
           <p style={{ color: c.textSecondary, fontSize: '13px', marginBottom: '30px' }}>
-            Son güncelleme: 5 Mayıs 2026
+            Son güncelleme: 15 Mayıs 2026
           </p>
 
           <div style={{ color: c.text, lineHeight: '1.8', fontSize: '15px' }}>
@@ -123,7 +123,7 @@ export default function PrivacyPolicy() {
 
             <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>c) Ödeme Bilgileri</h3>
             <ul style={{ paddingLeft: '20px' }}>
-              <li>Pro üyelik satın alındığında, ödeme bilgileri Lemon Squeezy tarafından işlenir (detay aşağıda)</li>
+              <li>Pro üyelik satın alındığında, ödeme bilgileri Polar Software (Polar.sh) ve onun ödeme işlemcisi Stripe tarafından işlenir (detay aşağıda)</li>
               <li>Kart numaranız, CVV gibi hassas bilgilere SiparişDefterim erişmez ve saklamaz</li>
             </ul>
 
@@ -160,15 +160,24 @@ export default function PrivacyPolicy() {
               <strong>Gizlilik Politikası:</strong> <a href="https://supabase.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa' }}>https://supabase.com/privacy</a>
             </p>
 
-            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>b) Lemon Squeezy Inc. (ABD) — Ödeme Sağlayıcısı</h3>
+            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>b) Polar Software (ABD) — Ödeme Sağlayıcısı (Merchant of Record)</h3>
             <p style={{ marginBottom: '10px' }}>
-              <strong>Hizmet:</strong> Pro üyelik ödemelerinin tahsilatı (Merchant of Record / Yetkili Satıcı).<br />
-              <strong>İşlenen Veriler:</strong> E-posta, ad, fatura adresi, kart bilgileri (Lemon Squeezy tarafından, SiparişDefterim'e iletilmez).<br />
+              <strong>Hizmet:</strong> Pro üyelik ödemelerinin tahsilatı (Merchant of Record / Yetkili Satıcı). Polar Software, vergi (KDV/sales tax) hesaplama ve fatura düzenleme süreçlerini de yürütür.<br />
+              <strong>İşlenen Veriler:</strong> E-posta, ad, fatura adresi, kart bilgileri (Polar ve alt işlemcisi Stripe tarafından, SiparişDefterim'e iletilmez).<br />
               <strong>Konum:</strong> Sunucular ABD'de bulunmaktadır.<br />
-              <strong>Gizlilik Politikası:</strong> <a href="https://www.lemonsqueezy.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa' }}>https://www.lemonsqueezy.com/privacy</a>
+              <strong>Gizlilik Politikası:</strong> <a href="https://polar.sh/legal/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa' }}>https://polar.sh/legal/privacy</a><br />
+              <strong>Kullanım Koşulları:</strong> <a href="https://polar.sh/legal/terms" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa' }}>https://polar.sh/legal/terms</a>
             </p>
 
-            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>c) Vercel Inc. (ABD)</h3>
+            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>c) Stripe, Inc. (ABD) — Ödeme İşlemcisi</h3>
+            <p style={{ marginBottom: '10px' }}>
+              <strong>Hizmet:</strong> Polar.sh'in alt ödeme işlemcisi olarak kart ödemelerinin işlenmesi ve banka hesabına aktarımı.<br />
+              <strong>İşlenen Veriler:</strong> Kart bilgileri (PCI-DSS standartlarına uygun), ödeme tutarı, işlem geçmişi.<br />
+              <strong>Konum:</strong> Sunucular ABD'de bulunmaktadır.<br />
+              <strong>Gizlilik Politikası:</strong> <a href="https://stripe.com/privacy" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa' }}>https://stripe.com/privacy</a>
+            </p>
+
+            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>d) Vercel Inc. (ABD)</h3>
             <p style={{ marginBottom: '10px' }}>
               <strong>Hizmet:</strong> Web sitesi barındırma (hosting).<br />
               <strong>İşlenen Veriler:</strong> IP adresi, tarayıcı bilgisi (sunucu logları).<br />
@@ -176,7 +185,7 @@ export default function PrivacyPolicy() {
               <strong>Gizlilik Politikası:</strong> <a href="https://vercel.com/legal/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: '#a78bfa' }}>https://vercel.com/legal/privacy-policy</a>
             </p>
 
-            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>d) Google LLC (ABD) — OAuth Girişi</h3>
+            <h3 style={{ marginTop: '20px', marginBottom: '10px', fontSize: '17px' }}>e) Google LLC (ABD) — OAuth Girişi</h3>
             <p style={{ marginBottom: '10px' }}>
               <strong>Hizmet:</strong> Google ile giriş yapma seçeneği (opsiyonel).<br />
               <strong>İşlenen Veriler:</strong> Google hesabı kullanırsanız e-posta adresi.<br />
@@ -219,7 +228,7 @@ export default function PrivacyPolicy() {
             <ul style={{ paddingLeft: '20px' }}>
               <li><strong>Hesap bilgileri:</strong> Hesap aktif olduğu sürece. Hesap silindiğinde 30 gün içinde anonimleştirilir veya silinir.</li>
               <li><strong>Sipariş verileri:</strong> Hesap aktif olduğu sürece kullanıcı kontrolünde.</li>
-              <li><strong>Ödeme kayıtları:</strong> Türkiye Vergi Kanunu uyarınca <strong>10 yıl</strong> (Lemon Squeezy tarafından).</li>
+              <li><strong>Ödeme kayıtları:</strong> Türkiye Vergi Kanunu uyarınca <strong>10 yıl</strong> (Polar Software / Stripe tarafından).</li>
               <li><strong>Sunucu logları:</strong> 30 gün.</li>
             </ul>
 
@@ -231,7 +240,7 @@ export default function PrivacyPolicy() {
               <li>Şifreler bcrypt algoritması ile şifrelenir</li>
               <li>Veritabanı erişimi yetkili kişilerle sınırlıdır</li>
               <li>Düzenli güvenlik denetimleri yapılır</li>
-              <li>Hassas ödeme verileri PCI-DSS uyumlu sağlayıcı (Lemon Squeezy) tarafından işlenir</li>
+              <li>Hassas ödeme verileri PCI-DSS uyumlu sağlayıcı (Polar.sh / Stripe) tarafından işlenir</li>
             </ul>
 
             {/* 9. Haklarınız */}

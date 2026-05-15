@@ -4,12 +4,7 @@ import { Suspense, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
-
-// Lemon Squeezy Checkout URLs (TEST MODE - Live mode'a geçince değiştir)
-const CHECKOUT_URLS = {
-  monthly: 'https://siparisdefterim-final.lemonsqueezy.com/checkout/buy/c2ec9f39-40ec-4f7a-a0eb-f6a6f5ce2461',
-  yearly: 'https://siparisdefterim-final.lemonsqueezy.com/checkout/buy/a4c6b3d5-dc9b-4375-babf-69ab15ca4999'
-}
+import { startPolarCheckout } from '../../lib/checkout-client'
 
 const SUPPORT_EMAIL = 'destek@deftertut.com'
 
@@ -25,7 +20,11 @@ const FAQS = [
   },
   {
     q: 'Hangi ödeme yöntemleri kabul ediliyor?',
-    a: 'Tüm kredi kartları (Visa, Mastercard, American Express), Apple Pay ve Google Pay kabul ediyoruz. Ödemeler güvenli ödeme sağlayıcımız Lemon Squeezy üzerinden, uluslararası PCI-DSS standartlarına uygun olarak işlenir.'
+    a: 'Tüm kredi kartları (Visa, Mastercard, American Express), Apple Pay ve Google Pay kabul ediyoruz. Ödemeler güvenli ödeme sağlayıcımız Polar.sh üzerinden, uluslararası PCI-DSS standartlarına uygun olarak işlenir.'
+  },
+  {
+    q: 'Ödemeler hangi para biriminde alınıyor?',
+    a: 'Ödemeler ABD Doları (USD) olarak alınır. Kartınızdan çekilen tutar bankanızın o günkü kurundan Türk Lirasına çevrilir. Bu nedenle ekstrenizde TL tutarı dönemden döneme küçük farklılıklar gösterebilir.'
   },
   {
     q: 'Faturamı nasıl alırım?',
@@ -57,6 +56,8 @@ function PricingContent() {
   const [isPro, setIsPro] = useState(false)
   const [openFaq, setOpenFaq] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
+  const [loadingPlan, setLoadingPlan] = useState(null)
+  const [checkoutError, setCheckoutError] = useState(null)
 
   const c = colors[theme]
   const isDark = theme === 'dark'
@@ -119,21 +120,25 @@ function PricingContent() {
     }
   }, [user?.id])
 
-  const handleMonthly = () => {
+  const handlePlanClick = async (plan) => {
     if (!user) {
       router.push('/login?redirect=/pricing')
       return
     }
-    window.open(CHECKOUT_URLS.monthly, '_blank')
+    if (loadingPlan) return
+    setCheckoutError(null)
+    setLoadingPlan(plan)
+    try {
+      await startPolarCheckout(plan)
+    } catch (err) {
+      setCheckoutError(err.message || 'Ödeme sayfası açılamadı, lütfen tekrar deneyin.')
+      setLoadingPlan(null)
+    }
   }
 
-  const handleYearly = () => {
-    if (!user) {
-      router.push('/login?redirect=/pricing')
-      return
-    }
-    window.open(CHECKOUT_URLS.yearly, '_blank')
-  }
+  const isMonthlyLoading = loadingPlan === 'monthly'
+  const isYearlyLoading = loadingPlan === 'yearly'
+  const anyLoading = loadingPlan !== null
 
   if (loading) {
     return (
@@ -324,6 +329,22 @@ function PricingContent() {
               </div>
             )}
 
+            {/* Checkout Error */}
+            {checkoutError && (
+              <div style={{
+                background: 'rgba(239, 68, 68, 0.1)',
+                border: '1px solid rgba(239, 68, 68, 0.4)',
+                color: '#ef4444',
+                padding: '12px 16px',
+                borderRadius: '10px',
+                fontSize: '13px',
+                marginBottom: '20px',
+                textAlign: 'left'
+              }}>
+                ⚠️ {checkoutError}
+              </div>
+            )}
+
             {/* Plan Kartları */}
             <div style={{
               display: 'grid',
@@ -351,7 +372,7 @@ function PricingContent() {
                 </p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '20px' }}>
                   <span style={{ fontSize: isMobile ? '36px' : '44px', fontWeight: '700', color: c.text }}>
-                    ₺99
+                    $2.99
                   </span>
                   <span style={{ fontSize: '14px', color: '#94a3b8' }}>/ay</span>
                 </div>
@@ -364,7 +385,8 @@ function PricingContent() {
                 </div>
 
                 <button
-                  onClick={handleMonthly}
+                  onClick={() => handlePlanClick('monthly')}
+                  disabled={anyLoading}
                   style={{
                     width: '100%',
                     padding: '14px',
@@ -374,10 +396,12 @@ function PricingContent() {
                     borderRadius: '12px',
                     fontSize: '15px',
                     fontWeight: '600',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
+                    cursor: anyLoading ? 'wait' : 'pointer',
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    opacity: anyLoading && !isMonthlyLoading ? 0.5 : 1
                   }}
                   onMouseOver={(e) => {
+                    if (anyLoading) return
                     e.currentTarget.style.transform = 'translateY(-2px)'
                     e.currentTarget.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.25)'
                   }}
@@ -386,7 +410,7 @@ function PricingContent() {
                     e.currentTarget.style.boxShadow = 'none'
                   }}
                 >
-                  Aylık Pro'ya Geç
+                  {isMonthlyLoading ? 'Yönlendiriliyor...' : "Aylık Pro'ya Geç"}
                 </button>
               </div>
 
@@ -427,12 +451,12 @@ function PricingContent() {
                 </p>
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '6px', marginBottom: '4px' }}>
                   <span style={{ fontSize: isMobile ? '36px' : '44px', fontWeight: '700', color: c.text }}>
-                    ₺83
+                    $2.50
                   </span>
                   <span style={{ fontSize: '14px', color: '#94a3b8' }}>/ay</span>
                 </div>
                 <p style={{ margin: '0 0 20px 0', fontSize: '13px', color: '#94a3b8' }}>
-                  ₺999 yıllık tek ödeme
+                  $29.99 yıllık tek ödeme
                 </p>
 
                 <div style={{ marginBottom: '24px' }}>
@@ -444,7 +468,8 @@ function PricingContent() {
                 </div>
 
                 <button
-                  onClick={handleYearly}
+                  onClick={() => handlePlanClick('yearly')}
+                  disabled={anyLoading}
                   style={{
                     width: '100%',
                     padding: '14px',
@@ -454,11 +479,13 @@ function PricingContent() {
                     borderRadius: '12px',
                     fontSize: '15px',
                     fontWeight: '600',
-                    cursor: 'pointer',
+                    cursor: anyLoading ? 'wait' : 'pointer',
                     boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)',
-                    transition: 'transform 0.2s, box-shadow 0.2s'
+                    transition: 'transform 0.2s, box-shadow 0.2s',
+                    opacity: anyLoading && !isYearlyLoading ? 0.5 : 1
                   }}
                   onMouseOver={(e) => {
+                    if (anyLoading) return
                     e.currentTarget.style.transform = 'translateY(-2px)'
                     e.currentTarget.style.boxShadow = '0 8px 25px rgba(102, 126, 234, 0.6)'
                   }}
@@ -467,7 +494,7 @@ function PricingContent() {
                     e.currentTarget.style.boxShadow = '0 4px 15px rgba(102, 126, 234, 0.4)'
                   }}
                 >
-                  Yıllık Pro'ya Geç →
+                  {isYearlyLoading ? 'Yönlendiriliyor...' : "Yıllık Pro'ya Geç →"}
                 </button>
               </div>
             </div>
@@ -603,7 +630,7 @@ function PricingContent() {
 }
 
 // Feature line component
-function FeatureLine({ text, highlighted, isDark , theme }) {
+function FeatureLine({ text, highlighted, isDark, theme }) {
   const c = colors[theme]
   return (
     <div style={{
