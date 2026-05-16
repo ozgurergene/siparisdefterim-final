@@ -13,6 +13,9 @@ import { colors, buttonGradients, glowEffects } from '../lib/theme'
  *   description="Müşterilerini takip et, sipariş geçmişini gör"
  *   icon="👥"
  * />
+ *
+ * Not: Ödeme Polar.sh üzerinden USD olarak alınır.
+ * Buton /pricing sayfasına yönlendirir; checkout oradaki startPolarCheckout ile başlatılır.
  */
 export default function ProUpgradePrompt({
   theme = 'light',
@@ -185,7 +188,7 @@ export default function ProUpgradePrompt({
             ))}
           </div>
 
-          {/* Pricing */}
+          {/* Pricing — USD (Polar.sh) */}
           <div style={{
             background: buttonGradients.primary,
             borderRadius: '16px',
@@ -197,10 +200,10 @@ export default function ProUpgradePrompt({
               Sadece
             </div>
             <div style={{ fontSize: '32px', fontWeight: '800', lineHeight: '1' }}>
-              99 TL<span style={{ fontSize: '16px', fontWeight: '500', opacity: 0.9 }}>/ay</span>
+              $2.99<span style={{ fontSize: '16px', fontWeight: '500', opacity: 0.9 }}>/ay</span>
             </div>
             <div style={{ fontSize: '12px', opacity: 0.85, marginTop: '6px' }}>
-              veya yıllık 999 TL (2 ay bedava 🎁)
+              veya yıllık $29.99 (2 ay bedava 🎁)
             </div>
           </div>
 
@@ -227,10 +230,20 @@ export default function ProUpgradePrompt({
             🚀 Pro&apos;ya Yükselt
           </button>
 
+          {/* Güvenli ödeme bilgisi — Polar.sh */}
+          <p style={{
+            fontSize: '11px',
+            color: c.textMuted,
+            margin: '10px 0 0 0',
+            lineHeight: '1.5'
+          }}>
+            🔒 Güvenli ödeme: Polar.sh · Ödeme USD cinsinden alınır, banka kurundan TL'ye çevrilir
+          </p>
+
           <button
             onClick={() => router.push('/dashboard')}
             style={{
-              marginTop: '12px',
+              marginTop: '8px',
               padding: '10px 20px',
               background: 'transparent',
               color: c.textSecondary,

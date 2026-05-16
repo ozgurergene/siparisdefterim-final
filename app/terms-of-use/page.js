@@ -8,16 +8,15 @@ import Footer from '../../components/Footer'
 
 export default function TermsOfUse() {
   const router = useRouter()
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'light'
-    return localStorage.getItem('siparisdefterim-theme') || 'light'
-  })
+  const [theme, setTheme] = useState('light')
+  const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState(null)
   const c = colors[theme]
 
   useEffect(() => {
     const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
     setTheme(savedTheme)
+    setMounted(true)
 
     const checkUser = async () => {
       const { data } = await supabase.auth.getSession()
@@ -32,6 +31,19 @@ export default function TermsOfUse() {
     window.addEventListener('storage', handleStorageChange)
     return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
+
+  // Sifir flash icin: mounted olana kadar localStorage'dan okunan tema ile placeholder
+  if (!mounted) {
+    const earlyTheme = typeof window !== 'undefined'
+      ? (localStorage.getItem('siparisdefterim-theme') || 'light')
+      : 'light'
+    return (
+      <div style={{
+        minHeight: '100vh',
+        background: earlyTheme === 'dark' ? '#0a0a0a' : '#fdf2f8'
+      }} />
+    )
+  }
 
   return (
     <div style={{
@@ -103,7 +115,7 @@ export default function TermsOfUse() {
               <li><strong>Ücretsiz Plan:</strong> 50 siparişe kadar</li>
               <li><strong>Pro Plan:</strong> 2.99 USD/ay veya 29.99 USD/yıl</li>
             </ul>
-            <p style={{ fontSize: '13px', color: colors.text, marginTop: '8px' }}>
+            <p style={{ fontSize: '13px', color: c.text, marginTop: '8px' }}>
               Ödemeler ABD Doları (USD) olarak tahsil edilir. Kartınızdan çekilen tutar, bankanızın o günkü kur
               ve komisyon politikasına göre Türk Lirasına çevrilir.
             </p>

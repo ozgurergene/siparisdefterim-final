@@ -29,11 +29,19 @@ export default function DistanceSales() {
           <ul style={{ paddingLeft: '20px' }}>
             <li><strong>Hizmet:</strong> Sipariş yönetim platformu</li>
             <li><strong>Ücretsiz Plan:</strong> 50 siparişe kadar ücretsiz</li>
-            <li><strong>Pro Plan:</strong> Aylık 99 TL veya Yıllık 999 TL</li>
+            <li><strong>Pro Plan:</strong> Aylık $2.99 USD veya Yıllık $29.99 USD</li>
+            <li style={{ fontSize: '13px', color: c.textSecondary, marginTop: '4px' }}>Ödemeler ABD Doları (USD) olarak alınır; kartınızdan çekilen tutar bankanızın o günkü kur ve komisyon politikasına göre Türk Lirasına çevrilir.</li>
           </ul>
 
           <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>4. Ödeme Şekli</h2>
-          <p>Kredi kartı ile güvenli ödeme altyapısı üzerinden tahsil edilir.</p>
+          <p>
+          Tüm ödemeler Merchant of Record (Yetkili Satıcı) sıfatıyla
+          <strong> Polar Software (Polar.sh)</strong> tarafından tahsil edilir. Kart ödemeleri,
+          Polar'ın alt ödeme işlemcisi olan <strong>Stripe, Inc.</strong> üzerinden
+          PCI-DSS standartlarına uygun olarak işlenir. KDV / sales tax hesaplama ve
+          fatura düzenleme süreçleri Polar Software tarafından yürütülür.
+          Kredi kartı, Apple Pay ve Google Pay desteklenir.
+        </p>
 
           <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>5. Teslimat</h2>
           <p>Dijital hizmet olup, ödeme onayından sonra anında hesabınız aktif edilir. Hizmetin ifasına ödeme onayıyla birlikte başlanmış sayılır.</p>

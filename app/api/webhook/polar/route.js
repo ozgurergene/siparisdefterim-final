@@ -99,71 +99,78 @@ export async function POST(request) {
 // ============================================================
 
 /**
+ * Güvenlik: user_id metadata'dan gelmiyorsa loglayıp çık.
+ * Çünkü:
+ *   - Checkout route'u login zorunlu — metadata.user_id HER ZAMAN dolmalı
+ *   - user_id yoksa: ya kod hatası, ya da Polar dashboard'tan manuel oluşturulmuş bir checkout
+ *   - Email fallback'i KASTEN kaldırıldı: başkasının email'ine ödeme yapan
+ *     bir saldırgan, gerçek user'ı Pro yapabilirdi. Güvenli değil.
+ */
+function requireUserId(subscriptionOrOrder, eventName) {
+  const userId = subscriptionOrOrder.metadata?.user_id;
+  if (!userId) {
+    console.error(
+      `[Polar Webhook] GÜVENLİK UYARISI: ${eventName} event'inde metadata.user_id yok.`,
+      {
+        id: subscriptionOrOrder.id,
+        customerEmail: subscriptionOrOrder.customer?.email,
+        metadata: subscriptionOrOrder.metadata,
+      }
+    );
+    return null;
+  }
+  return userId;
+}
+
+/**
  * Subscription aktif olunca user'ı Pro yap.
  * subscription.created ve subscription.active için çağrılır.
  */
 async function handleSubscriptionActive(subscription) {
-  const userId = subscription.metadata?.user_id;
-  const customerEmail = subscription.customer?.email;
+  const userId = requireUserId(subscription, "subscription.active");
+  if (!userId) return; // güvenlik: user_id yoksa Pro vermiyoruz
+
   const plan = subscription.metadata?.plan || "unknown";
 
-  if (!userId && !customerEmail) {
-    console.error("[Polar] Subscription'da user_id veya email yok:", subscription.id);
-    return;
-  }
+  const { error } = await supabase
+    .from("users")
+    .update({
+      is_pro: true,
+      polar_customer_id: subscription.customer?.id,
+      polar_subscription_id: subscription.id,
+      subscription_plan: plan,
+      subscription_status: "active",
+      subscription_current_period_end: subscription.currentPeriodEnd,
+    })
+    .eq("id", userId);
 
-  // Önce user_id ile dene, yoksa email fallback
-  const query = userId
-    ? supabase.from("users").update({
-        is_pro: true,
-        polar_customer_id: subscription.customer?.id,
-        polar_subscription_id: subscription.id,
-        subscription_plan: plan,
-        subscription_status: "active",
-        subscription_current_period_end: subscription.currentPeriodEnd,
-      }).eq("id", userId)
-    : supabase.from("users").update({
-        is_pro: true,
-        polar_customer_id: subscription.customer?.id,
-        polar_subscription_id: subscription.id,
-        subscription_plan: plan,
-        subscription_status: "active",
-        subscription_current_period_end: subscription.currentPeriodEnd,
-      }).eq("email", customerEmail);
-
-  const { error } = await query;
   if (error) {
     console.error("[Polar] handleSubscriptionActive update hatası:", error);
     throw error;
   }
 
-  console.log(`[Polar] User ${userId || customerEmail} → is_pro=true (${plan})`);
+  console.log(`[Polar] User ${userId} → is_pro=true (${plan})`);
 }
 
 /**
  * Subscription güncellendi (plan değişikliği, vs).
  */
 async function handleSubscriptionUpdated(subscription) {
-  const userId = subscription.metadata?.user_id;
-  const customerEmail = subscription.customer?.email;
-  const newStatus = subscription.status; // "active", "canceled", "past_due", etc.
+  const userId = requireUserId(subscription, "subscription.updated");
+  if (!userId) return;
 
-  // Status active değilse Pro olarak işaretleme
+  const newStatus = subscription.status; // "active", "canceled", "past_due", etc.
   const is_pro = newStatus === "active";
 
-  const query = userId
-    ? supabase.from("users").update({
-        is_pro,
-        subscription_status: newStatus,
-        subscription_current_period_end: subscription.currentPeriodEnd,
-      }).eq("id", userId)
-    : supabase.from("users").update({
-        is_pro,
-        subscription_status: newStatus,
-        subscription_current_period_end: subscription.currentPeriodEnd,
-      }).eq("email", customerEmail);
+  const { error } = await supabase
+    .from("users")
+    .update({
+      is_pro,
+      subscription_status: newStatus,
+      subscription_current_period_end: subscription.currentPeriodEnd,
+    })
+    .eq("id", userId);
 
-  const { error } = await query;
   if (error) {
     console.error("[Polar] handleSubscriptionUpdated hatası:", error);
     throw error;
@@ -175,19 +182,17 @@ async function handleSubscriptionUpdated(subscription) {
  * is_pro=true olarak bırakıyoruz, sadece status güncelle.
  */
 async function handleSubscriptionCanceled(subscription) {
-  const userId = subscription.metadata?.user_id;
-  const customerEmail = subscription.customer?.email;
+  const userId = requireUserId(subscription, "subscription.canceled");
+  if (!userId) return;
 
-  const query = userId
-    ? supabase.from("users").update({
-        subscription_status: "canceled",
-        // is_pro hala true — period_end gelince webhook revoked tetiklenir
-      }).eq("id", userId)
-    : supabase.from("users").update({
-        subscription_status: "canceled",
-      }).eq("email", customerEmail);
+  const { error } = await supabase
+    .from("users")
+    .update({
+      subscription_status: "canceled",
+      // is_pro hala true — period_end gelince webhook revoked tetiklenir
+    })
+    .eq("id", userId);
 
-  const { error } = await query;
   if (error) {
     console.error("[Polar] handleSubscriptionCanceled hatası:", error);
     throw error;
@@ -199,20 +204,17 @@ async function handleSubscriptionCanceled(subscription) {
  * is_pro hemen false yap.
  */
 async function handleSubscriptionRevoked(subscription) {
-  const userId = subscription.metadata?.user_id;
-  const customerEmail = subscription.customer?.email;
+  const userId = requireUserId(subscription, "subscription.revoked");
+  if (!userId) return;
 
-  const query = userId
-    ? supabase.from("users").update({
-        is_pro: false,
-        subscription_status: "revoked",
-      }).eq("id", userId)
-    : supabase.from("users").update({
-        is_pro: false,
-        subscription_status: "revoked",
-      }).eq("email", customerEmail);
+  const { error } = await supabase
+    .from("users")
+    .update({
+      is_pro: false,
+      subscription_status: "revoked",
+    })
+    .eq("id", userId);
 
-  const { error } = await query;
   if (error) {
     console.error("[Polar] handleSubscriptionRevoked hatası:", error);
     throw error;
@@ -221,24 +223,37 @@ async function handleSubscriptionRevoked(subscription) {
 
 /**
  * Order iade edildi — Pro'yu kaldır.
+ *
+ * NOT: Order refund için BURAYA özel olarak email fallback bıraktım.
+ * Çünkü:
+ *  - Bu negatif bir aksiyon (Pro'yu kaldırıyoruz, vermiyoruz)
+ *  - Tehlikeli senaryo: birinin Pro'sunu yanlışlıkla kaldırmak — düşük risk
+ *  - Pozitif aksiyon (Pro vermek) ise yüksek risk, fallback'i kaldırdık
  */
 async function handleOrderRefunded(order) {
   const userId = order.metadata?.user_id;
   const customerEmail = order.customer?.email;
 
+  if (!userId && !customerEmail) {
+    console.error("[Polar] order.refunded'da ne user_id ne email yok:", order.id);
+    return;
+  }
+
   const query = userId
-    ? supabase.from("users").update({
-        is_pro: false,
-        subscription_status: "refunded",
-      }).eq("id", userId)
-    : supabase.from("users").update({
-        is_pro: false,
-        subscription_status: "refunded",
-      }).eq("email", customerEmail);
+    ? supabase
+        .from("users")
+        .update({ is_pro: false, subscription_status: "refunded" })
+        .eq("id", userId)
+    : supabase
+        .from("users")
+        .update({ is_pro: false, subscription_status: "refunded" })
+        .eq("email", customerEmail);
 
   const { error } = await query;
   if (error) {
     console.error("[Polar] handleOrderRefunded hatası:", error);
     throw error;
   }
+
+  console.log(`[Polar] Order refunded — Pro kaldırıldı: ${userId || customerEmail}`);
 }

@@ -1,18 +1,16 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
 
-export default function TermsOfUse() {
+export default function RefundPolicyPage() {
   const router = useRouter()
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'light'
-    return localStorage.getItem('siparisdefterim-theme') || 'light'
-  })
+  const [theme, setTheme] = useState('light')
   const [user, setUser] = useState(null)
+
   const c = colors[theme]
 
   useEffect(() => {
@@ -24,13 +22,6 @@ export default function TermsOfUse() {
       if (data?.session?.user) setUser(data.session.user)
     }
     checkUser()
-
-    const handleStorageChange = () => {
-      const t = localStorage.getItem('siparisdefterim-theme')
-      if (t) setTheme(t)
-    }
-    window.addEventListener('storage', handleStorageChange)
-    return () => window.removeEventListener('storage', handleStorageChange)
   }, [])
 
   return (
@@ -65,108 +56,200 @@ export default function TermsOfUse() {
           <a
             href={user ? '/dashboard' : '/login'}
             style={{
-              color: '#a78bfa',
+              color: '#667eea',
               textDecoration: 'none',
               fontSize: '14px',
               fontWeight: '600'
             }}
           >
-            {user ? '← Panele Dön' : 'Giriş Yap'}
+            {user ? '← Panele Dön' : '← Ana Sayfa'}
           </a>
         </div>
       </div>
 
-      {/* Ana Icerik */}
-      <div style={{ flex: 1, padding: '40px 20px' }}>
+      {/* İçerik */}
+      <div style={{ flex: 1, padding: '40px 20px', maxWidth: '900px', margin: '0 auto', width: '100%', boxSizing: 'border-box' }}>
+        <h1 style={{ fontSize: '32px', marginBottom: '10px', color: c.text }}>İade ve İptal Politikası</h1>
+        <p style={{ color: c.textSecondary, fontSize: '13px', marginBottom: '30px' }}>
+          Son güncelleme: 15 Mayıs 2026
+        </p>
+
+        {/* Üst özet kutusu - "Iade yok" net mesaj */}
         <div style={{
-          maxWidth: '800px',
-          margin: '0 auto',
-          background: c.bgCard,
-          backdropFilter: c.backdropFilter,
-          WebkitBackdropFilter: c.backdropFilter,
-          padding: '40px',
-          borderRadius: '20px',
-          border: `1px solid ${c.border}`
+          background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
+          border: `1px solid ${theme === 'dark' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(245, 158, 11, 0.25)'}`,
+          borderRadius: '8px',
+          padding: '15px 20px',
+          marginBottom: '30px'
         }}>
-          <h1 style={{ color: c.text, marginBottom: '30px', fontSize: '28px' }}>Kullanım Koşulları</h1>
+          <p style={{ margin: 0, fontSize: '14px', color: c.text, lineHeight: '1.6' }}>
+            <strong>⚠️ Önemli Özet:</strong> Pro üyelik dijital bir hizmet olduğu için <strong>cayma hakkı kapsamı dışındadır</strong> ve
+            ödenen ücretler iade edilmez. Ancak <strong>dilediğiniz zaman iptal edebilirsiniz</strong>; iptal
+            sonrasında ödediğiniz dönemin sonuna kadar Pro özelliklerini kullanmaya devam edersiniz.
+            İptal için <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine yazabilirsiniz.
+          </p>
+        </div>
 
-          <div style={{ color: c.text, lineHeight: '1.8', fontSize: '15px' }}>
-            <h2 style={{ marginTop: '20px', marginBottom: '15px', fontSize: '20px' }}>Mesafeli Sözleşmeler Yönetmeliği Kapsamında Bilgilendirme</h2>
+        {/* Bölüm 1: Cayma Hakkı YOK + TKHK Madde 15/g */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>1. Cayma Hakkı ve İade Politikası</h2>
 
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Satıcı Bilgileri</h3>
-            <p><strong>Ünvan:</strong> SiparişDefterim</p>
-            <p><strong>E-mail:</strong> destek@deftertut.com</p>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik aboneliği, 6502 sayılı <strong>Tüketicinin Korunması Hakkında Kanun (TKHK)</strong> ve
+            <strong> Mesafeli Sözleşmeler Yönetmeliği'nin 15. maddesinin 1. fıkrasının (ğ) bendi</strong> uyarınca
+            <strong> "elektronik ortamda anında ifa edilen hizmetler"</strong> kapsamındadır.
+          </p>
 
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Hizmet Özeti</h3>
-            <p>Instagram satıcıları için sipariş yönetim, durum takibi ve müşteri bildirimi hizmetleri</p>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik ödemesi onaylandığı anda hizmetin ifasına başlanır ve Pro özellikler hesabınızda aktive edilir.
+            Bu sebeple <strong>cayma hakkı kullanılamaz</strong> ve <strong>ödenen ücretler iade edilmez</strong>.
+          </p>
 
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Fiyatlandırma</h3>
-            <ul style={{ paddingLeft: '20px' }}>
-              <li><strong>Ücretsiz Plan:</strong> 50 siparişe kadar</li>
-              <li><strong>Pro Plan:</strong> 2.99 USD/ay veya 29.99 USD/yıl</li>
-            </ul>
-            <p style={{ fontSize: '13px', color: c.textSecondary, marginTop: '8px' }}>
-              Ödemeler ABD Doları (USD) olarak tahsil edilir. Kartınızdan çekilen tutar, bankanızın o günkü kur
-              ve komisyon politikasına göre Türk Lirasına çevrilir.
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+            Pro üyelik satın alma sürecinde, sözleşmeyi kabul ederek bu hizmetin cayma hakkı kapsamı dışında
+            olduğunu ve cayma hakkından feragat ettiğinizi açıkça beyan etmiş olursunuz.
+          </p>
+        </section>
+
+        {/* Bölüm 2: İptal Nasıl Yapılır */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>2. İptal Hakkı ve İptal Nasıl Yapılır?</h2>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            İade yapılmamakla birlikte, <strong>aboneliğinizi dilediğiniz zaman iptal edebilirsiniz</strong>.
+            İptal sonrasında:
+          </p>
+
+          <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px', marginBottom: '12px' }}>
+            <li style={{ marginBottom: '8px' }}>Ödediğiniz dönemin (aylık/yıllık) <strong>sonuna kadar</strong> Pro özelliklerini kullanmaya devam edersiniz.</li>
+            <li style={{ marginBottom: '8px' }}>Dönem sonunda hesabınız otomatik olarak <strong>Ücretsiz plana</strong> geçer.</li>
+            <li style={{ marginBottom: '8px' }}>Bir sonraki dönem için sizden <strong>ücret tahsil edilmez</strong>.</li>
+            <li style={{ marginBottom: '8px' }}>Tüm siparişleriniz, müşterileriniz ve verileriniz <strong>kaybolmaz</strong>, görüntülemeye devam edebilirsiniz.</li>
+          </ul>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            İptal talebinizi göndermek için:
+          </p>
+
+          <div style={{ paddingLeft: '20px', marginBottom: '12px' }}>
+            <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '8px' }}>
+              📧 <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine
+              "İptal Talebi" konulu bir e-posta gönderin.
             </p>
-
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Ödeme Yöntemi</h3>
-            <p>
-              Kredi kartı, Apple Pay ve Google Pay desteklenir. Tüm ödemeler Merchant of Record (Yetkili Satıcı) olarak{' '}
-              <strong>Polar Software (Polar.sh)</strong> ve onun kart işleme alt yapısı <strong>Stripe, Inc.</strong>{' '}
-              üzerinden, PCI-DSS standartlarına uygun olarak işlenir. KDV / sales tax hesaplama ve fatura düzenleme
-              süreçleri Polar Software tarafından yürütülür.
-            </p>
-
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Hizmet Aktivasyonu</h3>
-            <p>Hizmet, üyelik onayı ve ödeme sonrası <strong>anında</strong> aktif edilir. Hizmetin ifasına ödeme onayıyla birlikte başlanmış sayılır.</p>
-
-            {/* Cayma Hakki */}
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>Cayma Hakkı</h3>
-
-            <div style={{
-              background: theme === 'dark' ? 'rgba(245, 158, 11, 0.08)' : 'rgba(245, 158, 11, 0.06)',
-              border: `1px solid ${theme === 'dark' ? 'rgba(245, 158, 11, 0.3)' : 'rgba(245, 158, 11, 0.25)'}`,
-              borderRadius: '8px',
-              padding: '14px',
-              marginBottom: '12px',
-              marginTop: '10px'
-            }}>
-              <p style={{ margin: 0, fontSize: '14px', lineHeight: '1.6' }}>
-                <strong>⚠️ Önemli:</strong> Pro üyelik dijital bir hizmet olduğu için cayma hakkı kapsamı dışındadır.
-              </p>
-            </div>
-
-            <p>
-              Pro üyelik, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve Mesafeli Sözleşmeler Yönetmeliği'nin
-              <strong> 15. maddesinin 1. fıkrasının (ğ) bendi</strong> uyarınca "elektronik ortamda anında ifa edilen
-              hizmetler" kapsamında olup, <strong>cayma hakkı bulunmamaktadır</strong>.
-            </p>
-
-            <p style={{ marginTop: '10px' }}>
-              Üye, Pro üyelik satın alma işlemini onaylayarak hizmetin satın alma anında ifasına başlanmasına ve
-              <strong> cayma hakkından feragat ettiğini açıkça beyan ve kabul</strong> eder.
-            </p>
-
-            <p style={{ marginTop: '10px' }}>
-              Üye, dilediği zaman aboneliğini iptal edebilir. İptal sonrasında ödediği dönemin sonuna kadar Pro
-              özelliklerini kullanmaya devam eder ve dönem sonunda otomatik olarak ücretsiz pakete geçer.
-              <strong> Yapılan ödemeler iade edilmez.</strong>
-            </p>
-
-            <p style={{ marginTop: '10px' }}>
-              Detaylı bilgi için <a href="/refund-policy" style={{ color: '#a78bfa' }}>İade ve İptal Politikası</a> sayfamızı inceleyebilirsiniz.
-            </p>
-
-            {/* Iptal Yontemi */}
-            <h3 style={{ marginTop: '25px', marginBottom: '10px', fontSize: '17px' }}>İptal Yöntemi</h3>
-            <p>
-              Aboneliğinizi iptal etmek için <strong>destek@deftertut.com</strong> adresine e-posta gönderebilir
-              veya <a href="/manage-subscription" style={{ color: '#a78bfa' }}>Aboneliği Yönet</a> sayfasındaki butonu kullanabilirsiniz.
-              Talepler 1-2 iş günü içinde işleme alınır.
+            <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+              Veya doğrudan <a href="/manage-subscription" style={{ color: '#667eea', fontWeight: '600' }}>Aboneliği Yönet</a> sayfasından
+              "İptal Talebi Gönder" butonunu kullanın.
             </p>
           </div>
-        </div>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+            Talebiniz <strong>1-2 iş günü içinde</strong> işleme alınır ve onay e-postası gönderilir.
+          </p>
+        </section>
+
+        {/* Bölüm 3: İade Politikası - İade YOK */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>3. İade Politikası</h2>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik abonelikleri için <strong>iade yapılmamaktadır</strong>. Bu durum aşağıdaki sebeplere dayanmaktadır:
+          </p>
+
+          <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px' }}>
+            <li style={{ marginBottom: '8px' }}>Pro üyelik, ödeme onayıyla birlikte <strong>anında aktive edilen dijital bir hizmettir</strong>.</li>
+            <li style={{ marginBottom: '8px' }}>TKHK Madde 15/ğ uyarınca elektronik ortamda anında ifa edilen hizmetler cayma hakkı kapsamı dışındadır.</li>
+            <li style={{ marginBottom: '8px' }}>Pro özellikler aktive edildiği anda kullanıma sunulur ve geri alınamaz nitelikte bir hizmettir.</li>
+            <li style={{ marginBottom: '8px' }}>Bu sebeple <strong>kullanılmamış süre veya kısmi iade talepleri kabul edilmez</strong>.</li>
+          </ul>
+        </section>
+
+        {/* Bölüm 4: Ücretsiz Deneme Önerisi */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>4. Satın Almadan Önce Deneyin</h2>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Pro üyelik için iade yapılmadığından, satın almadan önce hizmeti ücretsiz olarak deneyebilirsiniz:
+          </p>
+
+          <ul style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', paddingLeft: '25px' }}>
+            <li style={{ marginBottom: '8px' }}><strong>Ücretsiz Plan:</strong> 50 siparişe kadar tüm temel özellikler ücretsizdir.</li>
+            <li style={{ marginBottom: '8px' }}>Hizmetin size uygun olduğundan emin olduktan sonra Pro'ya yükseltebilirsiniz.</li>
+            <li style={{ marginBottom: '8px' }}>Sorularınız için satın almadan önce <a href="mailto:destek@deftertut.com" style={{ color: '#667eea' }}>destek@deftertut.com</a> adresine yazabilirsiniz.</li>
+          </ul>
+        </section>
+
+        {/* Bölüm 5: Yenileme ve Otomatik Tahsilat */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>5. Yenileme ve Otomatik Tahsilat</h2>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Aboneliğiniz, seçtiğiniz dönem (aylık veya yıllık) sonunda otomatik olarak yenilenir.
+            Otomatik yenilemeyi durdurmak istiyorsanız, <strong>yenileme tarihinden önce</strong> aboneliğinizi iptal etmeniz yeterlidir.
+          </p>
+
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+            Yenileme gerçekleştikten sonra yapılan iptal taleplerinde, mevcut dönem için ödenen ücret iade edilmez
+            (madde 3 uyarınca); ancak bir sonraki yenileme yapılmaz.
+          </p>
+        </section>
+
+        {/* Bölüm 6: Veri Saklama */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>6. Veri Saklama</h2>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+            İptal durumunda, sipariş ve müşteri verileriniz silinmez; sadece Pro özelliklerine erişiminiz
+            sınırlandırılır. Verilerinizin tamamen silinmesini istiyorsanız, KVKK kapsamındaki haklarınız doğrultusunda
+            <a href="mailto:destek@deftertut.com" style={{ color: '#667eea' }}> destek@deftertut.com</a> adresine yazabilirsiniz.
+          </p>
+        </section>
+
+        {/* Bölüm 7: Ödeme Sağlayıcısı — Polar.sh */}
+        <section style={{ marginBottom: '30px' }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>7. Ödeme Sağlayıcısı ve Para Birimi</h2>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '12px' }}>
+            Tüm ödeme işlemleri Merchant of Record (Yetkili Satıcı) olarak <strong>Polar Software</strong> (polar.sh) tarafından
+            gerçekleştirilir. Polar Software, vergi (KDV/sales tax) hesaplama ve fatura düzenleme süreçlerini de yürütür.
+            Kart ödemeleri, Polar'ın alt ödeme işlemcisi olan <strong>Stripe, Inc.</strong> üzerinden PCI-DSS standartlarına
+            uygun şekilde işlenir.
+          </p>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px' }}>
+            Ödemeler <strong>ABD Doları (USD)</strong> cinsinden alınır; kartınızdan çekilen tutar bankanızın
+            o günkü kurundan Türk Lirasına çevrilir. Bu nedenle ekstrenizdeki TL tutarı dönemden döneme küçük farklılıklar
+            gösterebilir. Ödeme süreciyle ilgili sorularınız için bizimle iletişime geçmeniz yeterlidir;
+            tüm talepler tarafımızdan koordine edilir.
+          </p>
+        </section>
+
+        {/* Bölüm 8 - İletişim */}
+        <section style={{
+          background: c.header,
+          border: `1px solid ${c.border}`,
+          borderRadius: '8px',
+          padding: '20px',
+          marginBottom: '30px'
+        }}>
+          <h2 style={{ fontSize: '20px', marginBottom: '12px', color: c.text }}>📞 İletişim</h2>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', marginBottom: '8px' }}>
+            İptal veya bu politikayla ilgili her türlü sorunuz için bize ulaşabilirsiniz:
+          </p>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', margin: '4px 0' }}>
+            📧 E-posta: <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a>
+          </p>
+          <p style={{ color: c.text, lineHeight: '1.7', fontSize: '14px', margin: '4px 0' }}>
+            🌐 Site: <a href="https://deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>deftertut.com</a>
+          </p>
+          <p style={{ color: c.textSecondary, fontSize: '12px', marginTop: '12px', marginBottom: 0 }}>
+            Tüm taleplerinize 1-2 iş günü içinde dönüş yapılır.
+          </p>
+        </section>
+
+        {/* Yasal Çerçeve */}
+        <section style={{ borderTop: `1px solid ${c.border}`, paddingTop: '20px', marginTop: '30px' }}>
+          <p style={{ color: c.textSecondary, fontSize: '12px', lineHeight: '1.6', textAlign: 'center', margin: 0 }}>
+            Bu politika, 6502 sayılı Tüketicinin Korunması Hakkında Kanun ve 27.11.2014 tarihli Mesafeli Sözleşmeler
+            Yönetmeliği'nin 15/1-ğ maddesi hükümleri çerçevesinde hazırlanmıştır.
+          </p>
+        </section>
       </div>
 
       <Footer theme={theme} />

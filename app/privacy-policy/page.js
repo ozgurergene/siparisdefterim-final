@@ -228,7 +228,7 @@ export default function PrivacyPolicy() {
             <ul style={{ paddingLeft: '20px' }}>
               <li><strong>Hesap bilgileri:</strong> Hesap aktif olduğu sürece. Hesap silindiğinde 30 gün içinde anonimleştirilir veya silinir.</li>
               <li><strong>Sipariş verileri:</strong> Hesap aktif olduğu sürece kullanıcı kontrolünde.</li>
-              <li><strong>Ödeme kayıtları:</strong> Türkiye Vergi Kanunu uyarınca <strong>10 yıl</strong> (Polar Software / Stripe tarafından).</li>
+              <li><strong>Ödeme kayıtları:</strong> Geçerli vergi mevzuatı uyarınca <strong>10 yıl</strong>'a kadar (Polar Software / Stripe tarafından).</li>
               <li><strong>Sunucu logları:</strong> 30 gün.</li>
             </ul>
 
