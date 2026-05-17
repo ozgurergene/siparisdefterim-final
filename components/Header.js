@@ -81,14 +81,16 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
   return (
     <div className="sd-header" style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 30px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'relative' }}>
       
-      {/* === YENI: Sadece tablet (768-1023px) icin Tasarim 3 override === */}
+      {/* === YENI: Tablet ve awkward viewport'lar (768-1279px) icin Tasarim 3 override === */}
+      {/* DEGISIKLIK: max-width 1023px -> 1279px. iPad Pro (1024) ve 1100-1279px laptop pencereleri */}
+      {/* artik kompakt tablet modunu kullanir (avatar gosterilir, email/cikis popup'a tasinir). */}
       <style jsx>{`
         /* Avatar varsayilan: gizli (web ve mobile'da gorunmesin) */
         .sd-header-avatar {
           display: none;
         }
         
-        @media (min-width: 768px) and (max-width: 1023px) {
+        @media (min-width: 768px) and (max-width: 1279px) {
           .sd-header {
             padding: 10px 16px !important;
           }
