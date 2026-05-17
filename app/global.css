@@ -61,3 +61,27 @@ html[data-theme="dark"] body {
 body {
   min-height: 100vh;
 }
+
+/* ============================================================ */
+/* OVERFLOW FIX — Geniş ekranlarda (1280px gibi) sayfa kayması  */
+/* ============================================================ */
+/*
+ * Sorun: Bazı viewport'larda (örn: Nest Hub Max 1280x800) sayfa
+ *        sağa-sola kayıyor, başlıklar/email'ler kenarlardan taşıyor.
+ * Sebep: Bir alt component fazla genişlikte (büyük olasılıkla
+ *        hardcoded width veya hesap yanlışlığı). Bu CSS taşmayı
+ *        kapatır — gerçek sebebi ileride bulup düzeltebiliriz,
+ *        ama bu hızlı bir güvenlik ağı.
+ *
+ * NE YAPAR?
+ *   - max-width: 100vw  → hiçbir şey viewport genişliğinden
+ *                         daha geniş olamaz
+ *   - overflow-x: hidden → yatay scroll çubuğu görünmez
+ *   - position: relative → fixed/absolute child'lar bozulmasın
+ */
+html,
+body {
+  max-width: 100vw;
+  overflow-x: hidden;
+  position: relative;
+}
