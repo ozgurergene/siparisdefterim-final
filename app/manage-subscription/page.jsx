@@ -6,11 +6,10 @@ import { supabase } from '../../lib/supabase'
 import { colors } from '../../lib/theme'
 import Footer from '../../components/Footer'
 
-// NOT: Polar.sh Customer Portal su an aktif degil.
-// Ileride self-service iptal/fatura goruntuleme istenirse:
-// app/api/customer-portal/polar/route.js endpoint'i acilip
-// polar.customerSessions.create({ customerId }) ile session olusturulabilir.
-// Su anda iptal email ile destek@deftertut.com uzerinden yapiliyor.
+// NOT: Polar.sh Customer Portal aktif. Musteri "Aboneligi Yonet" butonu ile
+// https://polar.sh/deftertut/portal adresine yonlendirilir; orada email + OTP
+// ile giris yapip iptal/odeme/fatura islemlerini kendisi yapar.
+// Webhook tarafi (subscription.canceled, order.refunded) zaten DB'yi senkronize ediyor.
 
 export default function ManageSubscriptionPage() {
   const router = useRouter()
@@ -51,13 +50,9 @@ export default function ManageSubscriptionPage() {
     checkUser()
   }, [router])
 
-  // === Email ile iptal talebi - mailto link ===
-  const handleEmailCancellation = () => {
-    const subject = encodeURIComponent('Pro Üyelik İptal Talebi')
-    const body = encodeURIComponent(
-      `Merhaba,\n\nPro üyeliğimi iptal etmek istiyorum.\n\nHesap E-posta: ${user?.email || '(otomatik doldurulamadi)'}\n\nTeşekkürler.`
-    )
-    window.location.href = `mailto:destek@deftertut.com?subject=${subject}&body=${body}`
+  // === Polar Customer Portal'a yonlendir (yeni sekmede) ===
+  const handleManagePortal = () => {
+    window.open('https://polar.sh/deftertut/portal', '_blank', 'noopener,noreferrer')
   }
 
   if (loading) {
@@ -157,7 +152,7 @@ export default function ManageSubscriptionPage() {
           </p>
         </div>
 
-        {/* Pro Kullanicilar Icin - Email ile Iptal */}
+        {/* Pro Kullanicilar Icin - Polar Customer Portal */}
         {isPro && (
           <div style={{
             background: c.header,
@@ -167,11 +162,11 @@ export default function ManageSubscriptionPage() {
             marginBottom: '20px'
           }}>
             <h3 style={{ fontSize: '18px', marginTop: 0, marginBottom: '12px', color: c.text }}>
-              📧 Aboneliği İptal Et
+              ⚙️ Aboneliği İptal Et
             </h3>
             <p style={{ color: c.text, fontSize: '14px', lineHeight: '1.7', marginBottom: '16px' }}>
-              Pro aboneliğinizi iptal etmek için aşağıdaki butona tıklayarak destek ekibimize e-posta gönderebilirsiniz.
-              Talebiniz 1-2 iş günü içinde işleme alınır.
+              Pro aboneliğinizi iptal etmek, ödeme yönteminizi güncellemek veya faturalarınızı indirmek için
+              Polar Customer Portal'ı kullanabilirsiniz. İşlemlerinizi anında ve kendiniz yapabilirsiniz.
             </p>
 
             {/* İade Politikası Notu */}
@@ -190,7 +185,7 @@ export default function ManageSubscriptionPage() {
             </div>
 
             <button
-              onClick={handleEmailCancellation}
+              onClick={handleManagePortal}
               style={{
                 display: 'inline-flex',
                 alignItems: 'center',
@@ -206,13 +201,20 @@ export default function ManageSubscriptionPage() {
                 boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
               }}
             >
-              📧 İptal Talebi Gönder
+              ⚙️ Aboneliği Yönet
             </button>
 
-            <p style={{ color: c.textSecondary, fontSize: '12px', marginTop: '12px', marginBottom: 0 }}>
-              💡 Butona tıkladığınızda e-posta uygulamanız otomatik olarak açılır.
-              Açılmazsa <a href="mailto:destek@deftertut.com" style={{ color: '#667eea', fontWeight: '600' }}>destek@deftertut.com</a> adresine
-              direkt yazabilirsiniz.
+            <p style={{ color: c.textSecondary, fontSize: '12px', marginTop: '12px', marginBottom: 0, lineHeight: '1.6' }}>
+              💡 Butona tıkladığınızda <strong>Polar Customer Portal</strong> yeni sekmede açılır. Burada aboneliğinizi
+              iptal edebilir, ödeme yönteminizi güncelleyebilir ve faturalarınızı indirebilirsiniz.
+              <br /><br />
+              <strong>Giriş Nasıl Yapılır:</strong> Polar size e-posta adresinize bir doğrulama kodu (OTP) gönderir.
+              Bu kodu portal sayfasına yazarak giriş yapabilirsiniz.
+              <br /><br />
+              <strong>Dikkat:</strong> Doğrulama kodu birkaç dakika içinde gelmezse <strong>Spam / Gereksiz</strong> klasörünüzü
+              kontrol edin. Polar'a kayıtlı e-posta adresinizi (ödeme sırasında kullandığınız adres) kullanmanız
+              gerekir; e-posta adresinizi değiştirdiyseniz veya farklı bir adresle ödeme yaptıysanız doğru adresi
+              kullandığınızdan emin olun.
             </p>
           </div>
         )}
