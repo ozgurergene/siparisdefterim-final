@@ -43,11 +43,11 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
   const c = colors[theme]
   const router = useRouter()
   const pathname = usePathname()
-  
-  // === YENI: Tablet icin ProfilePopup state ===
+
+  // ProfilePopup state (tablet + web ortak)
   const [showProfilePopup, setShowProfilePopup] = useState(false)
 
-  // Yeni Pro tab'ları (renk + path tanımları)
+  // Pro tab'lari (renk + path tanimlari)
   const proTabs = [
     {
       path: '/customers',
@@ -80,17 +80,17 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
 
   return (
     <div className="sd-header" style={{ background: c.header, borderBottom: `1px solid ${c.border}`, padding: '15px 30px', boxShadow: '0 2px 8px rgba(0,0,0,0.05)', position: 'relative' }}>
-      
-      {/* === YENI: Tablet ve awkward viewport'lar (768-1281px) icin Tasarim 3 override === */}
-      {/* DEGISIKLIK: max-width 1023px -> 1281px. iPad Pro (1024) ve 1100-1281px laptop pencereleri */}
-      {/* artik kompakt tablet modunu kullanir (avatar gosterilir, email/cikis popup'a tasinir). */}
+
+      {/* === Tablet + Web ortak kompakt gorunum (768px ve uzeri) === */}
+      {/* < 768px: Mobile component devreye giriyor (bu Header gorunmuyor)  */}
+      {/* >= 768px: Avatar gosterilir, email/tema/cikis ProfilePopup'a tasinir */}
       <style jsx>{`
-        /* Avatar varsayilan: gizli (web ve mobile'da gorunmesin) */
+        /* Avatar varsayilan: gizli (mobile'da gorunmesin) */
         .sd-header-avatar {
           display: none;
         }
-        
-        @media (min-width: 768px) and (max-width: 1281px) {
+
+        @media (min-width: 768px) {
           .sd-header {
             padding: 10px 16px !important;
           }
@@ -111,10 +111,11 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             flex-direction: column !important;
             align-items: center !important;
             gap: 2px !important;
-            padding: 6px 8px !important;
-            font-size: 9px !important;
-            min-width: 56px !important;
+            padding: 6px 12px !important;
+            font-size: 10px !important;
+            min-width: 70px !important;
             line-height: 1.1 !important;
+          }
           }
           .sd-nav-icon {
             font-size: 18px !important;
@@ -152,8 +153,8 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           .sd-header-pro-cta > span {
             font-size: 13px !important;
           }
-          
-          /* Tablette gizle: email, tema, cikis (popup'a tasindi) */
+
+          /* 768px+ tum cihazlarda gizle: email, tema, cikis (popup'a tasindi) */
           .sd-header-email {
             display: none !important;
           }
@@ -163,14 +164,14 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
           .sd-header-logout {
             display: none !important;
           }
-          
-          /* Tablette goster: avatar */
+
+          /* 768px+ tum cihazlarda goster: avatar */
           .sd-header-avatar {
             display: flex !important;
           }
         }
       `}</style>
-      
+
       <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'nowrap', gap: '10px' }}>
 
         {/* Logo + Home Icon */}
@@ -204,7 +205,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
 
           {/* Logo with gradient text */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <span className="sd-header-logo-emoji" style={{ fontSize: '20px' }}>📱</span>
+            <span className="sd-header-logo-emoji" style={{ fontSize: '20px' }}></span>
             <h1
               className="sd-header-logo-text"
               onClick={() => router.push('/home')}
@@ -438,7 +439,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             </button>
           )}
 
-          {/* Email — Tıklanabilir, /manage-subscription'a gider */}
+          {/* Email — Tıklanabilir, /manage-subscription'a gider (sadece <768px'de gorunur) */}
           {user?.email && (
             <a
               className="sd-header-email"
@@ -470,7 +471,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             </a>
           )}
 
-          {/* Theme Toggle Button */}
+          {/* Theme Toggle Button (sadece <768px'de gorunur) */}
           <button
             className="sd-header-theme"
             onClick={toggleTheme}
@@ -495,7 +496,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             {theme === 'light' ? '🌙' : '☀️'}
           </button>
 
-          {/* Logout Button */}
+          {/* Logout Button (sadece <768px'de gorunur) */}
           <button
             className="sd-header-logout"
             onClick={handleLogout}
@@ -521,7 +522,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             Çıkış
           </button>
 
-          {/* === YENI: Tablet icin Avatar Button (sadece tablette gorunur) === */}
+          {/* Avatar Button (768px ve uzeri tum cihazlarda gorunur) */}
           {user?.email && (
             <div
               className="sd-header-avatar"
@@ -529,6 +530,8 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
               style={{
                 width: '38px',
                 height: '38px',
+                minWidth: '38px',
+                minHeight: '38px',
                 borderRadius: '50%',
                 background: getAvatarGradient(user.email),
                 alignItems: 'center',
@@ -546,7 +549,7 @@ export default function Header({ user, ordersCreatedCount = 0, isPro = false, th
             </div>
           )}
 
-          {/* === YENI: ProfilePopup (sadece tablet'te kullanilir) === */}
+          {/* ProfilePopup (768px+ avatar tiklayinca acilir) */}
           <ProfilePopup
             user={user}
             isOpen={showProfilePopup}
