@@ -1,7 +1,7 @@
-# robots.txt — deftertut.com
+﻿# robots.txt â€” deftertut.com
 # ============================================================
-# Arama motorları için crawl politikası.
-# Public pazarlama sayfaları indekslenir, API ve auth-protected
+# Arama motorlarÄ± iÃ§in crawl politikasÄ±.
+# Public pazarlama sayfalarÄ± indekslenir, API ve auth-protected
 # sayfalar engellenir.
 # ============================================================
 
@@ -10,20 +10,20 @@ User-agent: *
 # Public sayfalara izin var:
 #   /                       (landing)
 #   /pricing                (fiyat)
-#   /login                  (giriş — SEO'da görünsün, kullanıcı bulabilsin)
-#   /signup                 (kayıt)
+#   /login                  (giriÅŸ â€” SEO'da gÃ¶rÃ¼nsÃ¼n, kullanÄ±cÄ± bulabilsin)
+#   /signup                 (kayÄ±t)
 #   /privacy-policy         (gizlilik)
-#   /terms-of-use           (kullanım koşulları)
-#   /refund-policy          (iade politikası)
-#   /distance-sales         (mesafeli satış)
-#   /reset-password         (şifre sıfırlama landing)
-#   /manage-subscription    (abonelik yönetimi)
+#   /terms-of-use           (kullanÄ±m koÅŸullarÄ±)
+#   /refund-policy          (iade politikasÄ±)
+#   /distance-sales         (mesafeli satÄ±ÅŸ)
+#   /reset-password         (ÅŸifre sÄ±fÄ±rlama landing)
+#   /manage-subscription    (abonelik yÃ¶netimi)
 
-# API endpoint'leri — crawler'ın bunlara bakmasına gerek yok
+# API endpoint'leri â€” crawler'Ä±n bunlara bakmasÄ±na gerek yok
 Disallow: /api/
 
-# Authenticated user routes — bu sayfalar zaten login zorunlu,
-# crawler'ı index'leme stresine sokmayalım
+# Authenticated user routes â€” bu sayfalar zaten login zorunlu,
+# crawler'Ä± index'leme stresine sokmayalÄ±m
 Disallow: /home
 Disallow: /dashboard
 Disallow: /completed
@@ -36,5 +36,5 @@ Disallow: /legal-confirm
 Disallow: /_next/
 Disallow: /_vercel/
 
-# Sitemap (ileride oluşturursan):
-# Sitemap: https://deftertut.com/sitemap.xml
+# Sitemap (ileride oluÅŸturursan):
+Sitemap: https://deftertut.com/sitemap.xml
