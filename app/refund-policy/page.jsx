@@ -8,13 +8,13 @@ import Footer from '../../components/Footer'
 
 export default function RefundPolicyPage() {
   const router = useRouter()
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [user, setUser] = useState(null)
 
   const c = colors[theme]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
 
     const checkUser = async () => {

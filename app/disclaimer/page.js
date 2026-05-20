@@ -4,11 +4,11 @@ import { useEffect, useState } from 'react'
 import { colors } from '../../lib/theme'
 
 export default function Disclaimer() {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const c = colors[theme]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
   }, [])
 

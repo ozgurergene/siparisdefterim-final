@@ -21,10 +21,10 @@ export default function RootLayout({ children }) {
             __html: `
               (function() {
                 try {
-                  var t = localStorage.getItem('siparisdefterim-theme') || 'light';
+                  var t = localStorage.getItem('siparisdefterim-theme') || 'dark';
                   document.documentElement.setAttribute('data-theme', t);
                 } catch (e) {
-                  document.documentElement.setAttribute('data-theme', 'light');
+                  document.documentElement.setAttribute('data-theme', 'dark');
                 }
               })();
             `,

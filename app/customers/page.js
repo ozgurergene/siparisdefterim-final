@@ -35,7 +35,7 @@ export default function CustomersPage() {
   const [isPro, setIsPro] = useState(false)
   const [loading, setLoading] = useState(true)
   const [customers, setCustomers] = useState([])
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [search, setSearch] = useState('')
   const [sortBy, setSortBy] = useState('last_order')
   const [isMobile, setIsMobile] = useState(false)

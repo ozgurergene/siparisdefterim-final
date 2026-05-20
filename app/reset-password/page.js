@@ -10,7 +10,7 @@ export default function ResetPassword() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [message, setMessage] = useState('')
   const [loading, setLoading] = useState(false)
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
 
   const supabase = createClientComponentClient({
     supabaseUrl: process.env.NEXT_PUBLIC_SUPABASE_URL,
@@ -41,7 +41,7 @@ export default function ResetPassword() {
   const c = colors[theme]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
   }, [])
 

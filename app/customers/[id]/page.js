@@ -56,7 +56,7 @@ export default function CustomerDetailPage() {
   const [loading, setLoading] = useState(true)
   const [customer, setCustomer] = useState(null)
   const [orders, setOrders] = useState([])
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [isMobile, setIsMobile] = useState(false)
   const [editing, setEditing] = useState(false)
   const [editData, setEditData] = useState({})

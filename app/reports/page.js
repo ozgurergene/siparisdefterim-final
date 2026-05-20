@@ -58,7 +58,7 @@ export default function ReportsPage() {
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([])
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [period, setPeriod] = useState('month')
   const [isMobile, setIsMobile] = useState(false)
   const [showUpgradeModal, setShowUpgradeModal] = useState(false)

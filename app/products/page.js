@@ -36,7 +36,7 @@ export default function ProductsPage() {
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [products, setProducts] = useState([])
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [search, setSearch] = useState('')
   const [filterCategory, setFilterCategory] = useState('all')
   const [isMobile, setIsMobile] = useState(false)

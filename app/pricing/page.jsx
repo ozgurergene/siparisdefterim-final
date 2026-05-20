@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { Suspense, useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
@@ -52,7 +52,7 @@ function PricingContent() {
   const router = useRouter()
   const [user, setUser] = useState(null)
   const [loading, setLoading] = useState(true)
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [isPro, setIsPro] = useState(false)
   const [openFaq, setOpenFaq] = useState(null)
   const [isMobile, setIsMobile] = useState(false)
@@ -70,7 +70,7 @@ function PricingContent() {
   }, [])
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
   }, [])
 

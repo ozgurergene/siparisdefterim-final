@@ -8,13 +8,13 @@ import Footer from '../../components/Footer'
 
 export default function TermsOfUse() {
   const router = useRouter()
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [mounted, setMounted] = useState(false)
   const [user, setUser] = useState(null)
   const c = colors[theme]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
     setMounted(true)
 
@@ -35,7 +35,7 @@ export default function TermsOfUse() {
   // Sifir flash icin: mounted olana kadar localStorage'dan okunan tema ile placeholder
   if (!mounted) {
     const earlyTheme = typeof window !== 'undefined'
-      ? (localStorage.getItem('siparisdefterim-theme') || 'light')
+      ? (localStorage.getItem('siparisdefterim-theme') || 'dark')
       : 'light'
     return (
       <div style={{

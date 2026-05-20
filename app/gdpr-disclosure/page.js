@@ -10,13 +10,13 @@ export default function GDPRDisclosure() {
   const router = useRouter()
   const [theme, setTheme] = useState(() => {
     if (typeof window === 'undefined') return 'light'
-    return localStorage.getItem('siparisdefterim-theme') || 'light'
+    return localStorage.getItem('siparisdefterim-theme') || 'dark'
   })
   const [user, setUser] = useState(null)
   const c = colors[theme]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
 
     const checkUser = async () => {

@@ -1467,7 +1467,7 @@ function DashboardContent() {
   const [loading, setLoading] = useState(true)
   const [orders, setOrders] = useState([])
   const [filteredOrders, setFilteredOrders] = useState([])
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [isPro, setIsPro] = useState(false)
   const [userProducts, setUserProducts] = useState([])
@@ -1560,7 +1560,7 @@ function DashboardContent() {
   }, [])
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
   }, [])
 

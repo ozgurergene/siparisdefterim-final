@@ -7,11 +7,11 @@ import { colors } from '../../lib/theme'
 
 function SuccessContent() {
   const router = useRouter()
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const c = colors[theme]
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
   }, [])
 

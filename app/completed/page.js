@@ -609,7 +609,7 @@ export default function CompletedPage() {
   const [loading, setLoading] = useState(true)
   const [completedOrders, setCompletedOrders] = useState([])
   const [filteredOrders, setFilteredOrders] = useState([])
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [searchName, setSearchName] = useState('')
   const [searchPhone, setSearchPhone] = useState('')
   const [searchProduct, setSearchProduct] = useState('')
@@ -651,7 +651,7 @@ export default function CompletedPage() {
   }, [])
 
   useEffect(() => {
-    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'light'
+    const savedTheme = localStorage.getItem('siparisdefterim-theme') || 'dark'
     setTheme(savedTheme)
   }, [])
 
