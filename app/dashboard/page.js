@@ -1919,12 +1919,36 @@ function DashboardContent() {
 
   const cancelEdit = () => { setEditingId(null); setEditingData(null) }
 
-  // === GUNCEL: WhatsApp mesajına sipariş no eklendi ===
+  // === GUNCEL: Durum bazli WhatsApp mesaji (kargo takip no dahil) ===
   const handleWhatsApp = (order) => {
     const phone = order.customer_phone.startsWith('0') ? order.customer_phone.slice(1) : order.customer_phone
     const orderNo = order.id ? order.id.slice(0, 8) : ''
     const orderNoPrefix = orderNo ? `#${orderNo} numaralı ` : ''
-    const message = `Merhaba ${order.customer_name}, ${orderNoPrefix}siparişiniz hakkında bilgi vermek istiyorum.`
+    const ad = order.customer_name || ''
+
+let message
+    switch (order.status) {
+      case 'payment_pending':
+        message = `Merhaba ${ad}, ${orderNoPrefix}siparişinizi aldık! Siparişinizi hazırlayabilmemiz için ödemenizi bekliyoruz. Herhangi bir sorunuz olursa bize yazabilirsiniz.`
+        break
+      case 'paid':
+        message = `Merhaba ${ad}, ${orderNoPrefix}ödemenizi aldık, çok teşekkür ederiz! Siparişiniz en kısa sürede hazırlanıp kargoya verilecek.`
+        break
+      case 'preparing':
+        message = `Merhaba ${ad}, ${orderNoPrefix}siparişiniz şu anda hazırlanıyor. En kısa sürede kargoya verip sizi bilgilendireceğiz.`
+        break
+      case 'shipped': {
+        const kargo = order.cargo_company ? ` ${order.cargo_company} ile` : ''
+        const takip = order.tracking_number ? ` Takip numaranız: ${order.tracking_number}.` : ''
+        message = `Merhaba ${ad}, ${orderNoPrefix}siparişiniz${kargo} kargoya verildi.${takip} Bizi tercih ettiğiniz için teşekkürler!`
+        break
+      }
+      case 'completed':
+        message = `Merhaba ${ad}, ${orderNoPrefix}siparişiniz elinize ulaştı mı, memnun kaldınız mı? Bizi tercih ettiğiniz için teşekkür ederiz, tekrar bekleriz.`
+        break
+      default:
+        message = `Merhaba ${ad}, ${orderNoPrefix}siparişiniz hakkında bilgi vermek istiyorum.`
+    }
     window.open(`https://wa.me/90${phone}?text=${encodeURIComponent(message)}`, '_blank')
   }
 

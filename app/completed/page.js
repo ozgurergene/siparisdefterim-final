@@ -910,8 +910,8 @@ export default function CompletedPage() {
       return
     }
  
-    // === MOBILE: Burada modal aç ===
-    setNewOrder({
+    // === MOBILE: sessionStorage + dashboard'a yönlendir (dashboard'ın tam formu açılsın) ===
+    const repeatData = {
       customer_name: order.customer_name || '',
       customer_phone: order.customer_phone || '',
       customer_address: order.customer_address || '',
@@ -919,9 +919,9 @@ export default function CompletedPage() {
       customer_district: order.customer_district || '',
       products: products.length > 0 ? products : [{ product: '', quantity: 1, unit_price: '', kdv_rate: '' }],
       note: order.note || ''
-    })
- 
-    setShowAddModal(true)
+    }
+    sessionStorage.setItem('repeat_order_data', JSON.stringify(repeatData))
+    router.push('/dashboard?repeat=1')
   }
   
   const totalCompleted = completedOrders.length
@@ -1152,7 +1152,7 @@ export default function CompletedPage() {
         <BottomTabBar
           activeTab="completed"
           onTabChange={handleTabChange}
-          onAddClick={() => setShowAddModal(true)}
+          onAddClick={() => router.push('/dashboard?add=1')}
           onLockedClick={() => setShowUpgradeModal(true)}
           isDark={isDark}
               isPro={isPro}
