@@ -237,9 +237,12 @@ export default function CustomerDetailPage() {
       alert('Bu müşterinin telefon numarası kayıtlı değil')
       return
     }
-    const phone = customer.phone.replace(/\D/g, '')
-    const msg = `Merhaba ${customer.name?.split(' ')[0] || ''}, `
-    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank')
+    let phone = customer.phone.replace(/\D/g, '')
+    if (phone.startsWith('0')) phone = phone.slice(1)
+    if (!phone.startsWith('90')) phone = '90' + phone
+    const ad = customer.name?.split(' ')[0] || ''
+    const msg = `Merhaba ${ad}, aldığınız üründen memnun kaldınız mı? Görüş ve önerileriniz bizim için çok değerli. Bizi tercih ettiğiniz için teşekkür ederiz, tekrar bekleriz!`
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank') 
   }
 
   const handleCall = () => {
@@ -247,7 +250,10 @@ export default function CustomerDetailPage() {
       alert('Bu müşterinin telefon numarası kayıtlı değil')
       return
     }
-    window.location.href = `tel:${customer.phone}`
+    let phone = customer.phone.replace(/\D/g, '')
+    if (phone.startsWith('0')) phone = phone.slice(1)
+    if (!phone.startsWith('90')) phone = '90' + phone
+    window.location.href = `tel:+${phone}`
   }
 
   const formatDate = (dateStr) => {
