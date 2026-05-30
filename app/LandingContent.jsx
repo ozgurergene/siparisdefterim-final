@@ -189,8 +189,8 @@ export default function LandingContent() {
               Fiyatları Gör
             </a>
           </div>
-          <p style={{ fontSize: '13px', color: c.textMuted, marginTop: '18px' }}>
-            Kredi kartı gerekmez · 50 sipariş ücretsiz
+          <p style={{ fontSize: '18px', color: c.textMuted, marginTop: '18px' }}>
+            Kayıt için kredi kartı gerekmez · İlk 50 sipariş ücretsiz
           </p>
         </section>
 
@@ -437,7 +437,7 @@ export default function LandingContent() {
             color: c.textMuted,
           }}
         >
-          <span>© {new Date().getFullYear()} SiparişDefterim</span>
+          <span>© {new Date().getFullYear()} Deftertut.com</span>
           <div style={{ display: 'flex', gap: '18px', flexWrap: 'wrap' }}>
             <a href="/privacy-policy" style={{ color: c.textMuted, textDecoration: 'none' }}>Gizlilik</a>
             <a href="/terms-of-use" style={{ color: c.textMuted, textDecoration: 'none' }}>Kullanım Koşulları</a>
