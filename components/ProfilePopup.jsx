@@ -113,6 +113,11 @@ export default function ProfilePopup({ user, isOpen, onClose, onLogout, ordersCr
             </div>
           </div>
 
+          <a href="/settings" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', textDecoration: 'none' }}>
+            <span style={{ fontSize: '16px' }}>🏪</span>
+            <span style={{ color: isDark ? '#e2e8f0' : '#1a1a2e', fontSize: '13px' }}>İşletme Bilgilerim</span>
+          </a>
+
           {isPro && (
             <a href="/manage-subscription" style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '10px 12px', borderRadius: '8px', cursor: 'pointer', textDecoration: 'none' }}>
               <span style={{ fontSize: '16px' }}>💳</span>

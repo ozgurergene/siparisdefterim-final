@@ -563,6 +563,21 @@ export default function HomePage() {
       router.replace('/login')
       return
     }
+
+    // === YENI: Isletme adi bos ve kullanici atlamadiysa onboarding'e yonlendir ===
+    const skipped = typeof window !== 'undefined' && localStorage.getItem('onboarding_skipped') === 'true'
+    if (!skipped) {
+      const { data: bizData } = await supabase
+        .from('users')
+        .select('business_name')
+        .eq('id', session.user.id)
+        .single()
+      if (!bizData?.business_name || !bizData.business_name.trim()) {
+        router.replace('/settings?onboarding=1')
+        return
+      }
+    }
+
     setUser(session.user)
     await fetchStats(session.user.id)
     setLoading(false)

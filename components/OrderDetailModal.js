@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { colors } from '../lib/theme'
+import { generateOrderPdf } from '../lib/orderPdf'
 
 // Status etiketleri ve renkleri
 const statusLabels = {
@@ -31,7 +32,7 @@ function formatMoney(n) {
   return parseFloat(n || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 }
 
-export default function OrderDetailModal({ order, isOpen, onClose, onRepeat, theme = 'light' }) {
+export default function OrderDetailModal({ order, isOpen, onClose, onRepeat, theme = 'dark', businessInfo = {} }) {
   const c = colors[theme]
   const isDark = theme === 'dark'
   const [copied, setCopied] = useState(false)
@@ -84,6 +85,7 @@ export default function OrderDetailModal({ order, isOpen, onClose, onRepeat, the
   }
 
   const handlePdfDownload = () => {
+    generateOrderPdf(order, businessInfo)
     setPdfToast(true)
     setTimeout(() => setPdfToast(false), 2500)
   }
@@ -496,7 +498,7 @@ export default function OrderDetailModal({ order, isOpen, onClose, onRepeat, the
               fontWeight: '600',
               cursor: 'pointer'
             }}
-            title="PDF olarak indir (yakında)"
+            title="PDF olarak indir"
           >
             📄 PDF İndir
           </button>
@@ -541,7 +543,7 @@ export default function OrderDetailModal({ order, isOpen, onClose, onRepeat, the
           zIndex: 10000,
           animation: 'fadeIn 0.2s ease'
         }}>
-          📄 PDF indirme özelliği yakında gelecek!
+          📄 PDF indiriliyor...
         </div>
       )}
 

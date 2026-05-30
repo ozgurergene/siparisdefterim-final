@@ -1470,6 +1470,7 @@ function DashboardContent() {
   const [theme, setTheme] = useState('dark')
   const [ordersCreatedCount, setOrdersCreatedCount] = useState(0)
   const [isPro, setIsPro] = useState(false)
+  const [businessInfo, setBusinessInfo] = useState({ business_name: '', business_phone: '', business_instagram: '' })
   const [userProducts, setUserProducts] = useState([])
   const [isMobile, setIsMobile] = useState(false)
   const [showAddModal, setShowAddModal] = useState(false)
@@ -1687,9 +1688,14 @@ function DashboardContent() {
       const { data: ordersData } = await supabase.from('orders').select('*').eq('user_id', userId).order('created_at', { ascending: false })
       const allOrders = ordersData || []
       setOrders(allOrders.filter(o => o.status !== 'completed'))
-      const { data: freshUserData } = await supabase.from('users').select('orders_created_count, is_pro').eq('id', userId).single()
+      const { data: freshUserData } = await supabase.from('users').select('orders_created_count, is_pro, business_name, business_phone, business_instagram').eq('id', userId).single()
       setOrdersCreatedCount(freshUserData?.orders_created_count || 0)
       setIsPro(freshUserData?.is_pro || false)
+      setBusinessInfo({
+        business_name: freshUserData?.business_name || '',
+        business_phone: freshUserData?.business_phone || '',
+        business_instagram: freshUserData?.business_instagram || ''
+      })
 
       // Pro kullanicilar icin kayitli urunleri yukle (otomatik tanima)
       if (freshUserData?.is_pro === true) {
@@ -1949,8 +1955,17 @@ let message
       default:
         message = `Merhaba ${ad}, ${orderNoPrefix}siparişiniz hakkında bilgi vermek istiyorum.`
     }
+        // === YENI: Isletme imzasi (varsa) ===
+    if (businessInfo.business_name && businessInfo.business_name.trim()) {
+      message += `\n\n— ${businessInfo.business_name.trim()}`
+      if (businessInfo.business_instagram && businessInfo.business_instagram.trim()) {
+        message += `\ninstagram.com/${businessInfo.business_instagram.trim()}`
+      }
+    }
+
     window.open(`https://wa.me/90${phone}?text=${encodeURIComponent(message)}`, '_blank')
   }
+
 
   const handleTabChange = (tabId) => {
     setActiveTab(tabId)
@@ -2245,6 +2260,7 @@ let message
           isOpen={detailOrder !== null}
           onClose={() => setDetailOrder(null)}
           theme={theme}
+          businessInfo={businessInfo}
         />
 
         <SuccessToast show={showSuccessToast} message="Sipariş başarıyla oluşturuldu!" />

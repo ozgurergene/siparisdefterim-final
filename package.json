@@ -11,6 +11,8 @@
     "@polar-sh/sdk": "^0.47.1",
     "@supabase/auth-helpers-nextjs": "^0.7.4",
     "@supabase/supabase-js": "^2.38.0",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
     "next": "^14.0.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",

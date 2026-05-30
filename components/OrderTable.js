@@ -60,8 +60,8 @@ Bizi tercih ettiğiniz için teşekkürler!`,
       
       shipped: `Merhaba ${name},
 
-Harika haber! ${orderNoPrefix}siparişiniz kargoya verildi!
-
+Harika haber! ${orderNoPrefix}siparişiniz${order.cargo_company ? ` ${order.cargo_company} ile` : ''} kargoya verildi!
+${order.tracking_number ? `\nTakip Numaranız: ${order.tracking_number}\n` : ''}
 Paketiniz yolda, çok yakında elinizde olacak.
 
 Kargo ile ilgili sorularınız için bize ulaşabilirsiniz. İyi günler!`,
