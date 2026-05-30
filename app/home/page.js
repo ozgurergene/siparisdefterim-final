@@ -1009,7 +1009,7 @@ export default function HomePage() {
             <a href="/refund-policy" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>İade Politikası</a>
             <a href="/privacy-policy" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>Gizlilik Politikası</a>
             <a href="/terms-of-use" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>Kullanım Koşulları</a>
-            <a href="/gdpr-disclosure" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>KVKK Aydınlatma</a>
+            <a href="/gdpr-disclosure" style={{ color: c.textSecondary, fontSize: '11px', textDecoration: 'none' }}>KVKK Aydınlatma Metni</a>
           </div>
           <p style={{ color: '#4a5568', fontSize: '10px', margin: 0 }}>
             © 2026 Deftertut.com - Tüm hakları saklıdır.

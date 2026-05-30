@@ -216,7 +216,7 @@ export default function LoginPage() {
               <input type="checkbox" checked={agreedToTerms} onChange={(e) => setAgreedToTerms(e.target.checked)}
                 style={{ width: 18, height: 18, marginTop: 2, accentColor: '#667eea' }} />
               <span style={{ fontSize: 13, color: '#94a3b8', lineHeight: 1.6 }}>
-                <a href="/gdpr-disclosure" target="_blank" style={linkStyle}>KVKK Aydınlatma</a>,{' '}
+                <a href="/gdpr-disclosure" target="_blank" style={linkStyle}>KVKK Aydınlatma Metni</a>,{' '}
                 <a href="/terms-of-use" target="_blank" style={linkStyle}>Kullanım Koşulları</a>,{' '}
                 <a href="/privacy-policy" target="_blank" style={linkStyle}>Gizlilik Politikası</a>,{' '}
                 <a href="/consent" target="_blank" style={linkStyle}>Açık Rıza</a> ve{' '}

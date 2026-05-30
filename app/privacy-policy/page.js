@@ -8,10 +8,7 @@ import Footer from '../../components/Footer'
 
 export default function PrivacyPolicy() {
   const router = useRouter()
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'light'
-    return localStorage.getItem('siparisdefterim-theme') || 'dark'
-  })
+  const [theme, setTheme] = useState('dark')
   const [user, setUser] = useState(null)
   const c = colors[theme]
 
@@ -97,7 +94,7 @@ export default function PrivacyPolicy() {
             {/* 1. Veri Sorumlusu */}
             <h2 style={{ marginTop: '20px', marginBottom: '15px', fontSize: '20px' }}>1. Veri Sorumlusu</h2>
             <p>
-              SiparişDefterim (deftertut.com) hizmetinin işletmecisi sıfatıyla kişisel verilerinizin işlenmesinden sorumludur.
+              Deftertut (deftertut.com), SiparişDefterim hizmetinin işletmecisi sıfatıyla kişisel verilerinizin işlenmesinden sorumludur.
               Tüm soru, talep ve şikayetlerinizi <a href="mailto:destek@deftertut.com" style={{ color: '#a78bfa' }}>destek@deftertut.com</a> adresine
               iletebilirsiniz.
             </p>

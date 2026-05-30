@@ -8,10 +8,7 @@ import Footer from '../../components/Footer'
 
 export default function GDPRDisclosure() {
   const router = useRouter()
-  const [theme, setTheme] = useState(() => {
-    if (typeof window === 'undefined') return 'light'
-    return localStorage.getItem('siparisdefterim-theme') || 'dark'
-  })
+  const [theme, setTheme] = useState('dark')
   const [user, setUser] = useState(null)
   const c = colors[theme]
 
@@ -91,7 +88,7 @@ export default function GDPRDisclosure() {
           <h1 style={{ color: c.text, marginBottom: '30px', fontSize: '28px' }}>KVKK Aydınlatma Metni</h1>
 
           <div style={{ color: c.text, lineHeight: '1.8', fontSize: '15px' }}>
-            <p><strong>Veri Sorumlusu:</strong> SiparişDefterim (deftertut.com)</p>
+            <p><strong>Veri Sorumlusu:</strong> Deftertut (deftertut.com)</p>
 
             <h2 style={{ marginTop: '30px', marginBottom: '15px', fontSize: '20px' }}>İşlenen Kişisel Veriler</h2>
             <ul style={{ paddingLeft: '20px' }}>
