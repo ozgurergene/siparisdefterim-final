@@ -194,6 +194,72 @@ export default function LandingContent() {
           </p>
         </section>
 
+        {/* ÜRÜN GÖRSELİ — hero shot (responsive) */}
+        <section style={{
+          padding: isMobile ? '0 0 30px' : '0 0 50px',
+          width: isMobile ? '100%' : '92vw',
+          position: isMobile ? 'static' : 'relative',
+          left: isMobile ? 'auto' : '50%',
+          transform: isMobile ? 'none' : 'translateX(-50%)',
+        }}>
+          {isMobile ? (
+            /* MOBİL: dik telefon görseli, tarayıcı çubuğu yok */
+            <div
+              style={{
+                maxWidth: '320px',
+                margin: '0 auto',
+                borderRadius: '24px',
+                overflow: 'hidden',
+                border: '1px solid rgba(102, 126, 234, 0.3)',
+                boxShadow: '0 16px 40px rgba(102, 126, 234, 0.3), 0 6px 18px rgba(0,0,0,0.4)',
+              }}
+            >
+              <img
+                src="/dashboard-mobile.png"
+                alt="SiparişDefterim mobil sipariş yönetim ekranı"
+                style={{ display: 'block', width: '100%', height: 'auto' }}
+              />
+            </div>
+          ) : (
+            /* MASAÜSTÜ: geniş görsel + sahte tarayıcı çubuğu */
+            <div
+              style={{
+                maxWidth: '1400px',
+                margin: '0 auto',
+                borderRadius: '16px',
+                overflow: 'hidden',
+                border: '1px solid rgba(102, 126, 234, 0.25)',
+                boxShadow:
+                  '0 20px 60px rgba(102, 126, 234, 0.25), 0 8px 24px rgba(0,0,0,0.4)',
+                background: c.card,
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '6px',
+                  padding: '10px 14px',
+                  background: 'rgba(255,255,255,0.04)',
+                  borderBottom: `1px solid ${c.cardBorder}`,
+                }}
+              >
+                <span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#ef4444', display: 'inline-block' }} />
+                <span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#f59e0b', display: 'inline-block' }} />
+                <span style={{ width: '11px', height: '11px', borderRadius: '50%', background: '#22c55e', display: 'inline-block' }} />
+                <span style={{ marginLeft: '12px', fontSize: '12px', color: c.textMuted }}>
+                  deftertut.com/dashboard
+                </span>
+              </div>
+              <img
+                src="/dashboard-preview.png"
+                alt="SiparişDefterim sipariş yönetim paneli ekran görüntüsü"
+                style={{ display: 'block', width: '100%', height: 'auto' }}
+              />
+            </div>
+          )}
+        </section>
+
         {/* ÖZELLİKLER */}
         <section style={{ padding: isMobile ? '20px 0' : '40px 0' }}>
           <h2
