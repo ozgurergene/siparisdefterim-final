@@ -1,5 +1,6 @@
 import './global.css'
 import { Inter } from 'next/font/google'
+import VisitTracker from '../components/VisitTracker'
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -37,6 +38,7 @@ export default function RootLayout({ children }) {
         WebkitFontSmoothing: 'antialiased',
         MozOsxFontSmoothing: 'grayscale',
       }}>
+        <VisitTracker />
         {children}
       </body>
     </html>
