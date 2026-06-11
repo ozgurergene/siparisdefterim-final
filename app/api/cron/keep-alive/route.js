@@ -1,14 +1,15 @@
 import { createClient } from '@supabase/supabase-js'
 import { NextResponse } from 'next/server'
 
-// Vercel Cron secret koruması — env'de tanımlı CRON_SECRET ile eşleşmeli
-// Bu sayede sadece Vercel cron job'ı bu endpoint'i çağırabilir, dışarıdan kimse atamaz
+// Vercel Cron secret koruması — Bearer token ile CRON_SECRET eşleşmeli.
+// Her iki taraf da trim edilir: env'e veya header'a sızmış boşluk/newline 401'e yol açmasın.
 
 export async function GET(request) {
-  // Authorization header kontrolü (Vercel Cron otomatik gönderir)
-  const authHeader = request.headers.get('authorization')
-  
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const authHeader = request.headers.get('authorization') || ''
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim()
+  const secret = (process.env.CRON_SECRET || '').trim()
+
+  if (!secret || token !== secret) {
     return NextResponse.json(
       { error: 'Unauthorized' },
       { status: 401 }
@@ -16,13 +17,12 @@ export async function GET(request) {
   }
 
   try {
-    // Service role key ile Supabase'e bağlan (RLS bypass et, sadece ping için)
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL,
       process.env.SUPABASE_SERVICE_ROLE_KEY
     )
 
-    // Hafif bir SELECT — sadece 1 satır oku, Supabase aktif say
+    // Hafif SELECT — Supabase'i aktif say
     const { data, error } = await supabase
       .from('users')
       .select('id')
@@ -31,8 +31,8 @@ export async function GET(request) {
     if (error) {
       console.error('Keep-alive Supabase error:', error)
       return NextResponse.json(
-        { 
-          status: 'error', 
+        {
+          status: 'error',
           message: 'Supabase ping failed',
           error: error.message,
           timestamp: new Date().toISOString()
@@ -41,7 +41,6 @@ export async function GET(request) {
       )
     }
 
-    // Başarılı ping
     return NextResponse.json({
       status: 'ok',
       message: 'Supabase ping successful — project kept alive',
@@ -51,8 +50,8 @@ export async function GET(request) {
   } catch (err) {
     console.error('Keep-alive unexpected error:', err)
     return NextResponse.json(
-      { 
-        status: 'error', 
+      {
+        status: 'error',
         message: 'Unexpected error',
         error: err.message,
         timestamp: new Date().toISOString()
